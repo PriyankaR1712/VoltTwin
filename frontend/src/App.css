@@ -477,3 +477,30 @@ button:disabled {
     flex-direction: column;
   }
 }
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.secondary-button {
+  color: #dce7f4;
+  background: #202c3b;
+  border: 1px solid #3a4b60;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background: #29384a;
+}
+
+@media (max-width: 760px) {
+  .form-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+}

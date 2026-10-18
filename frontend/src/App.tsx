@@ -3,6 +3,7 @@ import { useState } from 'react'
 import './App.css'
 
 const API_BASE = 'http://127.0.0.1:8000'
+const SAMPLE_FEATURES_URL = '/sample_request.json'
 
 type Scenario = {
   scenario: string
@@ -43,6 +44,37 @@ function App() {
   const [result, setResult] = useState<SimulationResult | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+    
+async function loadSampleBattery() {
+  setError('')
+
+  try {
+    const response = await fetch(SAMPLE_FEATURES_URL)
+
+    if (!response.ok) {
+      throw new Error('Could not load the sample battery file.')
+    }
+
+    const sample = await response.json()
+
+    if (!Array.isArray(sample.features) || sample.features.length !== 67) {
+      throw new Error('The sample file must contain exactly 67 features.')
+    }
+
+    setFeaturesText(JSON.stringify(sample.features, null, 2))
+    setBatteryId('XJTU-Battery-1')
+    setCycleCount('389')
+    setAdditionalCycles('100')
+    setResult(null)
+  } catch (err) {
+    setError(
+      err instanceof Error
+        ? err.message
+        : 'Unable to load the sample battery.',
+    )
+  }
+}
+
 
   async function runSimulation() {
     setError('')
@@ -197,13 +229,25 @@ function App() {
           />
         </label>
 
+        
         <div className="form-footer">
           <p>Use a real dataset row. Do not include the label column.</p>
-          <button onClick={runSimulation} disabled={loading}>
-            {loading ? 'Running analysis…' : 'Run battery analysis'}
-            {!loading && <span aria-hidden="true"> ↗</span>}
-          </button>
+          <div className="form-actions">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={loadSampleBattery}
+              disabled={loading}
+            >
+              Load sample battery
+            </button>
+            <button onClick={runSimulation} disabled={loading}>
+              {loading ? 'Running analysis…' : 'Run battery analysis'}
+              {!loading && <span aria-hidden="true"> ↗</span>}
+            </button>
+          </div>
         </div>
+
 
         {error && <div className="error-message" role="alert">{error}</div>}
       </section>
