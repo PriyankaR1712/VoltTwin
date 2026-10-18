@@ -23,6 +23,7 @@ type SimulationResult = {
     soh_percent: number
     cycle_count: number
   }
+
   predicted_soh: number
   predicted_soh_percent: number
   scenarios: Scenario[]
@@ -36,6 +37,43 @@ type SimulationResult = {
   notice: string
 }
 
+type DegradationResult = {
+  observation_count: number
+  window_size_used: number
+  latest_observed_soh: number
+  trend_per_sample: number
+  trend_percentage_points_per_sample: number
+  trend_r_squared: number | null
+  future_samples: number
+  projected_soh: number
+  projected_soh_percent: number
+  is_historical_estimate: boolean
+  is_future_forecast: boolean
+  forecast_type: string
+  notice: string
+}
+
+type HistoricalAnalysisResult = {
+  dataset_file: string
+  sheet_count: number
+  analysis_type: string
+  sheets: Record<
+    string,
+    {
+      observation_count: number
+      first_observed_soh: number
+      last_observed_soh: number
+      net_change_percentage_points: number
+      linear_trend_percentage_points_per_sample: number
+      recent_trend_percentage_points_per_sample: number
+      linear_trend_r_squared: number
+      trend_unit: string
+      is_historical_analysis: boolean
+      is_future_forecast: boolean
+    }
+  >
+}
+
 function App() {
   const [batteryId, setBatteryId] = useState('XJTU-Battery-1')
   const [cycleCount, setCycleCount] = useState('389')
@@ -44,7 +82,17 @@ function App() {
   const [result, setResult] = useState<SimulationResult | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-    
+  
+  const [observedSohText, setObservedSohText] = useState('')
+  const [futureSamples, setFutureSamples] = useState('25')
+  const [windowSize, setWindowSize] = useState('25')
+  const [degradationResult, setDegradationResult] =
+    useState<DegradationResult | null>(null)
+  const [historicalResult, setHistoricalResult] =
+    useState<HistoricalAnalysisResult | null>(null)
+  const [degradationError, setDegradationError] = useState('')
+  const [degradationLoading, setDegradationLoading] = useState(false)
+
 async function loadSampleBattery() {
   setError('')
 
@@ -152,7 +200,122 @@ async function loadSampleBattery() {
     } finally {
       setLoading(false)
     }
+
   }
+
+  
+async function runDegradationAnalysis() {
+  setDegradationError('')
+  setDegradationResult(null)
+
+  let observedSoh: number[]
+
+  try {
+    observedSoh = JSON.parse(observedSohText)
+
+    if (
+      !Array.isArray(observedSoh) ||
+      observedSoh.length < 3 ||
+      !observedSoh.every(
+        (value) =>
+          typeof value === 'number' &&
+          Number.isFinite(value) &&
+          value >= 0 &&
+          value <= 1,
+      )
+    ) {
+      setDegradationError(
+        'Enter at least 3 valid SOH values between 0 and 1 as a JSON array.',
+      )
+      return
+    }
+  } catch {
+    setDegradationError(
+      'SOH history must be a valid JSON array, such as [0.95, 0.94, 0.93].',
+    )
+    return
+  }
+
+  const future = Number(futureSamples)
+  const window = Number(windowSize)
+
+  if (
+    !Number.isInteger(future) ||
+    future < 0 ||
+    future > 10000 ||
+    !Number.isInteger(window) ||
+    window < 3 ||
+    window > 1000
+  ) {
+    setDegradationError(
+      'Future samples must be 0–10000, and window size must be 3–1000.',
+    )
+    return
+  }
+
+  setDegradationLoading(true)
+
+  try {
+    const response = await fetch(`${API_BASE}/estimate-degradation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        observed_soh: observedSoh,
+        future_samples: future,
+        window_size: window,
+      }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(
+        typeof data.detail === 'string'
+          ? data.detail
+          : 'The degradation API could not process this request.',
+      )
+    }
+
+    setDegradationResult(data as DegradationResult)
+  } catch (err) {
+    setDegradationError(
+      err instanceof Error
+        ? `${err.message} Check that the FastAPI backend is running.`
+        : 'Unable to connect to the degradation API.',
+    )
+  } finally {
+    setDegradationLoading(false)
+  }
+}
+
+async function loadHistoricalAnalysis() {
+  setDegradationError('')
+  setHistoricalResult(null)
+  setDegradationLoading(true)
+
+  try {
+    const response = await fetch(`${API_BASE}/historical-analysis`)
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(
+        typeof data.detail === 'string'
+          ? data.detail
+          : 'The historical-analysis API could not process this request.',
+      )
+    }
+
+    setHistoricalResult(data as HistoricalAnalysisResult)
+  } catch (err) {
+    setDegradationError(
+      err instanceof Error
+        ? `${err.message} Check that the FastAPI backend is running.`
+        : 'Unable to load historical analysis.',
+    )
+  } finally {
+    setDegradationLoading(false)
+  }
+}
 
   const formatPercent = (value: number) => `${(value * 100).toFixed(2)}%`
 
@@ -250,6 +413,173 @@ async function loadSampleBattery() {
 
 
         {error && <div className="error-message" role="alert">{error}</div>}
+      </section>
+
+      <section className="workspace">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">05 / DEGRADATION ANALYSIS</p>
+            <h2>Historical trend &amp; SOH projection</h2>
+          </div>
+          <span className="step-tag">Experimental forecast</span>
+        </div>
+
+        <label className="features-label">
+          Historical SOH observations
+          <span>
+            Enter a JSON array of SOH fractions between 0 and 1, ordered
+            from oldest to newest. Example: [0.95, 0.94, 0.93]
+          </span>
+          <textarea
+            rows={5}
+            value={observedSohText}
+            onChange={(event) => setObservedSohText(event.target.value)}
+            placeholder="[0.95, 0.94, 0.93, 0.92]"
+            spellCheck={false}
+          />
+        </label>
+
+        <div className="input-grid degradation-inputs">
+          <label>
+            Future samples
+            <input
+              type="number"
+              min="0"
+              max="10000"
+              step="1"
+              value={futureSamples}
+              onChange={(event) => setFutureSamples(event.target.value)}
+            />
+          </label>
+
+          <label>
+            Recent trend window
+            <input
+              type="number"
+              min="3"
+              max="1000"
+              step="1"
+              value={windowSize}
+              onChange={(event) => setWindowSize(event.target.value)}
+            />
+          </label>
+
+          <div className="degradation-actions">
+            <button
+              type="button"
+              onClick={runDegradationAnalysis}
+              disabled={degradationLoading}
+            >
+              {degradationLoading ? 'Analyzing…' : 'Estimate degradation'}
+            </button>
+          </div>
+        </div>
+
+        <div className="form-footer">
+          <p>Sample index is not a verified physical cycle count.</p>
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={loadHistoricalAnalysis}
+            disabled={degradationLoading}
+          >
+            Load XJTU historical analysis
+          </button>
+        </div>
+
+        {degradationError && (
+          <div className="error-message" role="alert">
+            {degradationError}
+          </div>
+        )}
+
+        {degradationResult && (
+          <div className="degradation-results">
+            <div className="metric-grid">
+              <article className="metric-card primary-metric">
+                <p>Latest observed SOH</p>
+                <strong>
+                  {(degradationResult.latest_observed_soh * 100).toFixed(2)}%
+                </strong>
+                <small>
+                  {degradationResult.observation_count} observations supplied
+                </small>
+              </article>
+
+              <article className="metric-card">
+                <p>Recent trend</p>
+                <strong>
+                  {degradationResult.trend_percentage_points_per_sample.toFixed(4)}
+                </strong>
+                <small>Percentage points per sample</small>
+              </article>
+
+              <article className="metric-card">
+                <p>Experimental projected SOH</p>
+                <strong>{degradationResult.projected_soh_percent.toFixed(2)}%</strong>
+                <small>
+                  After {degradationResult.future_samples} future samples
+                </small>
+              </article>
+            </div>
+
+            <p className="chart-caption">
+              Trend R²: {degradationResult.trend_r_squared === null
+                ? 'Unavailable'
+                : degradationResult.trend_r_squared.toFixed(4)}
+              {' · '}Window used: {degradationResult.window_size_used}
+            </p>
+
+            <aside className="notice" role="note">
+              <strong>Experimental projection</strong>
+              <p>{degradationResult.notice}</p>
+            </aside>
+          </div>
+        )}
+
+        {historicalResult && (
+          <div className="degradation-results">
+            <h3>
+              XJTU batch-1 observed trends ({historicalResult.sheet_count} sheets)
+            </h3>
+
+            <div className="historical-table-wrapper">
+              <table className="historical-table">
+                <thead>
+                  <tr>
+                    <th>Battery sheet</th>
+                    <th>Observations</th>
+                    <th>First SOH</th>
+                    <th>Last SOH</th>
+                    <th>Net change</th>
+                    <th>Recent trend (pp/sample)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(historicalResult.sheets).map(([name, sheet]) => (
+                    <tr key={name}>
+                      <td>{name}</td>
+                      <td>{sheet.observation_count}</td>
+                      <td>{(sheet.first_observed_soh * 100).toFixed(2)}%</td>
+                      <td>{(sheet.last_observed_soh * 100).toFixed(2)}%</td>
+                      <td>
+                        {sheet.net_change_percentage_points.toFixed(2)} pp
+                      </td>
+                      <td>
+                        {sheet.recent_trend_percentage_points_per_sample.toFixed(4)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <p className="chart-caption">
+              These values describe observed historical data. They are not
+              future forecasts or verified physical-cycle degradation rates.
+            </p>
+          </div>
+        )}
       </section>
 
       {result && (

@@ -1,10 +1,11 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 import torch
 from models.soh_predictor import SOHPredictor
 from digital_twin.historical_degradation import analyze_xjtu_workbook
+from digital_twin.degradation_estimator import DegradationEstimator
 from pathlib import Path
 
 app = FastAPI(
@@ -25,6 +26,35 @@ class BatteryFeatureSimulationInput(SOHFeatureInput):
     battery_id: str = Field(min_length=1, max_length=100)
     cycle_count: int = Field(ge=0)
     additional_cycles: int = Field(default=100, ge=0, le=100000)
+
+
+class SOHHistoryInput(BaseModel):
+    observed_soh: list[float] = Field(
+        ...,
+        min_length=3,
+        max_length=10000,
+        description="Historical SOH observations as fractions between 0 and 1",
+    )
+    future_samples: int = Field(
+        default=25,
+        ge=0,
+        le=10000,
+        description="Number of future observation samples for experimental projection",
+    )
+    window_size: int = Field(
+        default=25,
+        ge=3,
+        le=1000,
+        description="Number of recent observations used to estimate the trend",
+    )
+    @field_validator("observed_soh")
+    @classmethod
+    def validate_observed_soh(cls, values):
+        if any(not 0.0 <= value <= 1.0 for value in values):
+            raise ValueError(
+                "Every SOH observation must be between 0.0 and 1.0."
+            )
+        return values
 
 
 app.add_middleware(
@@ -204,4 +234,25 @@ def historical_analysis():
     result = analyze_xjtu_workbook(workbook_path)
 
     return result
+
+@app.post("/estimate-degradation")
+def estimate_degradation(request: SOHHistoryInput):
+    estimator = DegradationEstimator(window_size=request.window_size)
+
+    result = estimator.project(
+        observed_soh=request.observed_soh,
+        future_samples=request.future_samples,
+    )
+
+    return {
+        "battery_id": None,
+        "analysis_type": "historical_trend_and_experimental_projection",
+        **result,
+        "notice": (
+            "The trend is estimated from observed SOH samples. "
+            "Future SOH is an experimental linear extrapolation, "
+            "not a physically validated battery forecast. "
+            "Sample indices are not verified physical cycle counts."
+        ),
+    }
 
