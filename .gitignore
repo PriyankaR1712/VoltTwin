@@ -50,3 +50,9 @@ reference/SOHbenchmark/results/
 
 # External reference repository (download separately)
 reference/SOHbenchmark/
+# Local demo request files
+frontend/public/sample_request.json
+results/sample_request.json
+
+# Generated validation results
+results/degradation_validation.csv

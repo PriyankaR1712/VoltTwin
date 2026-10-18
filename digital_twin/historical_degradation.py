@@ -36,10 +36,29 @@ def analyze_soh_history(
     if np.any(soh < 0) or np.any(soh > 1):
         raise ValueError("Converted SOH values must be between 0 and 1.")
 
+    
     sample_indices = np.arange(len(soh), dtype=np.float64)
 
-    # Least-squares linear trend across the observed sequence.
-    slope, intercept = np.polyfit(sample_indices, soh, 1)
+    # Full-history linear trend.
+    full_slope, full_intercept = np.polyfit(sample_indices, soh, 1)
+
+    # Recent-window trend, using at most the latest 100 observations.
+    recent_window_size = min(100, len(soh))
+    recent_soh = soh[-recent_window_size:]
+    recent_indices = np.arange(
+        len(soh) - recent_window_size,
+        len(soh),
+        dtype=np.float64,
+    )
+
+    recent_slope, recent_intercept = np.polyfit(
+        recent_indices, recent_soh, 1
+    )
+
+    # Preserve the existing full-history fitted line and R-squared.
+    slope = full_slope
+    intercept = full_intercept
+
 
     fitted = slope * sample_indices + intercept
     residuals = soh - fitted
@@ -65,6 +84,15 @@ def analyze_soh_history(
         "linear_trend_percentage_points_per_sample": round(
             float(slope * 100), 6
         ),
+        
+        "recent_window_size": int(recent_window_size),
+        "recent_trend_percentage_points_per_sample": round(
+            float(recent_slope * 100), 6
+        ),
+        "trend_difference_percentage_points_per_sample": round(
+            float((recent_slope - full_slope) * 100), 6
+        ),
+
         "linear_trend_r_squared": (
             round(r_squared, 6) if r_squared is not None else None
         ),
