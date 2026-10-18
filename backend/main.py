@@ -1,0 +1,85 @@
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+
+app = FastAPI(
+    title="VoltTwin API",
+    description="API for EV battery SOH simulation and maintenance scenarios.",
+    version="0.1.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+class BatteryInput(BaseModel):
+    battery_id: str = Field(min_length=1, max_length=100)
+    soh: float = Field(ge=0.0, le=1.0)
+    cycle_count: int = Field(ge=0)
+    additional_cycles: int = Field(default=100, ge=0, le=100000)
+
+
+@app.get("/")
+def root():
+    return {
+        "message": "Welcome to VoltTwin API",
+        "status": "running",
+    }
+
+
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
+
+
+@app.post("/simulate")
+def simulate_battery(data: BatteryInput):
+    from digital_twin.battery_twin import (
+        BatteryState,
+        BatteryTwin,
+        SimulationAssumptions,
+    )
+    from digital_twin.counterfactual import (
+        MaintenanceScenario,
+        compare_scenarios,
+    )
+    from digital_twin.maintenance_agent import recommend_maintenance
+
+    twin = BatteryTwin(
+        state=BatteryState(
+            battery_id=data.battery_id,
+            soh=data.soh,
+            cycle_count=data.cycle_count,
+        ),
+        assumptions=SimulationAssumptions(
+            degradation_per_cycle=0.0001
+        ),
+    )
+
+    scenarios = [
+        MaintenanceScenario("No maintenance", data.additional_cycles, 0.0),
+        MaintenanceScenario("Maintenance A", data.additional_cycles, 0.005),
+        MaintenanceScenario("Maintenance B", data.additional_cycles, 0.01),
+    ]
+
+    results = compare_scenarios(twin, scenarios)
+    recommendation = recommend_maintenance(
+        results,
+        minimum_acceptable_soh=0.80,
+    )
+
+    return {
+        "battery": twin.get_state(),
+        "scenarios": results,
+        "recommendation": recommendation,
+        "notice": (
+            "Scenario outcomes use illustrative assumptions. "
+            "They are simulations, not validated maintenance effects."
+        ),
+    }
