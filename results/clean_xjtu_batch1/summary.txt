@@ -1,0 +1,9 @@
+Test battery: 1
+Training samples: 2257
+Validation samples: 565
+Test samples: 389
+Best epoch: 5
+Best validation MSE: 0.000242
+Test MAE: 0.015332
+Test MSE: 0.000457
+Test RMSE: 0.021377

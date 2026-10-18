@@ -1,0 +1,52 @@
+
+# Python virtual environments
+.venv/
+.venv311/
+venv/
+env/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# IDE and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Generated model and experiment artifacts
+*.pt
+*.pth
+*.pkl
+*.npz
+
+# Reference repository experiment outputs
+reference/SOHbenchmark/results/
+
+
+# Reference datasets - obtain from the original source
+reference/SOHbenchmark/data/
+
+# Reference research documents and graphics
+reference/SOHbenchmark/*.pdf
+reference/SOHbenchmark/*.png
+
+# Reference experiment outputs
+reference/SOHbenchmark/results/
+
+# External reference repository (download separately)
+reference/SOHbenchmark/
