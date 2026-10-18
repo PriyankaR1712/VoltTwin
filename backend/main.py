@@ -2,12 +2,22 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+import torch
+from models.soh_predictor import SOHPredictor
 
 app = FastAPI(
     title="VoltTwin API",
     description="API for EV battery SOH simulation and maintenance scenarios.",
     version="0.1.0",
 )
+
+class SOHFeatureInput(BaseModel):
+    features: list[float] = Field(
+        ...,
+        min_length=67,
+        max_length=67,
+        description="Exactly 67 handcrafted battery features",
+    )
 
 app.add_middleware(
     CORSMiddleware,
@@ -37,6 +47,26 @@ def root():
 def health():
     return {"status": "healthy"}
 
+
+@app.post("/predict-soh")
+def predict_soh(request: SOHFeatureInput):
+    predictor = SOHPredictor()
+
+    features = torch.tensor(
+        [request.features],
+        dtype=torch.float32,
+    )
+
+    prediction = predictor.predict(features)
+    soh = float(prediction.item())
+
+    return {
+        "predicted_soh": soh,
+        "predicted_soh_percent": round(soh * 100, 2),
+        "model": "Clean CNN trained on XJTU batch-1",
+        "input_feature_count": len(request.features),
+        "is_prediction": True,
+    }
 
 @app.post("/simulate")
 def simulate_battery(data: BatteryInput):
