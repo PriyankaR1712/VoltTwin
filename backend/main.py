@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import torch
 from models.soh_predictor import SOHPredictor
+from digital_twin.historical_degradation import analyze_xjtu_workbook
+from pathlib import Path
 
 app = FastAPI(
     title="VoltTwin API",
@@ -184,4 +186,22 @@ def simulate_from_features(data: BatteryFeatureSimulationInput):
             "simulation assumptions, not validated maintenance effects."
         ),
     }
+
+@app.get("/historical-analysis")
+def historical_analysis():
+    project_root = Path(__file__).resolve().parent.parent
+
+    workbook_path = (
+        project_root
+        / "reference"
+        / "SOHbenchmark"
+        / "data"
+        / "XJTU"
+        / "handcraft_features"
+        / "batch-1_features.xlsx"
+    )
+
+    result = analyze_xjtu_workbook(workbook_path)
+
+    return result
 
