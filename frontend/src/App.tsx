@@ -513,7 +513,10 @@ async function runAdaptiveMaintenance() {
             Battery ID
             <input
               value={batteryId}
-              onChange={(event) => setBatteryId(event.target.value)}
+              onChange={(event) => {
+                setBatteryId(event.target.value)
+                setResult(null)
+              }}
               placeholder="e.g. XJTU-Battery-1"
             />
           </label>
@@ -524,7 +527,10 @@ async function runAdaptiveMaintenance() {
               min="0"
               step="1"
               value={cycleCount}
-              onChange={(event) => setCycleCount(event.target.value)}
+              onChange={(event) => {
+                setCycleCount(event.target.value)
+                setResult(null)
+              }}
             />
           </label>
           <label>
@@ -535,7 +541,10 @@ async function runAdaptiveMaintenance() {
               max="100000"
               step="1"
               value={additionalCycles}
-              onChange={(event) => setAdditionalCycles(event.target.value)}
+              onChange={(event) => {
+                setAdditionalCycles(event.target.value)
+                setResult(null)
+              }}
             />
           </label>
         </div>
@@ -546,7 +555,10 @@ async function runAdaptiveMaintenance() {
           <textarea
             rows={7}
             value={featuresText}
-            onChange={(event) => setFeaturesText(event.target.value)}
+            onChange={(event) => {
+              setFeaturesText(event.target.value)
+              setResult(null)
+            }}
             placeholder="[6.50844, 1.67940, 12.6000, ...]"
             spellCheck={false}
           />
@@ -574,6 +586,111 @@ async function runAdaptiveMaintenance() {
 
         {error && <div className="error-message" role="alert">{error}</div>}
       </section>
+
+      {result && (
+        <>
+          <section className="results-section">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">02 / PREDICTION</p>
+                <h2>Battery health estimate</h2>
+              </div>
+              <span className="status-pill">Prediction complete</span>
+            </div>
+
+            <div className="metric-grid">
+              <article className="metric-card primary-metric">
+                <p>Predicted State of Health</p>
+                <strong>{result.predicted_soh_percent.toFixed(2)}%</strong>
+                <div className="health-track">
+                  <span style={{
+                    width: `${Math.min(100, Math.max(0, result.predicted_soh_percent))}%`,
+                  }} />
+                </div>
+                <small>Output from the trained CNN</small>
+              </article>
+              <article className="metric-card">
+                <p>Battery identifier</p>
+                <strong className="metric-text">{result.battery.battery_id}</strong>
+                <small>Digital Twin instance</small>
+              </article>
+              <article className="metric-card">
+                <p>Current cycle count</p>
+                <strong>{result.battery.cycle_count.toLocaleString()}</strong>
+                <small>Cycles supplied in the request</small>
+              </article>
+            </div>
+          </section>
+
+          <section className="results-section">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">03 / COUNTERFACTUALS</p>
+                <h2>Compare future scenarios</h2>
+              </div>
+              <span className="step-tag">
+                +{Number(additionalCycles).toLocaleString()} cycles
+              </span>
+            </div>
+
+            <div className="scenario-grid">
+              {result.scenarios.map((scenario) => (
+                <article className="scenario-card" key={scenario.scenario}>
+                  <p>{scenario.scenario}</p>
+                  <strong>{scenario.projected_soh_percent.toFixed(2)}%</strong>
+                  <div className="health-track">
+                    <span style={{
+                      width: `${Math.min(100, Math.max(0, scenario.projected_soh_percent))}%`,
+                    }} />
+                  </div>
+                  <div className="scenario-detail">
+                    <span>Change vs. baseline</span>
+                    <b>
+                      {scenario.difference_vs_baseline > 0 ? '+' : ''}
+                      {(scenario.difference_vs_baseline * 100).toFixed(2)} pp
+                    </b>
+                  </div>
+                  <div className="scenario-detail">
+                    <span>Recovery assumption</span>
+                    <b>{(scenario.recovery_assumption * 100).toFixed(2)} pp</b>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <p className="chart-caption">
+              Projected SOH is calculated using the configured degradation and
+              recovery assumptions; these maintenance effects are illustrative.
+            </p>
+          </section>
+
+          <section className="recommendation-card">
+            <p className="eyebrow">04 / MAINTENANCE AGENT</p>
+            <h2>Current recommendation</h2>
+            <div className="recommendation-main">
+              <div>
+                <span className="recommendation-label">Selected scenario</span>
+                <strong>{result.recommendation.recommended_scenario}</strong>
+              </div>
+              <div className="recommendation-soh">
+                <span className="recommendation-label">Projected SOH</span>
+                <strong>{formatPercent(result.recommendation.projected_soh)}</strong>
+              </div>
+            </div>
+            <p>{result.recommendation.reason}</p>
+            <span className="status-pill">{result.recommendation.status.replaceAll('_', ' ')}</span>
+          </section>
+
+          <aside className="notice" role="note">
+            <strong>Interpret results responsibly</strong>
+            <p>{result.notice}</p>
+            <p>
+              The SOH value is an ML prediction. Future degradation and
+              maintenance recovery values are simulation assumptions, not
+              experimentally validated maintenance outcomes.
+            </p>
+          </aside>
+        </>
+      )}
 
       <section className="workspace">
         <div className="section-heading">
@@ -746,7 +863,7 @@ async function runAdaptiveMaintenance() {
 <section className="workspace">
   <div className="section-heading">
     <div>
-      <p className="eyebrow">02 / SEQUENTIAL REPLAY</p>
+      <p className="eyebrow">06 / SEQUENTIAL REPLAY</p>
       <h2>Replay battery history</h2>
     </div>
     <span className="step-tag">XJTU dataset</span>
@@ -763,7 +880,13 @@ async function runAdaptiveMaintenance() {
       Battery dataset sheet
       <select
         value={replaySheet}
-        onChange={(event) => setReplaySheet(event.target.value)}
+        onChange={(event) => {
+          setReplaySheet(event.target.value)
+          setReplayResult(null)
+          setAdaptiveResult(null)
+          setReplayError('')
+          setAdaptiveError('')
+        }}
       >
         {Array.from({ length: 8 }, (_, index) => `Sheet${index + 1}`).map(
           (sheet) => (
@@ -779,7 +902,13 @@ async function runAdaptiveMaintenance() {
       Battery ID
       <input
         value={replayBatteryId}
-        onChange={(event) => setReplayBatteryId(event.target.value)}
+        onChange={(event) => {
+          setReplayBatteryId(event.target.value)
+          setReplayResult(null)
+          setAdaptiveResult(null)
+          setReplayError('')
+          setAdaptiveError('')
+        }}
         placeholder="e.g. XJTU-Battery-1"
       />
     </label>
@@ -877,7 +1006,7 @@ async function runAdaptiveMaintenance() {
 <section className="workspace">
   <div className="section-heading">
     <div>
-      <span className="eyebrow">03 / ADAPTIVE MAINTENANCE</span>
+      <span className="eyebrow">07 / ADAPTIVE MAINTENANCE</span>
       <h2>Integrated adaptive maintenance</h2>
       <p>
         Replay battery history, compare maintenance scenarios, and receive
@@ -990,111 +1119,6 @@ async function runAdaptiveMaintenance() {
     </>
   )}
 </section>
-
-      {result && (
-        <>
-          <section className="results-section">
-            <div className="section-heading">
-              <div>
-                <p className="eyebrow">02 / PREDICTION</p>
-                <h2>Battery health estimate</h2>
-              </div>
-              <span className="status-pill">Prediction complete</span>
-            </div>
-
-            <div className="metric-grid">
-              <article className="metric-card primary-metric">
-                <p>Predicted State of Health</p>
-                <strong>{result.predicted_soh_percent.toFixed(2)}%</strong>
-                <div className="health-track">
-                  <span style={{
-                    width: `${Math.min(100, Math.max(0, result.predicted_soh_percent))}%`,
-                  }} />
-                </div>
-                <small>Output from the trained CNN</small>
-              </article>
-              <article className="metric-card">
-                <p>Battery identifier</p>
-                <strong className="metric-text">{result.battery.battery_id}</strong>
-                <small>Digital Twin instance</small>
-              </article>
-              <article className="metric-card">
-                <p>Current cycle count</p>
-                <strong>{result.battery.cycle_count.toLocaleString()}</strong>
-                <small>Cycles supplied in the request</small>
-              </article>
-            </div>
-          </section>
-
-          <section className="results-section">
-            <div className="section-heading">
-              <div>
-                <p className="eyebrow">03 / COUNTERFACTUALS</p>
-                <h2>Compare future scenarios</h2>
-              </div>
-              <span className="step-tag">
-                +{Number(additionalCycles).toLocaleString()} cycles
-              </span>
-            </div>
-
-            <div className="scenario-grid">
-              {result.scenarios.map((scenario) => (
-                <article className="scenario-card" key={scenario.scenario}>
-                  <p>{scenario.scenario}</p>
-                  <strong>{scenario.projected_soh_percent.toFixed(2)}%</strong>
-                  <div className="health-track">
-                    <span style={{
-                      width: `${Math.min(100, Math.max(0, scenario.projected_soh_percent))}%`,
-                    }} />
-                  </div>
-                  <div className="scenario-detail">
-                    <span>Change vs. baseline</span>
-                    <b>
-                      {scenario.difference_vs_baseline > 0 ? '+' : ''}
-                      {(scenario.difference_vs_baseline * 100).toFixed(2)} pp
-                    </b>
-                  </div>
-                  <div className="scenario-detail">
-                    <span>Recovery assumption</span>
-                    <b>{(scenario.recovery_assumption * 100).toFixed(2)} pp</b>
-                  </div>
-                </article>
-              ))}
-            </div>
-            <p className="chart-caption">
-              Projected SOH is calculated using the configured degradation and
-              recovery assumptions; these maintenance effects are illustrative.
-            </p>
-          </section>
-
-          <section className="recommendation-card">
-            <p className="eyebrow">04 / MAINTENANCE AGENT</p>
-            <h2>Current recommendation</h2>
-            <div className="recommendation-main">
-              <div>
-                <span className="recommendation-label">Selected scenario</span>
-                <strong>{result.recommendation.recommended_scenario}</strong>
-              </div>
-              <div className="recommendation-soh">
-                <span className="recommendation-label">Projected SOH</span>
-                <strong>{formatPercent(result.recommendation.projected_soh)}</strong>
-              </div>
-            </div>
-            <p>{result.recommendation.reason}</p>
-            <span className="status-pill">{result.recommendation.status.replaceAll('_', ' ')}</span>
-          </section>
-
-          <aside className="notice" role="note">
-            <strong>Interpret results responsibly</strong>
-            <p>{result.notice}</p>
-            <p>
-              The SOH value is an ML prediction. Future degradation and
-              maintenance recovery values are simulation assumptions, not
-              experimentally validated maintenance outcomes.
-            </p>
-          </aside>
-        </>
-      )}
 
       <footer className="footer">
         <span>VoltTwin</span>
