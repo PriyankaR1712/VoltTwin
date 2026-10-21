@@ -282,3 +282,89 @@ def replay_battery_endpoint(request: SequentialReplayInput):
         battery_id=request.battery_id,
     )
 
+
+@app.post("/adaptive-maintenance")
+def adaptive_maintenance(request: SequentialReplayInput):
+    from digital_twin.battery_twin import (
+        BatteryState,
+        BatteryTwin,
+        SimulationAssumptions,
+    )
+    from digital_twin.counterfactual import (
+        MaintenanceScenario,
+        compare_scenarios,
+    )
+    from digital_twin.maintenance_agent import recommend_maintenance
+
+    project_root = Path(__file__).resolve().parent.parent
+    workbook_path = (
+        project_root
+        / "reference"
+        / "SOHbenchmark"
+        / "data"
+        / "XJTU"
+        / "handcraft_features"
+        / "batch-1_features.xlsx"
+    )
+
+    # 1. Replay the selected battery's historical observations.
+    replay = replay_battery(
+        workbook_path=workbook_path,
+        sheet_name=request.sheet_name,
+        battery_id=request.battery_id,
+    )
+
+    observed_soh = [
+        observation["actual_soh"]
+        for observation in replay["observations"]
+    ]
+
+    # 2. Estimate its recent historical degradation trend.
+    estimator = DegradationEstimator(window_size=25)
+    trend = estimator.estimate(observed_soh)
+
+    current_soh = replay["final_twin_state"]["soh"]
+
+    # 3. Initialize the twin with the latest observed SOH.
+    twin = BatteryTwin(
+        state=BatteryState(
+            battery_id=request.battery_id,
+            soh=current_soh,
+            cycle_count=0,
+        ),
+        assumptions=SimulationAssumptions(
+            degradation_per_cycle=0.0001,
+        ),
+    )
+
+    # 4. Simulate the existing counterfactual scenarios.
+    additional_cycles = 100
+    scenarios = [
+        MaintenanceScenario("No maintenance", additional_cycles, 0.0),
+        MaintenanceScenario("Maintenance A", additional_cycles, 0.005),
+        MaintenanceScenario("Maintenance B", additional_cycles, 0.01),
+    ]
+    scenario_results = compare_scenarios(twin, scenarios)
+
+    # 5. Select a scenario using current condition, recent trend,
+    #    and simulated outcomes.
+    recommendation = recommend_maintenance(
+        scenario_results,
+        minimum_acceptable_soh=0.80,
+        current_soh=current_soh,
+        trend_per_sample=trend["trend_per_sample"],
+    )
+
+    return {
+        "battery": twin.get_state(),
+        "replay": replay,
+        "degradation_trend": trend,
+        "scenarios": scenario_results,
+        "recommendation": recommendation,
+        "notice": (
+            "The CNN predictions are evaluated against recorded labels. "
+            "The degradation trend uses observation indices, not verified "
+            "physical cycles. Future degradation and maintenance effects "
+            "are illustrative simulations, not validated real-world effects."
+        ),
+    }
