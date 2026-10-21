@@ -74,6 +74,40 @@ type HistoricalAnalysisResult = {
   >
 }
 
+type ReplayObservation = {
+  observation_index: number
+  predicted_soh: number
+  predicted_soh_percent: number
+  actual_soh: number
+  actual_soh_percent: number
+  absolute_error: number
+  twin_state: {
+    battery_id: string
+    soh: number
+    soh_percent: number
+    cycle_count: number
+  }
+}
+
+type ReplayResult = {
+  battery_id: string
+  sheet_name: string
+  observation_count: number
+  mae: number
+  mae_percentage_points: number
+  rmse: number
+  rmse_percentage_points: number
+  evaluation_type: string
+  observation_order_is_verified_physical_cycle_order: boolean
+  observations: ReplayObservation[]
+  final_twin_state: {
+    battery_id: string
+    soh: number
+    soh_percent: number
+    cycle_count: number
+  }
+}
+
 function App() {
   const [batteryId, setBatteryId] = useState('XJTU-Battery-1')
   const [cycleCount, setCycleCount] = useState('389')
@@ -81,6 +115,13 @@ function App() {
   const [featuresText, setFeaturesText] = useState('')
   const [result, setResult] = useState<SimulationResult | null>(null)
   const [error, setError] = useState('')
+  
+  const [replaySheet, setReplaySheet] = useState('Sheet1')
+  const [replayBatteryId, setReplayBatteryId] = useState('XJTU-Battery-1')
+  const [replayResult, setReplayResult] = useState<ReplayResult | null>(null)
+  const [replayError, setReplayError] = useState('')
+  const [replayLoading, setReplayLoading] = useState(false)
+
   const [loading, setLoading] = useState(false)
   
   const [observedSohText, setObservedSohText] = useState('')
@@ -314,6 +355,49 @@ async function loadHistoricalAnalysis() {
     )
   } finally {
     setDegradationLoading(false)
+  }
+}
+
+async function runSequentialReplay() {
+  setReplayError('')
+  setReplayResult(null)
+
+  if (!replayBatteryId.trim()) {
+    setReplayError('Please enter a battery ID.')
+    return
+  }
+
+  setReplayLoading(true)
+
+  try {
+    const response = await fetch(`${API_BASE}/replay-battery`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sheet_name: replaySheet,
+        battery_id: replayBatteryId.trim(),
+      }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(
+        typeof data.detail === 'string'
+          ? data.detail
+          : 'The replay API could not process this request.',
+      )
+    }
+
+    setReplayResult(data as ReplayResult)
+  } catch (err) {
+    setReplayError(
+      err instanceof Error
+        ? `${err.message} Check that the FastAPI backend is running.`
+        : 'Unable to connect to the VoltTwin replay API.',
+    )
+  } finally {
+    setReplayLoading(false)
   }
 }
 
@@ -581,6 +665,139 @@ async function loadHistoricalAnalysis() {
           </div>
         )}
       </section>
+      
+
+<section className="workspace">
+  <div className="section-heading">
+    <div>
+      <p className="eyebrow">02 / SEQUENTIAL REPLAY</p>
+      <h2>Replay battery history</h2>
+    </div>
+    <span className="step-tag">XJTU dataset</span>
+  </div>
+
+  <p className="chart-caption">
+    Run the trained CNN against a battery's recorded observations,
+    compare predicted and actual SOH, and inspect the final Digital Twin
+    state. Observation order is not verified physical cycle order.
+  </p>
+
+  <div className="input-grid">
+    <label>
+      Battery dataset sheet
+      <select
+        value={replaySheet}
+        onChange={(event) => setReplaySheet(event.target.value)}
+      >
+        {Array.from({ length: 8 }, (_, index) => `Sheet${index + 1}`).map(
+          (sheet) => (
+            <option key={sheet} value={sheet}>
+              {sheet}
+            </option>
+          ),
+        )}
+      </select>
+    </label>
+
+    <label>
+      Battery ID
+      <input
+        value={replayBatteryId}
+        onChange={(event) => setReplayBatteryId(event.target.value)}
+        placeholder="e.g. XJTU-Battery-1"
+      />
+    </label>
+  </div>
+
+  <div className="form-footer">
+    <p>Predictions are evaluated against capacity-derived SOH labels.</p>
+    <button
+      type="button"
+      onClick={runSequentialReplay}
+      disabled={replayLoading}
+    >
+      {replayLoading ? 'Replaying observations…' : 'Run sequential replay'}
+    </button>
+  </div>
+
+  {replayError && (
+    <div className="error-message" role="alert">
+      {replayError}
+    </div>
+  )}
+
+  {replayResult && (
+    <div className="degradation-results">
+      <div className="metric-grid">
+        <article className="metric-card primary-metric">
+          <p>Observations processed</p>
+          <strong>{replayResult.observation_count}</strong>
+          <small>{replayResult.sheet_name}</small>
+        </article>
+
+        <article className="metric-card">
+          <p>Mean absolute error</p>
+          <strong>{replayResult.mae_percentage_points.toFixed(4)}</strong>
+          <small>SOH percentage points</small>
+        </article>
+
+        <article className="metric-card">
+          <p>Root mean squared error</p>
+          <strong>{replayResult.rmse_percentage_points.toFixed(4)}</strong>
+          <small>SOH percentage points</small>
+        </article>
+      </div>
+
+      <h3>Observation results</h3>
+      <div className="historical-table-wrapper">
+        <table className="historical-table">
+          <thead>
+            <tr>
+              <th>Index</th>
+              <th>Predicted SOH</th>
+              <th>Actual SOH</th>
+              <th>Absolute error</th>
+            </tr>
+          </thead>
+          <tbody>
+            {replayResult.observations
+              .filter(
+                (_, index) =>
+                  index < 5 ||
+                  index >= replayResult.observations.length - 5,
+              )
+              .map((observation) => (
+                <tr key={observation.observation_index}>
+                  <td>{observation.observation_index}</td>
+                  <td>{observation.predicted_soh_percent.toFixed(2)}%</td>
+                  <td>{observation.actual_soh_percent.toFixed(2)}%</td>
+                  <td>{(observation.absolute_error * 100).toFixed(4)} pp</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p className="chart-caption">
+        Showing the first and last five observations. Metrics use all
+        observations in the selected sheet.
+      </p>
+
+      <aside className="notice" role="note">
+        <strong>Final Digital Twin state</strong>
+        <p>
+          Battery: {replayResult.final_twin_state.battery_id}
+          {' · '}Observed SOH: {replayResult.final_twin_state.soh_percent.toFixed(2)}%
+        </p>
+        <p>
+          The replay updates the twin using observed SOH. This is a
+          historical replay, not a live battery stream.
+        </p>
+      </aside>
+    </div>
+  )}
+</section>
+
 
       {result && (
         <>

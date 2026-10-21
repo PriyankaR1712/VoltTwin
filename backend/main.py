@@ -7,6 +7,7 @@ from models.soh_predictor import SOHPredictor
 from digital_twin.historical_degradation import analyze_xjtu_workbook
 from digital_twin.degradation_estimator import DegradationEstimator
 from pathlib import Path
+from digital_twin.sequential_replay import replay_battery
 
 app = FastAPI(
     title="VoltTwin API",
@@ -255,4 +256,29 @@ def estimate_degradation(request: SOHHistoryInput):
             "Sample indices are not verified physical cycle counts."
         ),
     }
+
+class SequentialReplayInput(BaseModel):
+    sheet_name: str = Field(min_length=1, max_length=100)
+    battery_id: str = Field(min_length=1, max_length=100)
+
+
+@app.post("/replay-battery")
+def replay_battery_endpoint(request: SequentialReplayInput):
+    project_root = Path(__file__).resolve().parent.parent
+
+    workbook_path = (
+        project_root
+        / "reference"
+        / "SOHbenchmark"
+        / "data"
+        / "XJTU"
+        / "handcraft_features"
+        / "batch-1_features.xlsx"
+    )
+
+    return replay_battery(
+        workbook_path=workbook_path,
+        sheet_name=request.sheet_name,
+        battery_id=request.battery_id,
+    )
 
