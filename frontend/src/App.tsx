@@ -108,6 +108,39 @@ type ReplayResult = {
   }
 }
 
+type AdaptiveMaintenanceResult = {
+  battery: {
+    battery_id: string
+    soh: number
+    soh_percent: number
+    cycle_count: number
+  }
+  replay: ReplayResult
+  degradation_trend: {
+    observation_count: number
+    window_size_used: number
+    latest_observed_soh: number
+    trend_per_sample: number
+    trend_percentage_points_per_sample: number
+    trend_r_squared: number | null
+    is_historical_estimate: boolean
+    is_future_forecast: boolean
+  }
+  scenarios: Scenario[]
+  recommendation: {
+    recommended_scenario: string
+    projected_soh: number
+    status: string
+    reason: string
+    current_soh: number
+    trend_per_sample: number
+    minimum_acceptable_soh: number
+    is_simulation_based: boolean
+    is_rule_based: boolean
+  }
+  notice: string
+}
+
 function App() {
   const [batteryId, setBatteryId] = useState('XJTU-Battery-1')
   const [cycleCount, setCycleCount] = useState('389')
@@ -121,7 +154,9 @@ function App() {
   const [replayResult, setReplayResult] = useState<ReplayResult | null>(null)
   const [replayError, setReplayError] = useState('')
   const [replayLoading, setReplayLoading] = useState(false)
-
+  const [adaptiveResult, setAdaptiveResult] = useState<AdaptiveMaintenanceResult | null>(null)
+  const [adaptiveError, setAdaptiveError] = useState('')
+  const [adaptiveLoading, setAdaptiveLoading] = useState(false)
   const [loading, setLoading] = useState(false)
   
   const [observedSohText, setObservedSohText] = useState('')
@@ -400,7 +435,48 @@ async function runSequentialReplay() {
     setReplayLoading(false)
   }
 }
+async function runAdaptiveMaintenance() {
+  setAdaptiveError('')
+  setAdaptiveResult(null)
 
+  if (!replayBatteryId.trim()) {
+    setAdaptiveError('Please enter a battery ID.')
+    return
+  }
+
+  setAdaptiveLoading(true)
+
+  try {
+    const response = await fetch(`${API_BASE}/adaptive-maintenance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sheet_name: replaySheet,
+        battery_id: replayBatteryId.trim(),
+      }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(
+        typeof data.detail === 'string'
+          ? data.detail
+          : 'The adaptive-maintenance API could not process this request.',
+      )
+    }
+
+    setAdaptiveResult(data as AdaptiveMaintenanceResult)
+  } catch (err) {
+    setAdaptiveError(
+      err instanceof Error
+        ? `${err.message} Check that the FastAPI backend is running.`
+        : 'Unable to connect to the adaptive-maintenance API.',
+    )
+  } finally {
+    setAdaptiveLoading(false)
+  }
+}
   const formatPercent = (value: number) => `${(value * 100).toFixed(2)}%`
 
   return (
@@ -798,6 +874,122 @@ async function runSequentialReplay() {
   )}
 </section>
 
+<section className="workspace">
+  <div className="section-heading">
+    <div>
+      <span className="eyebrow">03 / ADAPTIVE MAINTENANCE</span>
+      <h2>Integrated adaptive maintenance</h2>
+      <p>
+        Replay battery history, compare maintenance scenarios, and receive
+        a condition-aware recommendation.
+      </p>
+    </div>
+  </div>
+
+  <div className="form-footer">
+    <button
+      className="primary-button"
+      onClick={runAdaptiveMaintenance}
+      disabled={adaptiveLoading}
+    >
+      {adaptiveLoading ? 'Analyzing battery...' : 'Run Adaptive Maintenance'}
+    </button>
+  </div>
+
+  {adaptiveError && (
+    <p className="error-message">{adaptiveError}</p>
+  )}
+
+  {adaptiveResult && (
+    <>
+      <div className="metric-grid">
+        <div className="metric-card">
+          <span>Observations</span>
+          <strong>{adaptiveResult.replay.observation_count}</strong>
+        </div>
+
+        <div className="metric-card">
+          <span>Current observed SOH</span>
+          <strong>
+            {adaptiveResult.battery.soh_percent.toFixed(2)}%
+          </strong>
+        </div>
+
+        <div className="metric-card">
+          <span>Replay MAE</span>
+          <strong>
+            {adaptiveResult.replay.mae_percentage_points.toFixed(2)} pp
+          </strong>
+        </div>
+
+        <div className="metric-card">
+          <span>Recent degradation trend</span>
+          <strong>
+            {adaptiveResult.degradation_trend
+              .trend_percentage_points_per_sample.toFixed(4)} pp/sample
+          </strong>
+        </div>
+      </div>
+
+      <h3>Counterfactual scenarios</h3>
+
+      <div className="scenario-grid">
+        {adaptiveResult.scenarios.map((scenario) => (
+          <div className="scenario-card" key={scenario.scenario}>
+            <h4>{scenario.scenario}</h4>
+
+            <p>Projected SOH</p>
+            <strong>
+              {scenario.projected_soh_percent.toFixed(2)}%
+            </strong>
+
+            <p>
+              Difference vs baseline:{' '}
+              {(scenario.difference_vs_baseline * 100).toFixed(2)} pp
+            </p>
+
+            <p>
+              Assumed recovery:{' '}
+              {(scenario.recovery_assumption * 100).toFixed(2)} pp
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="recommendation-card">
+        <div className="recommendation-main">
+          <span className="recommendation-label">
+            Recommended maintenance action
+          </span>
+
+          <h3>
+            {adaptiveResult.recommendation.recommended_scenario}
+          </h3>
+
+          <p className="recommendation-soh">
+            Projected SOH:{' '}
+            {(adaptiveResult.recommendation.projected_soh * 100).toFixed(2)}%
+          </p>
+
+          <span className="status-pill">
+            {adaptiveResult.recommendation.status.replaceAll('_', ' ')}
+          </span>
+
+          <p>{adaptiveResult.recommendation.reason}</p>
+        </div>
+      </div>
+
+      <p className="notice">{adaptiveResult.notice}</p>
+
+      <p className="chart-caption">
+        The recommendation uses rule-based logic. Maintenance recovery
+        values are illustrative simulation assumptions, not validated
+        real-world maintenance effects. Observation order is not confirmed
+        physical cycle order.
+      </p>
+    </>
+  )}
+</section>
 
       {result && (
         <>
