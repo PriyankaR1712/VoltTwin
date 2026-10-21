@@ -2,47 +2,72 @@
 
 **Adaptive EV Battery Maintenance Using an Agentic Digital Twin with Counterfactual Reasoning**
 
-VoltTwin is a software-based project that aims to estimate electric vehicle battery State of Health (SOH), simulate alternative maintenance scenarios using a digital twin, and recommend maintenance actions based on simulated outcomes and explicit constraints.
+VoltTwin is a software-based project for estimating electric vehicle (EV) battery State of Health (SOH), replaying historical battery observations, simulating alternative maintenance scenarios, and generating explainable maintenance recommendations.
 
-## Project Goals
+The project combines a CNN-based SOH prediction model with a software digital twin and rule-based maintenance decision logic. Counterfactual scenarios explore how different assumed maintenance outcomes could affect projected battery health.
 
-- Estimate battery SOH using machine learning.
-- Build a software-based battery digital twin.
-- Compare alternative maintenance scenarios using counterfactual reasoning.
-- Develop an agentic decision workflow for maintenance recommendations.
-- Evaluate model predictions and scenario-based decisions.
+> **Project status:** Ongoing academic project. Battery degradation and maintenance effects in the digital twin currently use illustrative assumptions and are not physically validated.
+
+## Project Objectives
+
+- Estimate battery SOH using a deep learning model.
+- Evaluate predictions on a held-out XJTU battery.
+- Represent battery health using a software-based digital twin.
+- Replay historical battery observations and analyze prediction errors.
+- Compare counterfactual maintenance scenarios.
+- Generate explainable maintenance recommendations using explicit decision rules.
+- Visualize battery predictions, historical trends, and simulation results through a web dashboard.
 
 ## Technology Stack
 
-- Python
-- PyTorch
-- pandas and NumPy
-- scikit-learn
-- FastAPI (planned)
-- React and TypeScript (planned)
-- PostgreSQL (planned)
+| Component | Technologies |
+|---|---|
+| Programming language | Python |
+| Deep learning | PyTorch |
+| Data processing | pandas, NumPy |
+| Machine learning utilities | scikit-learn |
+| Backend API | FastAPI |
+| Frontend | React, TypeScript |
+| Data visualization | Dashboard tables and charts |
+| Testing | pytest |
+| Dataset | XJTU lithium-ion battery dataset |
 
-## Current Progress
+## System Workflow
+
+1. **Battery data:** Load handcrafted battery features and capacity labels from the XJTU dataset.
+2. **SOH prediction:** Use the trained CNN model to estimate battery health.
+3. **Sequential replay:** Process historical observations in order, compare predicted SOH against actual SOH, and update the software twin's observed state.
+4. **Digital twin:** Maintain a software representation of battery health and simulate projected changes.
+5. **Counterfactual scenarios:** Compare a baseline scenario with alternative maintenance assumptions.
+6. **Maintenance recommendation:** Apply explicit decision rules to the simulated outcomes.
+7. **Dashboard:** Present prediction results, historical degradation analysis, replay metrics, and scenario comparisons.
+
+**Important:** The current sequential replay evaluates predictions in batch inference and records observations in order; it is not yet a live streaming battery system. The replay workflow and the scenario-based maintenance workflow are implemented as separate capabilities and should not be interpreted as a fully integrated autonomous maintenance loop.
+
+## Implemented Features
 
 - [x] Environment and reference dataset setup
-- [x] Initial CNN SOH baseline experiment
-- [x] Training-only feature normalization
-- [x] Clean CNN checkpoint and inference module
-- [x] Initial evaluation on one held-out XJTU battery
-- [ ] Digital twin simulation
-- [ ] Counterfactual maintenance scenarios
-- [ ] Agentic recommendation workflow
-- [ ] FastAPI integration
-- [ ] React dashboard
-- [ ] Evaluation across multiple held-out batteries
+- [x] CNN-based SOH baseline training
+- [x] Feature normalization fitted on training data
+- [x] Saved model checkpoint and inference module
+- [x] Evaluation on one held-out XJTU battery
+- [x] FastAPI endpoints for SOH prediction and simulation
+- [x] Software digital twin with configurable illustrative assumptions
+- [x] Counterfactual maintenance scenario comparison
+- [x] Rule-based maintenance recommendation
+- [x] Historical SOH trend analysis
+- [x] Experimental linear degradation estimation
+- [x] Sequential battery observation replay
+- [x] React and TypeScript dashboard integration
+- [x] Automated tests for implemented functionality
 
-## Initial SOH Experiment
+## SOH Model Evaluation
 
-Dataset: XJTU, Batch 1 handcrafted features  
-Held-out battery: Battery 1  
-Training samples: 2,257  
-Validation samples: 565  
-Test samples: 389  
+**Dataset:** XJTU, Batch 1 handcrafted features
+**Held-out battery:** Battery 1
+**Training samples:** 2,257
+**Validation samples:** 565
+**Test samples:** 389
 
 | Metric | Result |
 |---|---:|
@@ -50,22 +75,115 @@ Test samples: 389
 | MSE | 0.000457 |
 | RMSE | 0.021377 |
 
-The experiment uses SOH labels normalized by a capacity of 2.0. The metrics are from a single held-out battery and do not establish generalization across the full dataset.
+SOH labels are calculated by dividing capacity by the assumed maximum capacity of 2.0. The reported MAE corresponds to approximately **1.53 SOH percentage points**, and the RMSE corresponds to approximately **2.14 SOH percentage points**.
 
-See `BASELINE_RESULTS.md` for experiment details and limitations.
+These results describe evaluation on one held-out battery. The validation split contains samples from batteries used in training, so it does not establish generalization to entirely unseen batteries across the dataset.
 
-## Reference
+See [`BASELINE_RESULTS.md`](BASELINE_RESULTS.md) for additional experiment details and limitations.
 
-The initial SOH benchmarking work is based on:
+## Historical Degradation Analysis
 
-Wang et al. (2024), *Open access dataset, code library and benchmarking deep learning approaches for state-of-health estimation of lithium-ion batteries*, Journal of Energy Storage, 77, 109884.
+VoltTwin analyzes historical SOH observations to calculate degradation trends and compare simple forecasting approaches.
 
-- Paper: https://doi.org/10.1016/j.est.2023.109884
-- Reference code: https://github.com/wang-fujin/SOHbenchmark
-- Dataset information: https://wang-fujin.github.io/
+An exploratory evaluation on XJTU Batch 1 compared baseline and linear-trend methods using chronological data splits. The recent-window linear trend with a window of 25 observations achieved:
+
+- **MAE:** approximately 2.31 SOH percentage points
+- **RMSE:** approximately 2.88 SOH percentage points
+
+These are exploratory results on the available dataset, not evidence of general performance across other datasets or real-world batteries. Observation order is used as the trend index; it has not been verified as physical cycle count.
+
+## Digital Twin and Counterfactual Simulation
+
+The software twin maintains a battery's observed SOH and associated state information. It can simulate projected SOH under different assumed future usage and maintenance conditions.
+
+The current scenario comparison includes:
+
+- **No maintenance:** baseline simulation without recovery.
+- **Maintenance A:** simulation with an illustrative recovery assumption.
+- **Maintenance B:** simulation with a different illustrative recovery assumption.
+
+The maintenance recommendation uses explicit rules and an SOH threshold. It is not currently a trained reinforcement-learning agent or a validated autonomous maintenance system.
+
+Simulated maintenance recovery values are hypothetical. They should not be interpreted as measured maintenance effectiveness or real battery-life improvements.
+
+## Dataset and Reference Implementation
+
+The initial SOH benchmarking implementation is based on:
+
+Wang et al. (2024), *Open access dataset, code library and benchmarking deep learning approaches for state-of-health estimation of lithium-ion batteries*. *Journal of Energy Storage*, 77, 109884.
+
+- **Paper:** https://doi.org/10.1016/j.est.2023.109884
+- **Reference implementation:** https://github.com/wang-fujin/SOHbenchmark
+- **Dataset information:** https://wang-fujin.github.io/
 
 Download the dataset and reference code from their original sources. They are not included in this repository.
 
+## Running the Project Locally
+
+### Prerequisites
+
+- Python 3.11
+- Node.js and npm
+- The XJTU Batch 1 handcrafted-features workbook
+- The trained CNN checkpoint
+
+Place the dataset and checkpoint in the locations expected by the project configuration.
+
+### 1. Start the backend
+
+From the project root, activate your Python environment and install the project's required Python dependencies.
+
+```powershell
+.\.venv311\Scripts\Activate.ps1
+```
+
+Start the FastAPI application:
+
+```powershell
+python -m uvicorn backend.main:app --reload
+```
+
+The API is typically available at `http://127.0.0.1:8000`. Interactive API documentation is available at `http://127.0.0.1:8000/docs`.
+
+### 2. Start the frontend
+
+Open a second terminal:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Open the local URL printed by Vite, typically `http://localhost:5173`.
+
+**Setup note:** A `requirements.txt` or other dependency lock file should be provided for reproducible installation. If the repository does not yet contain one, the exact Python dependency installation command still needs to be documented.
+
+## Project Limitations and Future Work
+
+- Evaluate SOH prediction across additional independently held-out batteries and datasets.
+- Strengthen validation of the degradation estimator using independent test sequences.
+- Integrate sequential replay outputs with counterfactual simulation and maintenance recommendations into one end-to-end workflow.
+- Develop a more condition-aware adaptive maintenance policy and evaluate cases where the recommendation changes.
+- Investigate physics-based battery simulation if suitable input data and project requirements support it.
+- Validate simulated degradation and maintenance assumptions against suitable experimental or published evidence.
+
+## Repository Structure
+
+```text
+VoltTwin/
+├── backend/                 # FastAPI application
+├── digital_twin/            # Twin, replay, simulation, and decision logic
+├── frontend/                # React + TypeScript dashboard
+├── models/                  # Model inference code and checkpoint location
+├── preprocessing/            # Data preprocessing utilities
+├── tests/                   # Automated tests
+├── train_soh.py             # CNN training pipeline
+├── validate_degradation.py  # Exploratory degradation evaluation
+├── BASELINE_RESULTS.md      # Baseline experiment details
+└── README.md
+```
+
 ## Project Status
 
-This is an ongoing academic project. Digital twin behavior and maintenance scenario outcomes will be simulations, and their assumptions and limitations will be documented separately from measured data and model predictions.
+VoltTwin is an ongoing academic project. Model predictions, observed historical trends, and simulated scenario outcomes are distinct outputs and should be evaluated separately. Future work will focus on integrating these components into a coherent adaptive maintenance workflow and improving the validation of its decisions.
