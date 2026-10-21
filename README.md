@@ -122,32 +122,50 @@ Download the dataset and reference code from their original sources. They are no
 
 ### Prerequisites
 
+- Git
 - Python 3.11
 - Node.js and npm
 - The XJTU Batch 1 handcrafted-features workbook
 - The trained CNN checkpoint
 
-Place the dataset and checkpoint in the locations expected by the project configuration.
+The dataset and trained checkpoint are not included in this repository. Obtain the required files from the original dataset/reference sources and place them at the paths expected by the project.
 
-### 1. Start the backend
-
-From the project root, activate your Python environment and install the project's required Python dependencies.
+### 1. Clone the repository
 
 ```powershell
-.\.venv311\Scripts\Activate.ps1
+git clone https://github.com/PriyankaR1712/VoltTwin.git
+cd VoltTwin
 ```
 
-Start the FastAPI application:
+### 2. Set up the Python backend
+
+Create and activate a virtual environment from the project root:
+
+```powershell
+py -3.11 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+Install the Python dependencies:
+
+```powershell
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+Start the FastAPI backend:
 
 ```powershell
 python -m uvicorn backend.main:app --reload
 ```
 
-The API is typically available at `http://127.0.0.1:8000`. Interactive API documentation is available at `http://127.0.0.1:8000/docs`.
+The API is available at `http://127.0.0.1:8000`. Interactive API documentation is available at `http://127.0.0.1:8000/docs`.
 
-### 2. Start the frontend
+Keep this terminal running.
 
-Open a second terminal:
+### 3. Set up the React frontend
+
+Open a second terminal from the project root:
 
 ```powershell
 cd frontend
@@ -157,7 +175,24 @@ npm run dev
 
 Open the local URL printed by Vite, typically `http://localhost:5173`.
 
-**Setup note:** A `requirements.txt` or other dependency lock file should be provided for reproducible installation. If the repository does not yet contain one, the exact Python dependency installation command still needs to be documented.
+Keep this terminal running too.
+
+### 4. Run the tests
+
+From the project root, with the Python virtual environment activated:
+
+```powershell
+python -m pytest
+```
+
+### Troubleshooting
+
+- **Python version:** Use Python 3.11 for the project environment.
+- **Missing model or dataset:** Confirm the required checkpoint and XJTU workbook exist at the paths expected by the backend.
+- **Backend errors:** Check the backend terminal and visit `/docs` to verify the API is running.
+- **Frontend errors:** Check the frontend terminal and confirm npm dependencies installed successfully.
+- **PowerShell activation blocked:** If your system prevents virtual-environment activation, use an appropriate local execution-policy setting or invoke the environment's Python executable directly.
+
 
 ## Project Limitations and Future Work
 
