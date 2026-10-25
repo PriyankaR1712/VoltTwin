@@ -1,8 +1,6 @@
 import math
-from dataclasses import dataclass, field
-
-
-
+from dataclasses import dataclass
+from digital_twin.degradation_estimator import DegradationEstimator
 @dataclass
 class BatteryState:
     """Represents the current state of one battery."""
@@ -157,4 +155,88 @@ class BatteryTwin:
                 self.assumptions.degradation_per_cycle
             ),
             "is_simulation": True,
+        }
+    def simulate_hybrid(
+        self,
+        future_samples: int,
+        baseline_degradation_per_sample: float = 0.001,
+        trend_weight: float = 0.5,
+    ) -> dict:
+        """
+        Project future SOH using baseline degradation and recent trend.
+
+        This is an experimental simulation, not a validated
+        physical battery degradation model.
+        """
+        if (
+            not isinstance(future_samples, int)
+            or isinstance(future_samples, bool)
+            or future_samples < 0
+        ):
+            raise ValueError(
+                "Future samples must be a non-negative integer."
+            )
+
+        if (
+            not isinstance(baseline_degradation_per_sample, (int, float))
+            or not math.isfinite(baseline_degradation_per_sample)
+            or not 0.0 <= baseline_degradation_per_sample <= 1.0
+        ):
+            raise ValueError(
+                "Baseline degradation must be between 0 and 1."
+            )
+
+        if (
+            not isinstance(trend_weight, (int, float))
+            or not math.isfinite(trend_weight)
+            or not 0.0 <= trend_weight <= 1.0
+        ):
+            raise ValueError("Trend weight must be between 0 and 1.")
+
+        if len(self.observation_history) < 3:
+            raise ValueError(
+                "At least 3 SOH observations are required."
+            )
+
+        observations = [
+            record["observed_soh"]
+            for record in self.observation_history
+        ]
+
+        window_size = min(25, len(observations))
+        estimator = DegradationEstimator(window_size=window_size)
+        trend = estimator.estimate(observations)
+
+        trend_per_sample = float(trend["trend_per_sample"])
+        trend_based_rate = max(0.0, -trend_per_sample)
+
+        hybrid_rate = (
+            (1.0 - trend_weight) * baseline_degradation_per_sample
+            + trend_weight * trend_based_rate
+        )
+
+        projected_soh = max(
+            0.0,
+            min(
+                1.0,
+                self.state.soh - future_samples * hybrid_rate,
+            ),
+        )
+
+        return {
+            "battery_id": self.state.battery_id,
+            "initial_soh": round(self.state.soh, 4),
+            "projected_soh": round(projected_soh, 4),
+            "projected_soh_percent": round(projected_soh * 100, 2),
+            "future_samples": future_samples,
+            "baseline_degradation_per_sample": (
+                baseline_degradation_per_sample
+            ),
+            "trend_per_sample": trend_per_sample,
+            "trend_based_degradation_per_sample": trend_based_rate,
+            "trend_weight": trend_weight,
+            "hybrid_degradation_per_sample": hybrid_rate,
+            "model_type": "hybrid_baseline_recent_trend",
+            "is_simulation": True,
+            "is_physically_validated": False,
         }

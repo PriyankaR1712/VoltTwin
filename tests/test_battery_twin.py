@@ -55,4 +55,63 @@ def test_simulation_does_not_modify_observed_state():
 
     assert twin.state.soh == pytest.approx(0.85)
     assert len(twin.observation_history) == 1
-    
+def test_hybrid_simulation_uses_baseline_and_recent_trend():
+    twin = create_twin()
+
+    for index, soh in enumerate([0.96, 0.93, 0.90]):
+        twin.update_from_observation(soh, observation_index=index)
+
+    result = twin.simulate_hybrid(
+        future_samples=10,
+        baseline_degradation_per_sample=0.001,
+        trend_weight=0.5,
+    )
+
+    # Recent slope = -0.03 per observation.
+    # Hybrid rate = 0.5 * 0.001 + 0.5 * 0.03 = 0.0155.
+    # Projection = 0.90 - 10 * 0.0155 = 0.745.
+    assert result["projected_soh"] == pytest.approx(0.745)
+    assert result["is_simulation"] is True
+
+
+def test_hybrid_simulation_does_not_modify_twin_state():
+    twin = create_twin()
+
+    for index, soh in enumerate([0.96, 0.93, 0.90]):
+        twin.update_from_observation(soh, observation_index=index)
+
+    twin.simulate_hybrid(
+        future_samples=10,
+        baseline_degradation_per_sample=0.001,
+        trend_weight=0.5,
+    )
+
+    assert twin.state.soh == pytest.approx(0.90)
+    assert len(twin.observation_history) == 3
+
+
+def test_hybrid_simulation_requires_enough_observations():
+    twin = create_twin()
+    twin.update_from_observation(0.90, observation_index=0)
+    twin.update_from_observation(0.89, observation_index=1)
+
+    with pytest.raises(ValueError):
+        twin.simulate_hybrid(
+            future_samples=10,
+            baseline_degradation_per_sample=0.001,
+            trend_weight=0.5,
+        )
+
+
+def test_hybrid_simulation_rejects_invalid_weight():
+    twin = create_twin()
+
+    for index, soh in enumerate([0.96, 0.93, 0.90]):
+        twin.update_from_observation(soh, observation_index=index)
+
+    with pytest.raises(ValueError):
+        twin.simulate_hybrid(
+            future_samples=10,
+            baseline_degradation_per_sample=0.001,
+            trend_weight=1.5,
+        )
