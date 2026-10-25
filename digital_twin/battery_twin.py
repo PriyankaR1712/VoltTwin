@@ -210,9 +210,19 @@ class BatteryTwin:
         trend_per_sample = float(trend["trend_per_sample"])
         trend_based_rate = max(0.0, -trend_per_sample)
 
+        trend_r_squared = trend["trend_r_squared"]
+
+        if trend_r_squared is None:
+            effective_trend_weight = 0.0
+        else:
+            effective_trend_weight = (
+                trend_weight * max(0.0, min(1.0, trend_r_squared))
+            )
+
         hybrid_rate = (
-            (1.0 - trend_weight) * baseline_degradation_per_sample
-            + trend_weight * trend_based_rate
+            (1.0 - effective_trend_weight)
+            * baseline_degradation_per_sample
+            + effective_trend_weight * trend_based_rate
         )
 
         projected_soh = max(
@@ -234,7 +244,9 @@ class BatteryTwin:
             ),
             "trend_per_sample": trend_per_sample,
             "trend_based_degradation_per_sample": trend_based_rate,
-            "trend_weight": trend_weight,
+                        "trend_weight": trend_weight,
+            "trend_r_squared": trend_r_squared,
+            "effective_trend_weight": effective_trend_weight,
             "hybrid_degradation_per_sample": hybrid_rate,
             "model_type": "hybrid_baseline_recent_trend",
             "is_simulation": True,

@@ -114,4 +114,51 @@ def test_hybrid_simulation_rejects_invalid_weight():
             future_samples=10,
             baseline_degradation_per_sample=0.001,
             trend_weight=1.5,
-        )
+       )
+def test_hybrid_weight_is_reduced_for_less_reliable_trend():
+    twin = create_twin()
+
+    for index, soh in enumerate([0.96, 0.94, 0.95, 0.90, 0.91]):
+        twin.update_from_observation(soh, observation_index=index)
+
+    result = twin.simulate_hybrid(
+        future_samples=10,
+        baseline_degradation_per_sample=0.001,
+        trend_weight=0.5,
+    )
+
+    assert result["trend_r_squared"] < 1.0
+    assert result["effective_trend_weight"] < 0.5
+
+
+def test_hybrid_keeps_full_weight_for_perfect_linear_trend():
+    twin = create_twin()
+
+    for index, soh in enumerate([0.96, 0.93, 0.90, 0.87, 0.84]):
+        twin.update_from_observation(soh, observation_index=index)
+
+    result = twin.simulate_hybrid(
+        future_samples=10,
+        baseline_degradation_per_sample=0.001,
+        trend_weight=0.5,
+    )
+
+    assert result["trend_r_squared"] == pytest.approx(1.0)
+    assert result["effective_trend_weight"] == pytest.approx(0.5)
+
+
+def test_hybrid_uses_baseline_when_trend_fit_is_unavailable():
+    twin = create_twin()
+
+    for index, soh in enumerate([0.90, 0.90, 0.90]):
+        twin.update_from_observation(soh, observation_index=index)
+
+    result = twin.simulate_hybrid(
+        future_samples=10,
+        baseline_degradation_per_sample=0.001,
+        trend_weight=0.5,
+    )
+
+    assert result["trend_r_squared"] is None
+    assert result["effective_trend_weight"] == pytest.approx(0.0)
+    assert result["hybrid_degradation_per_sample"] == pytest.approx(0.001)
