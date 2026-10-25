@@ -96,7 +96,10 @@ def replay_battery(
     ):
         # Update the twin with the observed SOH after evaluating
         # the model prediction for this observation.
-        twin.state.soh = float(actual)
+        twin.update_from_observation(
+        observed_soh=float(actual),
+        observation_index=index,
+)
 
         observations.append(
             {

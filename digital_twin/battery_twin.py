@@ -1,5 +1,6 @@
+import math
+from dataclasses import dataclass, field
 
-from dataclasses import dataclass
 
 
 @dataclass
@@ -55,7 +56,7 @@ class BatteryTwin:
     ):
         self.state = state
         self.assumptions = assumptions or SimulationAssumptions()
-
+        self.observation_history: list[dict] = []
     def get_state(self) -> dict:
         """Return the current battery state."""
         return {
@@ -65,6 +66,46 @@ class BatteryTwin:
             "cycle_count": self.state.cycle_count,
         }
 
+    def update_from_observation(
+        self,
+        observed_soh: float,
+        observation_index: int | None = None,
+    ) -> dict:
+        """
+        Update the twin using an observed SOH value.
+
+        Observation indices represent positions in the supplied
+        history, not verified physical battery cycle counts.
+        """
+        if not isinstance(observed_soh, (int, float)):
+            raise ValueError("Observed SOH must be a finite number.")
+
+        if not math.isfinite(observed_soh):
+            raise ValueError("Observed SOH must be a finite number.")
+
+        if not 0.0 <= observed_soh <= 1.0:
+            raise ValueError("Observed SOH must be between 0 and 1.")
+
+        if observation_index is not None:
+            if (
+                not isinstance(observation_index, int)
+                or isinstance(observation_index, bool)
+                or observation_index < 0
+            ):
+                raise ValueError(
+                    "Observation index must be a non-negative integer."
+                )
+
+        self.state.soh = float(observed_soh)
+
+        record = {
+            "observation_index": observation_index,
+            "observed_soh": float(observed_soh),
+            "observed_soh_percent": round(float(observed_soh) * 100, 2),
+        }
+        self.observation_history.append(record)
+
+        return record
     def simulate(
         self,
         additional_cycles: int,
