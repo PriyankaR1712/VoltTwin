@@ -29,6 +29,7 @@ def test_observation_updates_twin_state():
     assert result["observed_soh"] == pytest.approx(0.85)
 
 
+
 def test_observation_is_recorded_in_history():
     twin = create_twin()
 
@@ -38,7 +39,25 @@ def test_observation_is_recorded_in_history():
     assert len(twin.observation_history) == 2
     assert twin.observation_history[-1]["observed_soh"] == pytest.approx(0.85)
 
+def test_prediction_is_recorded_separately_from_observation():
+    twin = create_twin()
 
+    twin.record_prediction(0.92, observation_index=0)
+    twin.update_from_observation(0.90, observation_index=0)
+
+    assert len(twin.prediction_history) == 1
+    assert twin.prediction_history[0]["predicted_soh"] == pytest.approx(0.92)
+    assert len(twin.observation_history) == 1
+    assert twin.observation_history[0]["observed_soh"] == pytest.approx(0.90)
+    assert twin.state.soh == pytest.approx(0.90)
+
+
+@pytest.mark.parametrize("invalid_soh", [-0.1, 1.1, float("nan"), float("inf")])
+def test_invalid_prediction_is_rejected(invalid_soh):
+    twin = create_twin()
+
+    with pytest.raises(ValueError):
+        twin.record_prediction(invalid_soh)
 @pytest.mark.parametrize("invalid_soh", [-0.1, 1.1, float("nan"), float("inf")])
 def test_invalid_observation_is_rejected(invalid_soh):
     twin = create_twin()

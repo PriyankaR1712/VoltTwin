@@ -55,6 +55,7 @@ class BatteryTwin:
         self.state = state
         self.assumptions = assumptions or SimulationAssumptions()
         self.observation_history: list[dict] = []
+        self.prediction_history: list[dict] = []
     def get_state(self) -> dict:
         """Return the current battery state."""
         return {
@@ -104,6 +105,39 @@ class BatteryTwin:
         self.observation_history.append(record)
 
         return record
+    def record_prediction(
+        self,
+        predicted_soh: float,
+        observation_index: int | None = None,
+    ) -> dict:
+        """Record predicted SOH separately from observed battery state."""
+        if (
+            not isinstance(predicted_soh, (int, float))
+            or isinstance(predicted_soh, bool)
+            or not math.isfinite(predicted_soh)
+        ):
+            raise ValueError("Predicted SOH must be a finite number.")
+
+        if not 0.0 <= predicted_soh <= 1.0:
+            raise ValueError("Predicted SOH must be between 0 and 1.")
+
+        if observation_index is not None and (
+            not isinstance(observation_index, int)
+            or isinstance(observation_index, bool)
+            or observation_index < 0
+        ):
+            raise ValueError(
+                "Observation index must be a non-negative integer."
+            )
+
+        record = {
+            "observation_index": observation_index,
+            "predicted_soh": float(predicted_soh),
+            "predicted_soh_percent": round(float(predicted_soh) * 100, 2),
+        }
+        self.prediction_history.append(record)
+        return record
+
     def simulate(
         self,
         additional_cycles: int,

@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 import torch
@@ -8,6 +8,7 @@ from digital_twin.historical_degradation import analyze_xjtu_workbook
 from digital_twin.degradation_estimator import DegradationEstimator
 from pathlib import Path
 from digital_twin.sequential_replay import replay_battery
+from digital_twin.agentic_controller import run_agentic_maintenance_loop
 
 app = FastAPI(
     title="VoltTwin API",
@@ -261,6 +262,9 @@ class SequentialReplayInput(BaseModel):
     sheet_name: str = Field(min_length=1, max_length=100)
     battery_id: str = Field(min_length=1, max_length=100)
 
+class AdaptiveMaintenanceInput(SequentialReplayInput):
+    diagnostic_evidence: dict = Field(default_factory=dict)
+
 
 @app.post("/replay-battery")
 def replay_battery_endpoint(request: SequentialReplayInput):
@@ -283,19 +287,9 @@ def replay_battery_endpoint(request: SequentialReplayInput):
     )
 
 
-@app.post("/adaptive-maintenance")
-def adaptive_maintenance(request: SequentialReplayInput):
-    from digital_twin.battery_twin import (
-        BatteryState,
-        BatteryTwin,
-        SimulationAssumptions,
-    )
-    from digital_twin.counterfactual import (
-        MaintenanceScenario,
-        compare_scenarios,
-    )
-    from digital_twin.maintenance_agent import recommend_maintenance
 
+@app.post("/adaptive-maintenance")
+def adaptive_maintenance(request: AdaptiveMaintenanceInput):
     project_root = Path(__file__).resolve().parent.parent
     workbook_path = (
         project_root
@@ -307,7 +301,7 @@ def adaptive_maintenance(request: SequentialReplayInput):
         / "batch-1_features.xlsx"
     )
 
-    # 1. Replay the selected battery's historical observations.
+    # 1. Replay historical battery observations.
     replay = replay_battery(
         workbook_path=workbook_path,
         sheet_name=request.sheet_name,
@@ -319,52 +313,49 @@ def adaptive_maintenance(request: SequentialReplayInput):
         for observation in replay["observations"]
     ]
 
-    # 2. Estimate its recent historical degradation trend.
+    # 2. Estimate the recent degradation trend.
     estimator = DegradationEstimator(window_size=25)
     trend = estimator.estimate(observed_soh)
 
     current_soh = replay["final_twin_state"]["soh"]
 
-    # 3. Initialize the twin with the latest observed SOH.
-    twin = BatteryTwin(
-        state=BatteryState(
+    # 3. Run the integrated Digital Twin decision loop.
+    try:
+        controller_result = run_agentic_maintenance_loop(
             battery_id=request.battery_id,
-            soh=current_soh,
+            current_soh=current_soh,
             cycle_count=0,
-        ),
-        assumptions=SimulationAssumptions(
-            degradation_per_cycle=0.0001,
-        ),
-    )
+            trend_per_sample=trend["trend_per_sample"],
+            additional_cycles=100,
+            minimum_acceptable_soh=0.80,
+            diagnostic_evidence=request.diagnostic_evidence,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=str(exc),
+        ) from exc
 
-    # 4. Simulate the existing counterfactual scenarios.
-    additional_cycles = 100
-    scenarios = [
-        MaintenanceScenario("No maintenance", additional_cycles, 0.0),
-        MaintenanceScenario("Maintenance A", additional_cycles, 0.005),
-        MaintenanceScenario("Maintenance B", additional_cycles, 0.01),
-    ]
-    scenario_results = compare_scenarios(twin, scenarios)
-
-    # 5. Select a scenario using current condition, recent trend,
-    #    and simulated outcomes.
-    recommendation = recommend_maintenance(
-        scenario_results,
-        minimum_acceptable_soh=0.80,
-        current_soh=current_soh,
-        trend_per_sample=trend["trend_per_sample"],
-    )
-
+    # 4. Return the replay, simulation results, and final recommendation.
     return {
-        "battery": twin.get_state(),
+        "battery": controller_result["observed_battery_state"],
         "replay": replay,
         "degradation_trend": trend,
-        "scenarios": scenario_results,
-        "recommendation": recommendation,
+        "interventions": controller_result["intervention_proposals"],
+        "scenarios": controller_result["simulation_outcomes"],
+        "selected_scenario": controller_result["selected_scenario"],
+        "selected_action": controller_result["selected_action"],
+        "recommendation": controller_result["recommendation"],
+        "controller_type": controller_result["controller_type"],
+        "maintenance_effects_validated": controller_result[
+            "maintenance_effects_validated"
+        ],
         "notice": (
             "The CNN predictions are evaluated against recorded labels. "
             "The degradation trend uses observation indices, not verified "
             "physical cycles. Future degradation and maintenance effects "
-            "are illustrative simulations, not validated real-world effects."
+            "are illustrative simulations, not validated real-world effects. "
+            "The current decision controller is deterministic and rule-based."
         ),
     }
+

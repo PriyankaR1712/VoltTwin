@@ -109,6 +109,8 @@ type ReplayResult = {
 }
 
 type AdaptiveMaintenanceResult = {
+  controller_type: string
+  maintenance_effects_validated: boolean
   battery: {
     battery_id: string
     soh: number
@@ -137,6 +139,20 @@ type AdaptiveMaintenanceResult = {
     minimum_acceptable_soh: number
     is_simulation_based: boolean
     is_rule_based: boolean
+    recommended_action: string
+    action_steps: string[]
+    required_evidence: string[]
+    urgency: string
+    decision_factors: {
+      current_soh_below_threshold: boolean
+      trend_is_declining: boolean
+      trend_indicates_rapid_decline: boolean
+      baseline_meets_threshold: boolean
+      acceptable_scenario_count: number
+    }
+    available_action_categories: string[]
+    is_adaptive_policy: boolean
+    maintenance_effects_validated: boolean
   }
   notice: string
 }
@@ -157,6 +173,11 @@ function App() {
   const [adaptiveResult, setAdaptiveResult] = useState<AdaptiveMaintenanceResult | null>(null)
   const [adaptiveError, setAdaptiveError] = useState('')
   const [adaptiveLoading, setAdaptiveLoading] = useState(false)
+  const [thermalAlert, setThermalAlert] = useState(false)
+  const [bmsFaultCodes, setBmsFaultCodes] = useState('')
+  const [cellVoltageImbalance, setCellVoltageImbalance] = useState(false)
+  const [chargingAnomaly, setChargingAnomaly] = useState(false)
+  const [confirmedFault, setConfirmedFault] = useState(false)
   const [loading, setLoading] = useState(false)
   
   const [observedSohText, setObservedSohText] = useState('')
@@ -453,6 +474,16 @@ async function runAdaptiveMaintenance() {
       body: JSON.stringify({
         sheet_name: replaySheet,
         battery_id: replayBatteryId.trim(),
+        diagnostic_evidence: {
+          thermal_alert: thermalAlert,
+          bms_fault_codes: bmsFaultCodes
+            .split(',')
+            .map((code) => code.trim())
+            .filter(Boolean),
+          cell_voltage_imbalance: cellVoltageImbalance,
+          charging_anomaly: chargingAnomaly,
+          confirmed_fault: confirmedFault,
+        },
       }),
     })
 
@@ -988,17 +1019,33 @@ async function runAdaptiveMaintenance() {
         observations in the selected sheet.
       </p>
 
+      
       <aside className="notice" role="note">
         <strong>Final Digital Twin state</strong>
+
         <p>
           Battery: {replayResult.final_twin_state.battery_id}
-          {' · '}Observed SOH: {replayResult.final_twin_state.soh_percent.toFixed(2)}%
+          {' · '}
+          Observed SOH:{' '}
+          {replayResult.final_twin_state.soh_percent.toFixed(2)}%
         </p>
+
         <p>
-          The replay updates the twin using observed SOH. This is a
-          historical replay, not a live battery stream.
+          Observations processed: {replayResult.observation_count}
+        </p>
+
+        <p>
+          Physical cycle count: Unverified / unavailable
+        </p>
+
+        <p>
+          The twin's SOH is updated using observed historical data.
+          The observation count represents the number of records replayed,
+          not verified physical battery cycles. This is a historical
+          replay, not a live battery stream.
         </p>
       </aside>
+
     </div>
   )}
 </section>
@@ -1014,7 +1061,62 @@ async function runAdaptiveMaintenance() {
       </p>
     </div>
   </div>
+  <div className="diagnostic-inputs">
+    <h3>Diagnostic evidence</h3>
+    <p className="chart-caption">
+      Enter only evidence you have actually observed or confirmed.
+      These inputs are not automatically detected by the dataset.
+    </p>
 
+    <label>
+      <input
+        type="checkbox"
+        checked={thermalAlert}
+        onChange={(event) => setThermalAlert(event.target.checked)}
+      />
+      Thermal alert reported
+    </label>
+
+    <label>
+      <input
+        type="checkbox"
+        checked={cellVoltageImbalance}
+        onChange={(event) =>
+          setCellVoltageImbalance(event.target.checked)
+        }
+      />
+      Cell voltage imbalance reported
+    </label>
+
+    <label>
+      <input
+        type="checkbox"
+        checked={chargingAnomaly}
+        onChange={(event) => setChargingAnomaly(event.target.checked)}
+      />
+      Charging anomaly reported
+    </label>
+
+    <label>
+      <input
+        type="checkbox"
+        checked={confirmedFault}
+        onChange={(event) => setConfirmedFault(event.target.checked)}
+      />
+      Fault confirmed by diagnostic evidence
+    </label>
+
+    <label>
+      BMS fault codes
+      <span>Enter codes separated by commas, if available.</span>
+      <input
+        type="text"
+        value={bmsFaultCodes}
+        onChange={(event) => setBmsFaultCodes(event.target.value)}
+        placeholder="e.g. BMS_01, BMS_02"
+      />
+    </label>
+  </div>
   <div className="form-footer">
     <button
       className="primary-button"
@@ -1085,28 +1187,105 @@ async function runAdaptiveMaintenance() {
         ))}
       </div>
 
+      
       <div className="recommendation-card">
+        <p className="eyebrow">MAINTENANCE AGENT DECISION</p>
+
         <div className="recommendation-main">
-          <span className="recommendation-label">
-            Recommended maintenance action
-          </span>
+          <div>
+            <span className="recommendation-label">Recommended action</span>
+            <h3>{adaptiveResult.recommendation.recommended_action}</h3>
+          </div>
 
-          <h3>
-            {adaptiveResult.recommendation.recommended_scenario}
-          </h3>
-
-          <p className="recommendation-soh">
-            Projected SOH:{' '}
-            {(adaptiveResult.recommendation.projected_soh * 100).toFixed(2)}%
-          </p>
-
-          <span className="status-pill">
-            {adaptiveResult.recommendation.status.replaceAll('_', ' ')}
-          </span>
-
-          <p>{adaptiveResult.recommendation.reason}</p>
+          <div className="recommendation-soh">
+            <span className="recommendation-label">Urgency</span>
+            <strong>
+              {adaptiveResult.recommendation.urgency.toUpperCase()}
+            </strong>
+          </div>
         </div>
+
+        <p>{adaptiveResult.recommendation.reason}</p>
+
+        <div className="scenario-detail">
+          <span>Selected simulation scenario</span>
+          <b>{adaptiveResult.recommendation.recommended_scenario}</b>
+        </div>
+      
+
+        <div className="scenario-detail">
+          <span>Projected SOH</span>
+          <b>
+            {(adaptiveResult.recommendation.projected_soh * 100).toFixed(2)}%
+          </b>
+        </div>
+
+        <div className="scenario-detail">
+          <span>SOH threshold status</span>
+          <b>{adaptiveResult.recommendation.status.replaceAll('_', ' ')}</b>
+        </div>
+
+        <h3>Recommended action steps</h3>
+        <ol>
+          {adaptiveResult.recommendation.action_steps.map((step, index) => (
+            <li key={index}>{step}</li>
+          ))}
+        </ol>
+
+        <h3>Evidence required</h3>
+        <ul>
+          {adaptiveResult.recommendation.required_evidence.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+
+        <p className="chart-caption">
+          Rule-based, simulation-informed recommendation. Maintenance effects
+          have not been validated in real-world conditions.
+        </p>
       </div>
+      <div className="scenario-detail">
+        <span>Controller type</span>
+        <b>{adaptiveResult.controller_type.replaceAll('_', ' ')}</b>
+      </div>
+
+      <div className="scenario-detail">
+        <span>Maintenance effects validated</span>
+        <b>{adaptiveResult.maintenance_effects_validated ? 'Yes' : 'No'}</b>
+      </div>
+
+      <h3>Decision factors</h3>
+      <ul>
+        <li>
+          Current SOH below threshold:{' '}
+          {adaptiveResult.recommendation.decision_factors.current_soh_below_threshold
+            ? 'Yes'
+            : 'No'}
+        </li>
+        <li>
+          Degradation trend declining:{' '}
+          {adaptiveResult.recommendation.decision_factors.trend_is_declining
+            ? 'Yes'
+            : 'No'}
+        </li>
+        <li>
+          Rapid degradation detected:{' '}
+          {adaptiveResult.recommendation.decision_factors.trend_indicates_rapid_decline
+            ? 'Yes'
+            : 'No'}
+        </li>
+        <li>
+          Baseline meets SOH threshold:{' '}
+          {adaptiveResult.recommendation.decision_factors.baseline_meets_threshold
+            ? 'Yes'
+            : 'No'}
+        </li>
+        <li>
+          Acceptable scenarios:{' '}
+          {adaptiveResult.recommendation.decision_factors.acceptable_scenario_count}
+        </li>
+      </ul>
+
 
       <p className="notice">{adaptiveResult.notice}</p>
 

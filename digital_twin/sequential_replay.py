@@ -93,7 +93,12 @@ def replay_battery(
 
     for index, (prediction, actual) in enumerate(
         zip(predictions, actual_soh)
+        
     ):
+        twin.record_prediction(
+            predicted_soh=float(prediction),
+            observation_index=index,
+        )
         # Update the twin with the observed SOH after evaluating
         # the model prediction for this observation.
         twin.update_from_observation(
@@ -126,6 +131,7 @@ def replay_battery(
             float(np.sqrt(np.mean(squared_errors)) * 100), 4
         ),
         "observations": observations,
+        "prediction_history": twin.prediction_history,
         "final_twin_state": twin.get_state(),
         "evaluation_type": "sequential_observation_replay",
         "observation_order_is_verified_physical_cycle_order": False,

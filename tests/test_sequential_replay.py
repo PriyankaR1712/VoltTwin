@@ -39,6 +39,10 @@ def test_replay_evaluates_predictions_and_updates_twin(tmp_path, monkeypatch):
     )
 
     assert result["observation_count"] == 3
+    assert len(result["prediction_history"]) == 3
+    assert result["prediction_history"][0]["predicted_soh"] == pytest.approx(0.94)
+    assert len(result["observations"]) == 3
+    assert result["observations"][0]["actual_soh"] == pytest.approx(0.95)
     assert result["mae"] == pytest.approx(
         np.mean([0.01, 0.01, 0.01])
     )

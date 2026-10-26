@@ -72,3 +72,42 @@ def test_invalid_current_soh_is_rejected(scenarios):
 def test_invalid_trend_is_rejected(scenarios):
     with pytest.raises(ValueError):
         recommend_maintenance(scenarios, trend_per_sample=float("nan"))
+
+@pytest.mark.parametrize(
+    "evidence, expected_action",
+    [
+        (
+            {"thermal_alert": True},
+            "Thermal Management Inspection",
+        ),
+        (
+            {"bms_fault_codes": ["CELL_VOLTAGE_FAULT"]},
+            "Battery Management System Check",
+        ),
+        (
+            {"cell_voltage_imbalance": True},
+            "Battery Management System Check",
+        ),
+        (
+            {"charging_anomaly": True},
+            "Charging and Usage Review",
+        ),
+        (
+            {"confirmed_fault": True},
+            "Qualified Repair/Replacement Assessment",
+        ),
+    ],
+)
+def test_diagnostic_evidence_selects_action(
+    scenarios, evidence, expected_action
+):
+    result = recommend_maintenance(
+        scenarios,
+        current_soh=0.90,
+        trend_per_sample=-0.0001,
+        diagnostic_evidence=evidence,
+    )
+
+    assert result["recommended_action"] == expected_action
+    assert result["action_steps"]
+    assert result["required_evidence"]

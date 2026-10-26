@@ -1,7 +1,7 @@
 
 from dataclasses import dataclass
 from typing import List
-
+import math
 from digital_twin.battery_twin import BatteryTwin
 
 
@@ -13,17 +13,30 @@ class MaintenanceScenario:
     additional_cycles: int
     recovery_assumption: float = 0.0
 
+    
     def __post_init__(self):
-        if not self.name.strip():
+        if not isinstance(self.name, str) or not self.name.strip():
             raise ValueError("Scenario name cannot be empty.")
 
-        if self.additional_cycles < 0:
-            raise ValueError("Additional cycles cannot be negative.")
-
-        if not 0.0 <= self.recovery_assumption <= 1.0:
+        if (
+            not isinstance(self.additional_cycles, int)
+            or isinstance(self.additional_cycles, bool)
+            or self.additional_cycles < 0
+        ):
             raise ValueError(
-                "Recovery assumption must be between 0 and 1."
+                "Additional cycles must be a non-negative integer."
             )
+
+        if (
+            not isinstance(self.recovery_assumption, (int, float))
+            or isinstance(self.recovery_assumption, bool)
+            or not math.isfinite(self.recovery_assumption)
+            or not 0.0 <= self.recovery_assumption <= 1.0
+        ):
+            raise ValueError(
+                "Recovery assumption must be finite and between 0 and 1."
+            )
+
 
 
 def compare_scenarios(
