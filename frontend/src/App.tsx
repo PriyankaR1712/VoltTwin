@@ -1,6 +1,20 @@
 
 import { useState } from 'react'
 import './App.css'
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  ReferenceLine,
+  Cell,
+} from 'recharts'
 
 const API_BASE = 'http://127.0.0.1:8000'
 const SAMPLE_FEATURES_URL = '/sample_request.json'
@@ -1034,12 +1048,142 @@ async function runAdaptiveMaintenance() {
 
       </div>
       
+      <h3>Remaining Useful Life & EOL Threshold</h3>
+      <p className="chart-caption">
+        Current SOH compared with the 80% reference threshold.
+        RUL is expressed in observations, not verified physical cycles.
+      </p>
+
+      <div style={{ width: '100%', height: 300 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={[
+              {
+                name: 'Current SOH',
+                value: replayResult.rul_estimate.current_soh_percent,
+              },
+              {
+                name: 'EOL threshold',
+                value: replayResult.rul_estimate.eol_threshold_percent,
+              },
+            ]}
+            margin={{ top: 25, right: 20, left: 0, bottom: 10 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis
+              domain={[
+                (min: number) => Math.max(0, Math.floor(min - 5)),
+                (max: number) => Math.min(100, Math.ceil(max + 5)),
+              ]}
+              tickFormatter={(value) => `${value}%`}
+            />
+            <Tooltip
+              formatter={(value) =>
+                typeof value === 'number'
+                  ? `${value.toFixed(2)}%`
+                  : value
+              }
+            />
+            
+            <Bar
+              dataKey="value"
+              name="SOH"
+              label={{
+                position: 'top',
+                formatter: (value) =>
+                  typeof value === 'number'
+                    ? `${value.toFixed(2)}%`
+                    : '',
+              }}
+            >
+              {[
+                replayResult.rul_estimate.current_soh_percent,
+                replayResult.rul_estimate.eol_threshold_percent,
+              ].map((_, index) => (
+                <Cell
+                  key={index}
+                  fill={
+                    index === 0 &&
+                    replayResult.rul_estimate.current_soh_percent <=
+                      replayResult.rul_estimate.eol_threshold_percent
+                      ? '#dc2626'
+                      : '#64748b'
+                  }
+                />
+              ))}
+            </Bar>
+
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <p className="chart-caption">
+        RUL status: {replayResult.rul_estimate.status.replaceAll('_', ' ')}.
+        This estimate is experimental and is not physically validated.
+      </p>
+
       <p className="chart-caption">
         RUL is an experimental estimate in observations, not verified
         remaining battery cycles. The 80% end-of-life threshold is a
         configurable project assumption. This estimate is not physically
         validated.
       </p>
+      
+      <h3>Actual vs Predicted SOH</h3>
+      <p className="chart-caption">
+        CNN predictions compared with capacity-derived SOH labels.
+      </p>
+
+      <div style={{ width: '100%', height: 320 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            data={replayResult.observations}
+            margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="observation_index"
+              tick={{ fontSize: 12 }}
+              label={{
+                value: 'Observation index',
+                position: 'insideBottom',
+                offset: -5,
+              }}
+            />
+            <YAxis
+              domain={[0, 100]}
+              tick={{ fontSize: 12 }}
+              tickFormatter={(value) => `${value}%`}
+            />
+            <Tooltip
+              formatter={(value) =>
+                typeof value === 'number'
+                  ? `${value.toFixed(2)}%`
+                  : value
+              }
+              labelFormatter={(label) => `Observation ${label}`}
+            />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="actual_soh_percent"
+              name="Actual SOH"
+              stroke="#16a34a"
+              dot={false}
+              strokeWidth={2}
+            />
+            <Line
+              type="monotone"
+              dataKey="predicted_soh_percent"
+              name="Predicted SOH"
+              stroke="#2563eb"
+              dot={false}
+              strokeWidth={2}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
 
       <h3>Observation results</h3>
       <div className="historical-table-wrapper">
@@ -1218,7 +1362,47 @@ async function runAdaptiveMaintenance() {
           </strong>
         </div>
       </div>
+      <h3>Counterfactual Maintenance Comparison</h3>
+      <p className="chart-caption">
+        Comparison of projected SOH under different simulated maintenance scenarios.
+      </p>
 
+      <div style={{ width: '100%', height: 320 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={adaptiveResult.scenarios}
+            margin={{ top: 10, right: 20, left: 0, bottom: 20 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="scenario"
+              tick={{ fontSize: 11 }}
+              interval={0}
+            />
+            <YAxis
+              domain={[0, 100]}
+              tickFormatter={(value) => `${value}%`}
+            />
+            <Tooltip
+              formatter={(value) =>
+                typeof value === 'number'
+                  ? `${value.toFixed(2)}%`
+                  : value
+              }
+            />
+            <Bar
+              dataKey="projected_soh_percent"
+              name="Projected SOH"
+              fill="#2563eb"
+              label={{
+                position: 'top',
+                formatter: (value) =>
+                  typeof value === 'number' ? `${value.toFixed(2)}%` : '',
+              }}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
       <h3>Counterfactual scenarios</h3>
 
       <div className="scenario-grid">
@@ -1246,6 +1430,78 @@ async function runAdaptiveMaintenance() {
       {adaptiveResult.hybrid_projection && (
         <div className="recommendation-card">
           <p className="eyebrow">EXPERIMENTAL FORECAST</p>
+          <h3>SOH Degradation Forecast</h3>
+          <p className="chart-caption">
+            Experimental linear projection from initial to final SOH.
+            Intermediate points are illustrative, not model-generated predictions.
+          </p>
+
+          <div style={{ width: '100%', height: 320 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={Array.from(
+                  {
+                    length:
+                      adaptiveResult.hybrid_projection.future_samples + 1,
+                  },
+                  (_, index) => {
+                    const projection = adaptiveResult.hybrid_projection!
+                    const initial = projection.initial_soh * 100
+                    const final = projection.projected_soh_percent
+                    const horizon = projection.future_samples
+
+                    return {
+                      sample: index,
+                      soh: horizon === 0
+                        ? initial
+                        : initial + (final - initial) * index / horizon,
+                    }
+                  },
+                )}
+                margin={{ top: 10, right: 20, left: 0, bottom: 10 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="sample"
+                  tick={{ fontSize: 12 }}
+                  label={{
+                    value: 'Future observation samples',
+                    position: 'insideBottom',
+                    offset: -5,
+                  }}
+                />
+                <YAxis
+                  domain={[
+                    (dataMin: number) => Math.max(0, Math.floor(dataMin - 2)),
+                    (dataMax: number) => Math.min(100, Math.ceil(dataMax + 2)),
+                  ]}
+                  tickFormatter={(value) => `${value}%`}
+                />
+                <Tooltip
+                  formatter={(value) =>
+                    typeof value === 'number'
+                      ? `${value.toFixed(2)}%`
+                      : value
+                  }
+                  labelFormatter={(label) => `Future sample ${label}`}
+                />
+                <ReferenceLine
+                  y={80}
+                  stroke="#dc2626"
+                  strokeDasharray="5 5"
+                  label="80% reference"
+                />
+                <Line
+                  type="linear"
+                  dataKey="soh"
+                  name="Illustrative projected SOH"
+                  stroke="#f59e0b"
+                  strokeWidth={3}
+                  dot
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
           <h3>Hybrid SOH Projection</h3>
 
           <div className="scenario-detail">
