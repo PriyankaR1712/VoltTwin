@@ -21,6 +21,7 @@ def run_agentic_maintenance_loop(
     additional_cycles: int = 100,
     minimum_acceptable_soh: float = 0.80,
     diagnostic_evidence: dict | None = None,
+    observed_soh_history: list[float] | None = None,
 ) -> dict:
     """Observe state, propose interventions, simulate, and select an action.
 
@@ -86,6 +87,28 @@ def run_agentic_maintenance_loop(
         ),
     )
     observed_state = twin.get_state()
+    # Estimate a trend-aware baseline projection from observed history.
+    # The controller's input trend alone is not sufficient: the Digital
+    # Twin's hybrid simulator requires at least three observations.
+        # 6. Run the hybrid projection when sufficient historical
+    # observations are available.
+    hybrid_projection = None
+
+    if observed_soh_history is not None and len(observed_soh_history) >= 3:
+        twin.observation_history = [
+            {
+                "observation_index": index,
+                "observed_soh": float(soh),
+                "observed_soh_percent": float(soh) * 100,
+            }
+            for index, soh in enumerate(observed_soh_history)
+        ]
+
+        hybrid_projection = twin.simulate_hybrid(
+          future_samples=min(additional_cycles, 10),
+          baseline_degradation_per_sample=0.001,
+          trend_weight=0.5,
+        ) 
 
     # 2. Generate candidate interventions for what-if evaluation.
     interventions = [
@@ -137,6 +160,7 @@ def run_agentic_maintenance_loop(
         "controller_type": "deterministic_rule_based",
         "is_simulation_based": True,
         "maintenance_effects_validated": False,
+        "hybrid_projection": hybrid_projection,
         "notice": (
             "Interventions are candidate scenarios. Recovery values are "
             "illustrative assumptions, not validated maintenance effects. "

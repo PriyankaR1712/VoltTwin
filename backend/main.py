@@ -329,6 +329,7 @@ def adaptive_maintenance(request: AdaptiveMaintenanceInput):
             additional_cycles=100,
             minimum_acceptable_soh=0.80,
             diagnostic_evidence=request.diagnostic_evidence,
+            observed_soh_history=observed_soh,
         )
     except ValueError as exc:
         raise HTTPException(
@@ -347,6 +348,7 @@ def adaptive_maintenance(request: AdaptiveMaintenanceInput):
         "selected_action": controller_result["selected_action"],
         "recommendation": controller_result["recommendation"],
         "controller_type": controller_result["controller_type"],
+        "hybrid_projection": controller_result["hybrid_projection"],
         "maintenance_effects_validated": controller_result[
             "maintenance_effects_validated"
         ],

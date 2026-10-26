@@ -109,6 +109,23 @@ type ReplayResult = {
 }
 
 type AdaptiveMaintenanceResult = {
+  hybrid_projection: {
+    battery_id: string
+    initial_soh: number
+    projected_soh: number
+    projected_soh_percent: number
+    future_samples: number
+    baseline_degradation_per_sample: number
+    trend_per_sample: number
+    trend_based_degradation_per_sample: number
+    trend_weight: number
+    trend_r_squared: number | null
+    effective_trend_weight: number
+    hybrid_degradation_per_sample: number
+    model_type: string
+    is_simulation: boolean
+    is_physically_validated: boolean
+  } | null
   controller_type: string
   maintenance_effects_validated: boolean
   battery: {
@@ -1186,6 +1203,62 @@ async function runAdaptiveMaintenance() {
           </div>
         ))}
       </div>
+      {adaptiveResult.hybrid_projection && (
+        <div className="recommendation-card">
+          <p className="eyebrow">EXPERIMENTAL FORECAST</p>
+          <h3>Hybrid SOH Projection</h3>
+
+          <div className="scenario-detail">
+            <span>Initial SOH</span>
+            <b>
+              {(adaptiveResult.hybrid_projection.initial_soh * 100).toFixed(2)}%
+            </b>
+          </div>
+
+          <div className="scenario-detail">
+            <span>Projected SOH</span>
+            <b>
+              {adaptiveResult.hybrid_projection.projected_soh_percent.toFixed(2)}%
+            </b>
+          </div>
+
+          <div className="scenario-detail">
+            <span>Forecast horizon</span>
+            <b>
+              {adaptiveResult.hybrid_projection.future_samples} samples
+            </b>
+          </div>
+
+          <div className="scenario-detail">
+            <span>Hybrid degradation rate</span>
+            <b>
+              {(adaptiveResult.hybrid_projection.hybrid_degradation_per_sample * 100).toFixed(4)} pp/sample
+            </b>
+          </div>
+
+          <div className="scenario-detail">
+            <span>Trend fit (R²)</span>
+            <b>
+              {adaptiveResult.hybrid_projection.trend_r_squared === null
+                ? 'Unavailable'
+                : adaptiveResult.hybrid_projection.trend_r_squared.toFixed(3)}
+            </b>
+          </div>
+
+          <p className="chart-caption">
+            This experimental projection combines a baseline degradation
+            assumption with a recent observed trend. Samples are not verified
+            physical battery cycles.
+          </p>
+
+          <p className="chart-caption">
+            Physically validated:{' '}
+            {adaptiveResult.hybrid_projection.is_physically_validated
+              ? 'Yes'
+              : 'No — experimental simulation only'}
+          </p>
+        </div>
+      )}
 
       
       <div className="recommendation-card">
