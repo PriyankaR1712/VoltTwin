@@ -97,6 +97,21 @@ type ReplayResult = {
   mae_percentage_points: number
   rmse: number
   rmse_percentage_points: number
+  
+  rul_estimate: {
+    current_soh: number
+    current_soh_percent: number
+    eol_threshold: number
+    eol_threshold_percent: number
+    rul_observations: number | null
+    status: string
+    trend_per_sample: number
+    trend_r_squared: number | null
+    unit: string
+    is_physically_validated: boolean
+    method: string
+  }
+
   evaluation_type: string
   observation_order_is_verified_physical_cycle_order: boolean
   observations: ReplayObservation[]
@@ -999,7 +1014,32 @@ async function runAdaptiveMaintenance() {
           <strong>{replayResult.rmse_percentage_points.toFixed(4)}</strong>
           <small>SOH percentage points</small>
         </article>
+        
+        <article className="metric-card primary-metric">
+          <p>Estimated Remaining Useful Life</p>
+          <strong>
+            {replayResult.rul_estimate.rul_observations === null
+              ? 'Unavailable'
+              : replayResult.rul_estimate.rul_observations}
+          </strong>
+          <small>
+            {replayResult.rul_estimate.status.replaceAll('_', ' ')}
+            {' · '}
+            {replayResult.rul_estimate.unit}
+          </small>
+          <small>
+            EOL threshold: {replayResult.rul_estimate.eol_threshold_percent.toFixed(1)}% SOH
+          </small>
+        </article>
+
       </div>
+      
+      <p className="chart-caption">
+        RUL is an experimental estimate in observations, not verified
+        remaining battery cycles. The 80% end-of-life threshold is a
+        configurable project assumption. This estimate is not physically
+        validated.
+      </p>
 
       <h3>Observation results</h3>
       <div className="historical-table-wrapper">

@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
-
+from digital_twin.rul_estimator import RULEstimator
 from digital_twin.battery_twin import BatteryState, BatteryTwin
 from models.soh_predictor import SOHPredictor
 
@@ -117,7 +117,8 @@ def replay_battery(
                 "twin_state": twin.get_state(),
             }
         )
-
+        rul_estimator = RULEstimator(eol_threshold=0.80)
+        rul_result = rul_estimator.estimate(actual_soh.tolist())
     return {
         "battery_id": battery_id,
         "sheet_name": sheet_name,
@@ -133,6 +134,7 @@ def replay_battery(
         "observations": observations,
         "prediction_history": twin.prediction_history,
         "final_twin_state": twin.get_state(),
+        "rul_estimate": rul_result,
         "evaluation_type": "sequential_observation_replay",
         "observation_order_is_verified_physical_cycle_order": False,
     }
