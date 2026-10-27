@@ -17,7 +17,7 @@ import {
 } from 'recharts'
 
 const API_BASE = 'http://127.0.0.1:8000'
-const SAMPLE_FEATURES_URL = '/sample_request.json'
+
 
 type Scenario = {
   scenario: string
@@ -240,28 +240,37 @@ async function loadSampleBattery() {
   setError('')
 
   try {
-    const response = await fetch(SAMPLE_FEATURES_URL)
+    const match = batteryId.match(/XJTU-Battery-(\d+)/i)
+    const batteryNumber = match ? Number(match[1]) : 1
 
-    if (!response.ok) {
-      throw new Error('Could not load the sample battery file.')
+    if (batteryNumber < 1 || batteryNumber > 8) {
+      throw new Error('Select a battery between 1 and 8.')
     }
+
+    const response = await fetch(
+      `${API_BASE}/sample-battery/${batteryNumber}`,
+    )
 
     const sample = await response.json()
 
+    if (!response.ok) {
+      throw new Error(sample.detail || 'Could not load battery data.')
+    }
+
     if (!Array.isArray(sample.features) || sample.features.length !== 67) {
-      throw new Error('The sample file must contain exactly 67 features.')
+      throw new Error('The selected battery must contain 67 features.')
     }
 
     setFeaturesText(JSON.stringify(sample.features, null, 2))
-    setBatteryId('XJTU-Battery-1')
-    setCycleCount('389')
+    setBatteryId(sample.battery_id)
+    setCycleCount(String(sample.row_number))
     setAdditionalCycles('100')
     setResult(null)
   } catch (err) {
     setError(
       err instanceof Error
         ? err.message
-        : 'Unable to load the sample battery.',
+        : 'Unable to load battery data.',
     )
   }
 }
@@ -588,14 +597,22 @@ async function runAdaptiveMaintenance() {
         <div className="input-grid">
           <label>
             Battery ID
-            <input
+            <select
               value={batteryId}
               onChange={(event) => {
                 setBatteryId(event.target.value)
                 setResult(null)
               }}
-              placeholder="e.g. XJTU-Battery-1"
-            />
+            >
+              {Array.from({ length: 8 }, (_, index) => (
+                <option
+                  key={index + 1}
+                  value={`XJTU-Battery-${index + 1}`}
+                >
+                  {`XJTU-Battery-${index + 1}`}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             Current cycle count

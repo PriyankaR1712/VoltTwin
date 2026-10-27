@@ -360,4 +360,59 @@ def adaptive_maintenance(request: AdaptiveMaintenanceInput):
             "The current decision controller is deterministic and rule-based."
         ),
     }
+@app.get("/sample-battery/{battery_number}")
+def get_sample_battery(battery_number: int):
+    import pandas as pd
 
+    if battery_number < 1 or battery_number > 8:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=400,
+            detail="Battery number must be between 1 and 8."
+        )
+
+    project_root = Path(__file__).resolve().parent.parent
+
+    workbook_path = (
+        project_root
+        / "reference"
+        / "SOHbenchmark"
+        / "data"
+        / "XJTU"
+        / "handcraft_features"
+        / "batch-1_features.xlsx"
+    )
+
+    sheet_name = f"Sheet{battery_number}"
+    df = pd.read_excel(workbook_path, sheet_name=sheet_name)
+
+    if df.empty:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=400,
+            detail="Selected battery sheet is empty."
+        )
+
+    # The workbook should contain 67 feature columns and one label column.
+    if len(df.columns) != 68:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=500,
+            detail=f"Expected 68 columns (67 features + label), found {len(df.columns)}."
+        )
+
+    row = df.iloc[-1]
+    features = row.iloc[:67].tolist()
+
+    if not all(pd.notna(value) for value in features):
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=500,
+            detail="The selected row contains missing feature values."
+        )
+
+    return {
+        "battery_id": f"XJTU-Battery-{battery_number}",
+        "features": [float(value) for value in features],
+        "row_number": len(df),
+    }
