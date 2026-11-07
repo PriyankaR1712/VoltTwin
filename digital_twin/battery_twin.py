@@ -137,7 +137,29 @@ class BatteryTwin:
         }
         self.prediction_history.append(record)
         return record
+    def update_from_prediction(
+        self,
+        predicted_soh: float,
+        observation_index: int | None = None,
+    ) -> dict:
+        """
+        Update the operational twin using a model-predicted SOH.
 
+        Predictions are recorded separately from actual observations.
+        """
+        record = self.record_prediction(
+            predicted_soh=predicted_soh,
+            observation_index=observation_index,
+        )
+
+        self.state.soh = float(predicted_soh)
+
+        return {
+            **record,
+            "current_soh": self.state.soh,
+            "current_soh_percent": round(self.state.soh * 100, 2),
+            "state_source": "cnn_prediction",
+        }
     def simulate(
         self,
         additional_cycles: int,

@@ -181,3 +181,15 @@ def test_hybrid_uses_baseline_when_trend_fit_is_unavailable():
     assert result["trend_r_squared"] is None
     assert result["effective_trend_weight"] == pytest.approx(0.0)
     assert result["hybrid_degradation_per_sample"] == pytest.approx(0.001)
+def test_prediction_updates_operational_twin_without_recording_observation():
+    twin = create_twin()
+
+    result = twin.update_from_prediction(
+        predicted_soh=0.87,
+        observation_index=5,
+    )
+
+    assert twin.state.soh == pytest.approx(0.87)
+    assert len(twin.prediction_history) == 1
+    assert len(twin.observation_history) == 0
+    assert result["state_source"] == "cnn_prediction"
