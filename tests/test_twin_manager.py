@@ -132,3 +132,17 @@ def test_manager_rejects_invalid_cnn_prediction():
         manager.process_observation(np.ones(67), 0)
 
     assert len(manager.twin.prediction_history) == 0
+def test_manager_returns_prediction_history():
+    manager = create_manager([0.95, 0.93])
+
+    manager.process_observation(np.ones(67), 0)
+    manager.process_observation(np.ones(67), 1)
+
+    history = manager.get_history()
+
+    assert history["battery_id"] == "test-battery"
+    assert history["observation_count"] == 2
+    assert len(history["prediction_history"]) == 2
+    assert history["prediction_history"][0]["predicted_soh"] == pytest.approx(0.95)
+    assert history["prediction_history"][1]["predicted_soh"] == pytest.approx(0.93)
+    assert history["observation_history"] == []

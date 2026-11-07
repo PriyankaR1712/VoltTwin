@@ -208,3 +208,19 @@ class TwinManager:
             "rul_unit": "observations",
             "is_physically_validated": False,
         }
+    def get_history(self) -> dict:
+        """Return prediction history for dashboard visualisations."""
+
+        return {
+            "battery_id": self.twin.state.battery_id,
+            "prediction_history": list(
+                self.twin.prediction_history
+            ),
+            "observation_history": list(
+                self.twin.observation_history
+            ),
+            "observation_count": len(
+                self.twin.prediction_history
+            ),
+            "state_source": "cnn_prediction",
+        }
