@@ -56,3 +56,6 @@ results/sample_request.json
 
 # Generated validation results
 results/degradation_validation.csv
+
+# Local SOHbenchmark reference copy
+references/SOHbenchmark/
