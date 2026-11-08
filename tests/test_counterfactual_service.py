@@ -6,6 +6,7 @@ import torch
 from backend.twin_registry import TwinRegistry
 from digital_twin import twin_manager as twin_manager_module
 from digital_twin.counterfactual_service import simulate_registered_twin
+from digital_twin.scenario_validation import validate_counterfactual_response
 
 
 class ConstantPredictor:
@@ -59,3 +60,37 @@ def test_registered_counterfactual_does_not_mutate_twin_or_histories(
     assert after["state"]["prediction_count"] == prediction_count
     assert after["state"]["state_source"] == provenance
     assert after["history"] == before["history"]
+
+
+def test_real_counterfactual_response_validates_without_mutating_registered_twin(
+    registered_manager,
+):
+    registry, manager = registered_manager
+    snapshot = manager.get_snapshot()
+    state_before = deepcopy(snapshot["state"])
+    history_before = deepcopy(snapshot["history"])
+    observation_index_before = manager.last_observation_index
+
+    response = simulate_registered_twin(
+        registry,
+        "counterfactual-test",
+        additional_cycles=125,
+        state_snapshot=snapshot,
+    )
+    validated = validate_counterfactual_response(
+        response,
+        captured_snapshot=snapshot,
+        requested_horizon=125,
+    )
+
+    after = manager.get_snapshot()
+    assert set(validated.scenarios) == {
+        "No maintenance",
+        "Maintenance A",
+        "Maintenance B",
+    }
+    assert validated.snapshot_version == snapshot["version"]
+    assert response["snapshot_version"] == snapshot["version"]
+    assert after["state"] == state_before
+    assert after["history"] == history_before
+    assert manager.last_observation_index == observation_index_before
