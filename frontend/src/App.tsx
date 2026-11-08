@@ -1,6 +1,7 @@
 
 import { useState } from 'react'
 import './App.css'
+import FeatureExplorer from './components/FeatureExplorer'
 import {
   ResponsiveContainer,
   LineChart,
@@ -573,6 +574,7 @@ async function runAdaptiveMaintenance() {
           <span>VoltTwin</span>
         </a>
         <span className="project-label">EV BATTERY INTELLIGENCE</span>
+        <a className="feature-nav-link" href="#feature-explorer">Feature Explorer</a>
         <span className="connection"><span /> API-powered dashboard</span>
       </header>
 
@@ -1684,6 +1686,17 @@ async function runAdaptiveMaintenance() {
     </>
   )}
 </section>
+
+      <section id="feature-explorer" className="workspace feature-explorer-host">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">08 / FEATURE METADATA</p>
+            <h2>Explore handcrafted features</h2>
+          </div>
+          <span className="step-tag">67 inputs</span>
+        </div>
+        <FeatureExplorer />
+      </section>
 
       <footer className="footer">
         <span>VoltTwin</span>

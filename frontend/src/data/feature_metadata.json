@@ -1,0 +1,605 @@
+﻿[
+  {
+    "feature_id": "cc_energy",
+    "name": "CC_energy",
+    "order": 1,
+    "group": "CC",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cc_q",
+    "name": "CC_Q",
+    "order": 2,
+    "group": "CC",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cc_time_mean",
+    "name": "CC_t_mean",
+    "order": 3,
+    "group": "CC",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cc_voltage_mean",
+    "name": "CC_V_mean",
+    "order": 4,
+    "group": "CC",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cc_temp_mean",
+    "name": "CC_T_mean",
+    "order": 5,
+    "group": "CC",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cc_voltage_std",
+    "name": "CC_V_std",
+    "order": 6,
+    "group": "CC",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cc_temp_std",
+    "name": "CC_T_std",
+    "order": 7,
+    "group": "CC",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cc_voltage_skewness",
+    "name": "CC_V_skewness",
+    "order": 8,
+    "group": "CC",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cc_temp_skewness",
+    "name": "CC_T_skewness",
+    "order": 9,
+    "group": "CC",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cc_voltage_kurtosis",
+    "name": "CC_V_kurtosis",
+    "order": 10,
+    "group": "CC",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cc_temp_kurtosis",
+    "name": "CC_T_kurtosis",
+    "order": 11,
+    "group": "CC",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cc_ccct",
+    "name": "CC_CCCT",
+    "order": 12,
+    "group": "CC",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cc_entropy",
+    "name": "CC_entropy",
+    "order": 13,
+    "group": "CC",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "dv_energy",
+    "name": "dV_energy",
+    "order": 14,
+    "group": "dV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "dv_q",
+    "name": "dV_Q",
+    "order": 15,
+    "group": "dV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "dv_time_mean",
+    "name": "dV_t_mean",
+    "order": 16,
+    "group": "dV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "dv_voltage_mean",
+    "name": "dV_V_mean",
+    "order": 17,
+    "group": "dV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "dv_temp_mean",
+    "name": "dV_T_mean",
+    "order": 18,
+    "group": "dV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "dv_voltage_std",
+    "name": "dV_V_std",
+    "order": 19,
+    "group": "dV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "dv_temp_std",
+    "name": "dV_T_std",
+    "order": 20,
+    "group": "dV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "dv_voltage_skewness",
+    "name": "dV_V_skewness",
+    "order": 21,
+    "group": "dV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "dv_temp_skewness",
+    "name": "dV_T_skewness",
+    "order": 22,
+    "group": "dV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "dv_voltage_kurtosis",
+    "name": "dV_V_kurtosis",
+    "order": 23,
+    "group": "dV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "dv_temp_kurtosis",
+    "name": "dV_T_kurtosis",
+    "order": 24,
+    "group": "dV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "dv_dv_devide_dt",
+    "name": "dV_dV_devide_dt",
+    "order": 25,
+    "group": "dV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "dv_entropy",
+    "name": "dV_entropy",
+    "order": 26,
+    "group": "dV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cv_energy",
+    "name": "CV_energy",
+    "order": 27,
+    "group": "CV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cv_q",
+    "name": "CV_Q",
+    "order": 28,
+    "group": "CV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cv_time_mean",
+    "name": "CV_t_mean",
+    "order": 29,
+    "group": "CV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cv_current_mean",
+    "name": "CV_C_mean",
+    "order": 30,
+    "group": "CV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cv_temp_mean",
+    "name": "CV_T_mean",
+    "order": 31,
+    "group": "CV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cv_current_std",
+    "name": "CV_C_std",
+    "order": 32,
+    "group": "CV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cv_temp_std",
+    "name": "CV_T_std",
+    "order": 33,
+    "group": "CV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cv_current_skewness",
+    "name": "CV_C_skewness",
+    "order": 34,
+    "group": "CV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cv_temp_skewness",
+    "name": "CV_T_skewness",
+    "order": 35,
+    "group": "CV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cv_current_kurtosis",
+    "name": "CV_C_kurtosis",
+    "order": 36,
+    "group": "CV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cv_temp_kurtosis",
+    "name": "CV_T_kurtosis",
+    "order": 37,
+    "group": "CV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cv_cvct",
+    "name": "CV_CVCT",
+    "order": 38,
+    "group": "CV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "cv_entropy",
+    "name": "CV_entropy",
+    "order": 39,
+    "group": "CV",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "di_energy",
+    "name": "dI_energy",
+    "order": 40,
+    "group": "dI",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "di_q",
+    "name": "dI_Q",
+    "order": 41,
+    "group": "dI",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "di_time_mean",
+    "name": "dI_t_mean",
+    "order": 42,
+    "group": "dI",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "di_current_mean",
+    "name": "dI_C_mean",
+    "order": 43,
+    "group": "dI",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "di_temp_mean",
+    "name": "dI_T_mean",
+    "order": 44,
+    "group": "dI",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "di_current_std",
+    "name": "dI_C_std",
+    "order": 45,
+    "group": "dI",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "di_temp_std",
+    "name": "dI_T_std",
+    "order": 46,
+    "group": "dI",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "di_current_skewness",
+    "name": "dI_C_skewness",
+    "order": 47,
+    "group": "dI",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "di_temp_skewness",
+    "name": "dI_T_skewness",
+    "order": 48,
+    "group": "dI",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "di_current_kurtosis",
+    "name": "dI_C_kurtosis",
+    "order": 49,
+    "group": "dI",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "di_temp_kurtosis",
+    "name": "dI_T_kurtosis",
+    "order": 50,
+    "group": "dI",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "di_di_devide_dt",
+    "name": "dI_dI_devide_dt",
+    "order": 51,
+    "group": "dI",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "di_entropy",
+    "name": "dI_entropy",
+    "order": 52,
+    "group": "dI",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_energy",
+    "name": "Charge_energy",
+    "order": 53,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_q",
+    "name": "Charge_Q",
+    "order": 54,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_time_mean",
+    "name": "Charge_t_mean",
+    "order": 55,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_voltage_mean",
+    "name": "Charge_V_mean",
+    "order": 56,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_current_mean",
+    "name": "Charge_C_mean",
+    "order": 57,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_temp_mean",
+    "name": "Charge_T_mean",
+    "order": 58,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_current_std",
+    "name": "Charge_C_std",
+    "order": 59,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_voltage_std",
+    "name": "Charge_V_std",
+    "order": 60,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_temp_std",
+    "name": "Charge_T_std",
+    "order": 61,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_current_skewness",
+    "name": "Charge_C_skewness",
+    "order": 62,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_voltage_skewness",
+    "name": "Charge_V_skewness",
+    "order": 63,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_temp_skewness",
+    "name": "Charge_T_skewness",
+    "order": 64,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_current_kurtosis",
+    "name": "Charge_C_kurtosis",
+    "order": 65,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_voltage_kurtosis",
+    "name": "Charge_V_kurtosis",
+    "order": 66,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  },
+  {
+    "feature_id": "charge_temp_kurtosis",
+    "name": "Charge_T_kurtosis",
+    "order": 67,
+    "group": "Charge",
+    "description": null,
+    "formula": null,
+    "unit": null
+  }
+]

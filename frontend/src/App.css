@@ -70,6 +70,18 @@ button, input, textarea, a {
   border-radius: 11px;
 }
 
+.feature-nav-link {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.feature-nav-link:hover {
+  color: #a0f0d9;
+}
+
 .project-label, .eyebrow {
   color: var(--muted);
   font-size: 11px;
