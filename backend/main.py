@@ -9,7 +9,7 @@ from digital_twin.degradation_estimator import DegradationEstimator
 from pathlib import Path
 from digital_twin.sequential_replay import replay_battery
 from digital_twin.agentic_controller import run_agentic_maintenance_loop
-
+from backend.twin_registry import twin_registry
 app = FastAPI(
     title="VoltTwin API",
     description="API for EV battery SOH simulation and maintenance scenarios.",
@@ -23,7 +23,12 @@ class SOHFeatureInput(BaseModel):
         max_length=67,
         description="Exactly 67 handcrafted battery features",
     )
+class TwinInitializeInput(BaseModel):
+    initial_soh: float = Field(default=1.0, ge=0.0, le=1.0)
 
+
+class TwinObservationInput(SOHFeatureInput):
+    observation_index: int = Field(ge=0)
 class BatteryFeatureSimulationInput(SOHFeatureInput):
     battery_id: str = Field(min_length=1, max_length=100)
     cycle_count: int = Field(ge=0)
@@ -87,7 +92,87 @@ def root():
 def health():
     return {"status": "healthy"}
 
+@app.post("/twin/{battery_id}/initialize")
+def initialize_twin(
+    battery_id: str,
+    request: TwinInitializeInput,
+):
+    if twin_registry.exists(battery_id):
+        raise HTTPException(
+            status_code=409,
+            detail=f"Twin already exists for battery '{battery_id}'.",
+        )
 
+    try:
+        manager = twin_registry.initialize(
+            battery_id=battery_id,
+            initial_soh=request.initial_soh,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=str(exc),
+        ) from exc
+
+    return {
+        "message": "Digital Twin initialized successfully.",
+        "battery_id": battery_id,
+        "state": manager.get_state(),
+    }
+@app.post("/twin/{battery_id}/observation")
+def process_twin_observation(
+    battery_id: str,
+    request: TwinObservationInput,
+):
+    try:
+        manager = twin_registry.get(battery_id)
+
+        result = manager.process_observation(
+            feature_values=request.features,
+            observation_index=request.observation_index,
+        )
+
+        return {
+            "message": "Battery observation processed successfully.",
+            **result,
+        }
+
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail=str(exc),
+        ) from exc
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=str(exc),
+        ) from exc
+@app.get("/twin/{battery_id}/state")
+def get_twin_state(battery_id: str):
+    try:
+        manager = twin_registry.get(battery_id)
+        return manager.get_state()
+
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail=str(exc),
+        ) from exc
+
+
+@app.get("/twin/{battery_id}/history")
+def get_twin_history(battery_id: str):
+    try:
+        manager = twin_registry.get(battery_id)
+        return manager.get_history()
+
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail=str(exc),
+        ) from exc
+    
 @app.post("/predict-soh")
 def predict_soh(request: SOHFeatureInput):
     predictor = SOHPredictor()
