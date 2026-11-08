@@ -1,6 +1,7 @@
 ﻿
 import math
 from copy import deepcopy
+from threading import RLock
 
 import numpy as np
 import torch
@@ -56,10 +57,24 @@ class TwinManager:
         )
 
         self.last_observation_index = None
+        self._lock = RLock()
+        self._version = 0
         self._state_cache_key = None
         self._state_cache_value = None
 
     def process_observation(
+        self,
+        feature_values,
+        observation_index=None,
+    ) -> dict:
+        """Atomically process one observation and update the registered twin."""
+        with self._lock:
+            return self._process_observation_locked(
+                feature_values,
+                observation_index=observation_index,
+            )
+
+    def _process_observation_locked(
         self,
         feature_values,
         observation_index=None,
@@ -133,6 +148,7 @@ class TwinManager:
             predicted_soh=predicted_soh,
             observation_index=observation_index,
         )
+        self._version += 1
 
         if observation_index is not None:
             self.last_observation_index = observation_index
@@ -183,7 +199,10 @@ class TwinManager:
 
     def get_state(self) -> dict:
         """Return the latest operational Digital Twin state."""
+        with self._lock:
+            return self._get_state_locked()
 
+    def _get_state_locked(self) -> dict:
         twin_state = self.twin.get_state()
         prediction_records = self.twin.prediction_history
         cache_key = (
@@ -209,14 +228,11 @@ class TwinManager:
 
         degradation = None
         rul = None
-
         if len(prediction_history) >= 3:
             degradation = self.degradation_estimator.estimate(
                 prediction_history
             )
-            rul = self.rul_estimator.estimate(
-                prediction_history
-            )
+            rul = self.rul_estimator.estimate(prediction_history)
 
         state = {
             "battery_id": self.twin.state.battery_id,
@@ -232,9 +248,13 @@ class TwinManager:
         self._state_cache_key = cache_key
         self._state_cache_value = deepcopy(state)
         return state
-    def get_history(self) -> dict:
-        """Return prediction history for dashboard visualisations."""
 
+    def get_history(self) -> dict:
+        """Return prediction and observation history."""
+        with self._lock:
+            return self._get_history_locked()
+
+    def _get_history_locked(self) -> dict:
         return {
             "battery_id": self.twin.state.battery_id,
             "prediction_history": list(
@@ -248,3 +268,23 @@ class TwinManager:
             ),
             "state_source": "cnn_prediction",
         }
+
+    def get_snapshot(self) -> dict:
+        """Capture state, histories, metadata and assumptions atomically."""
+        with self._lock:
+            snapshot = {
+                "battery_id": self.twin.state.battery_id,
+                "version": self._version,
+                "state": self._get_state_locked(),
+                "history": self._get_history_locked(),
+                "simulation_assumptions": {
+                    "degradation_per_cycle": (
+                        self.twin.assumptions.degradation_per_cycle
+                    ),
+                    "maintenance_recovery": (
+                        self.twin.assumptions.maintenance_recovery
+                    ),
+                },
+                "_manager_identity": id(self),
+            }
+            return deepcopy(snapshot)

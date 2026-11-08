@@ -3,7 +3,10 @@
 import math
 
 from backend.twin_registry import twin_registry as shared_twin_registry
-from digital_twin.counterfactual_service import simulate_registered_twin
+from digital_twin.counterfactual_service import (
+    assess_registered_baseline,
+    simulate_registered_twin,
+)
 from digital_twin.maintenance_agent import recommend_maintenance
 
 
@@ -44,8 +47,10 @@ def run_agent_orchestrator(
         shared_twin_registry if twin_registry is None else twin_registry
     )
     manager = registry.get(battery_id)
-    state = manager.get_state()
-    history = manager.get_history()
+    snapshot = manager.get_snapshot()
+    state = snapshot["state"]
+    history = snapshot["history"]
+    state_source = state.get("state_source")
 
     prediction_count = state.get("prediction_count")
     if (
@@ -136,29 +141,30 @@ def run_agent_orchestrator(
         current_soh < minimum_acceptable_soh or declining or fault_evidence
     )
 
-    # Delegate all scenario execution to the shared registered-twin service.
-    simulation = simulate_registered_twin(
-        twin_registry=registry,
-        battery_id=battery_id,
-        additional_cycles=additional_cycles,
-    )
-    if simulation.get("state_source") != "cnn_prediction":
-        raise ValueError("Counterfactual result lost CNN prediction provenance.")
-
     if needs_counterfactual:
         plan_tool = "counterfactual_simulation"
+        simulation = simulate_registered_twin(
+            twin_registry=registry,
+            battery_id=battery_id,
+            additional_cycles=additional_cycles,
+            state_snapshot=snapshot,
+        )
+        if simulation.get("state_source") != "cnn_prediction":
+            raise ValueError(
+                "Counterfactual result lost CNN prediction provenance."
+            )
         scenario_results = simulation["scenarios"]
+        snapshot_version = simulation["snapshot_version"]
     else:
         plan_tool = "baseline_battery_assessment"
-        scenario_results = [
-            item
-            for item in simulation["scenarios"]
-            if item["scenario"] == "No maintenance"
-        ]
-        if not scenario_results:
-            raise ValueError(
-                "Counterfactual service returned no baseline scenario."
-            )
+        baseline_result = assess_registered_baseline(
+            twin_registry=registry,
+            battery_id=battery_id,
+            additional_cycles=additional_cycles,
+            state_snapshot=snapshot,
+        )
+        scenario_results = [baseline_result]
+        snapshot_version = baseline_result["snapshot_version"]
 
     recommendation = recommend_maintenance(
         scenario_results=scenario_results,
@@ -169,25 +175,16 @@ def run_agent_orchestrator(
     )
 
     observation_index = state.get("last_observation_index")
-    analysis_plan = [
-        "battery_state_observation",
-        "prediction_history_context",
-    ]
-    executed_tools = list(analysis_plan)
-    if isinstance(manager_degradation, dict):
-        analysis_plan.append("degradation_result_reuse")
-        executed_tools.append("degradation_result_reuse")
-    if isinstance(manager_rul, dict):
-        analysis_plan.append("rul_result_reuse")
-        executed_tools.append("rul_result_reuse")
+    analysis_plan = ["registered_twin_snapshot"]
     analysis_plan.extend([plan_tool, "maintenance_recommendation"])
-    executed_tools.extend([plan_tool, "maintenance_recommendation"])
+    executed_tools = list(analysis_plan)
 
     tool_results = {
         "battery_state": twin_state,
-        "state_source": simulation["state_source"],
+        "state_source": state_source,
         "observation_index": observation_index,
         "prediction_count": prediction_count,
+        "snapshot_version": snapshot_version,
         "prediction_history": prediction_history,
         "history_state_source": history["state_source"],
         "degradation": degradation,
@@ -206,7 +203,7 @@ def run_agent_orchestrator(
         "recommended_action": recommendation["recommended_action"],
         "recommended_scenario": recommendation["recommended_scenario"],
         "decision_status": recommendation["status"],
-        "state_source": simulation["state_source"],
+        "state_source": state_source,
         "observation_index": observation_index,
         "prediction_count": prediction_count,
         "is_agentic_workflow": True,
