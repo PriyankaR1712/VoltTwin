@@ -138,6 +138,24 @@ class BatteryTwin:
         self.prediction_history.append(record)
         return record
 
+    def update_from_prediction(
+        self,
+        predicted_soh: float,
+        observation_index: int | None = None,
+    ) -> dict:
+        """Update twin state from a CNN prediction, preserving provenance."""
+        record = self.record_prediction(
+            predicted_soh=predicted_soh,
+            observation_index=observation_index,
+        )
+        self.state.soh = float(predicted_soh)
+        return {
+            **record,
+            "current_soh": self.state.soh,
+            "current_soh_percent": round(self.state.soh * 100, 2),
+            "state_source": "cnn_prediction",
+        }
+
     def simulate(
         self,
         additional_cycles: int,
@@ -149,8 +167,13 @@ class BatteryTwin:
         maintenance_recovery is an illustrative scenario assumption,
         not a measured or proven maintenance benefit.
         """
-        if additional_cycles < 0:
-            raise ValueError("Additional cycles cannot be negative.")
+        if (
+            type(additional_cycles) is not int
+            or not 0 <= additional_cycles <= 100000
+        ):
+            raise ValueError(
+                "Additional cycles must be an integer between 0 and 100000."
+            )
 
         recovery = (
             self.assumptions.maintenance_recovery

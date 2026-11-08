@@ -74,6 +74,29 @@ def test_simulation_does_not_modify_observed_state():
 
     assert twin.state.soh == pytest.approx(0.85)
     assert len(twin.observation_history) == 1
+
+
+@pytest.mark.parametrize("additional_cycles", [0, 100, 100000])
+def test_simulation_accepts_integer_horizons(additional_cycles):
+    twin = create_twin()
+
+    result = twin.simulate(additional_cycles=additional_cycles)
+
+    assert result["additional_cycles"] == additional_cycles
+    assert result["projected_cycle_count"] == additional_cycles
+
+
+@pytest.mark.parametrize(
+    "additional_cycles",
+    [True, False, 1.5, "10", None, -1, 100001],
+)
+def test_simulation_rejects_invalid_cycle_horizons(additional_cycles):
+    twin = create_twin()
+
+    with pytest.raises(ValueError, match="Additional cycles"):
+        twin.simulate(additional_cycles=additional_cycles)
+
+
 def test_hybrid_simulation_uses_baseline_and_recent_trend():
     twin = create_twin()
 
