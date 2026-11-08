@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 import torch
 from models.soh_predictor import SOHPredictor
 from digital_twin.historical_degradation import analyze_xjtu_workbook
@@ -11,6 +11,10 @@ from digital_twin.sequential_replay import replay_battery
 from digital_twin.agentic_controller import run_agentic_maintenance_loop
 from backend.twin_registry import twin_registry
 from backend.features_api import router as features_router
+from digital_twin.counterfactual_service import (
+    CounterfactualStateUnavailable,
+    simulate_registered_twin,
+)
 app = FastAPI(
     title="VoltTwin API",
     description="API for EV battery SOH simulation and maintenance scenarios.",
@@ -31,6 +35,19 @@ class TwinInitializeInput(BaseModel):
 
 class TwinObservationInput(SOHFeatureInput):
     observation_index: int = Field(ge=0)
+
+
+class CounterfactualInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    additional_cycles: int = Field(
+        default=100,
+        ge=0,
+        le=100000,
+        strict=True,
+    )
+
+
 class BatteryFeatureSimulationInput(SOHFeatureInput):
     battery_id: str = Field(min_length=1, max_length=100)
     cycle_count: int = Field(ge=0)
@@ -159,6 +176,29 @@ def get_twin_state(battery_id: str):
     except KeyError as exc:
         raise HTTPException(
             status_code=404,
+            detail=str(exc),
+        ) from exc
+
+
+@app.post("/twin/{battery_id}/counterfactual")
+def run_twin_counterfactual(
+    battery_id: str,
+    request: CounterfactualInput,
+):
+    try:
+        return simulate_registered_twin(
+            twin_registry=twin_registry,
+            battery_id=battery_id,
+            additional_cycles=request.additional_cycles,
+        )
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail=str(exc),
+        ) from exc
+    except CounterfactualStateUnavailable as exc:
+        raise HTTPException(
+            status_code=409,
             detail=str(exc),
         ) from exc
 
