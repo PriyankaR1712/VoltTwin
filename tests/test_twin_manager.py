@@ -1,4 +1,6 @@
 
+from threading import Event, Thread
+
 import numpy as np
 import pytest
 import torch
@@ -146,3 +148,109 @@ def test_manager_returns_prediction_history():
     assert history["prediction_history"][0]["predicted_soh"] == pytest.approx(0.95)
     assert history["prediction_history"][1]["predicted_soh"] == pytest.approx(0.93)
     assert history["observation_history"] == []
+
+
+def test_snapshot_version_tracks_successful_observations():
+    manager = create_manager([0.95, 0.93])
+
+    assert manager.get_snapshot()["version"] == 0
+    manager.process_observation(np.ones(67), observation_index=0)
+    assert manager.get_snapshot()["version"] == 1
+    manager.process_observation(np.ones(67), observation_index=1)
+    snapshot = manager.get_snapshot()
+
+    assert snapshot["version"] == 2
+    assert snapshot["state"]["prediction_count"] == 2
+    assert snapshot["state"]["last_observation_index"] == 1
+    assert len(snapshot["history"]["prediction_history"]) == 2
+
+
+def test_snapshot_and_history_are_deep_copy_isolated():
+    manager = create_manager([0.95])
+    manager.process_observation(np.ones(67), observation_index=0)
+
+    snapshot = manager.get_snapshot()
+    snapshot["state"]["twin_state"]["soh"] = 0.1
+    snapshot["history"]["prediction_history"][0]["predicted_soh"] = 0.1
+    snapshot["simulation_assumptions"]["degradation_per_cycle"] = 0.9
+
+    history = manager.get_history()
+    history["prediction_history"][0]["predicted_soh"] = 0.2
+
+    fresh = manager.get_snapshot()
+    assert fresh["state"]["twin_state"]["soh"] == pytest.approx(0.95)
+    assert fresh["history"]["prediction_history"][0]["predicted_soh"] == pytest.approx(0.95)
+    assert fresh["simulation_assumptions"]["degradation_per_cycle"] == pytest.approx(0.0001)
+
+
+def test_concurrent_duplicate_observation_is_applied_once():
+    manager = create_manager([0.95])
+    start = Event()
+    outcomes = []
+
+    def submit_observation():
+        start.wait()
+        try:
+            outcomes.append(manager.process_observation(np.ones(67), observation_index=0))
+        except ValueError as exc:
+            outcomes.append(exc)
+
+    workers = [Thread(target=submit_observation) for _ in range(2)]
+    for worker in workers:
+        worker.start()
+    start.set()
+    for worker in workers:
+        worker.join(timeout=5)
+
+    assert all(not worker.is_alive() for worker in workers)
+    assert sum(isinstance(outcome, dict) for outcome in outcomes) == 1
+    assert sum(isinstance(outcome, ValueError) for outcome in outcomes) == 1
+    snapshot = manager.get_snapshot()
+    assert snapshot["version"] == 1
+    assert snapshot["state"]["prediction_count"] == 1
+    assert snapshot["state"]["last_observation_index"] == 0
+
+
+def test_snapshot_waits_for_observation_and_captures_consistent_state():
+    inference_started = Event()
+    release_inference = Event()
+    snapshot_started = Event()
+    snapshot_finished = Event()
+
+    class BlockingPredictor:
+        def predict(self, features):
+            inference_started.set()
+            assert release_inference.wait(timeout=5)
+            return torch.tensor([0.92], dtype=torch.float32)
+
+    manager = TwinManager(battery_id="snapshot-battery", predictor=BlockingPredictor())
+    observation_worker = Thread(
+        target=lambda: manager.process_observation(np.ones(67), observation_index=4)
+    )
+    observation_worker.start()
+    assert inference_started.wait(timeout=5)
+
+    captured = []
+
+    def capture_snapshot():
+        snapshot_started.set()
+        captured.append(manager.get_snapshot())
+        snapshot_finished.set()
+
+    snapshot_worker = Thread(target=capture_snapshot)
+    snapshot_worker.start()
+    assert snapshot_started.wait(timeout=5)
+    assert not snapshot_finished.wait(timeout=0.05)
+
+    release_inference.set()
+    observation_worker.join(timeout=5)
+    snapshot_worker.join(timeout=5)
+
+    assert not observation_worker.is_alive()
+    assert not snapshot_worker.is_alive()
+    snapshot = captured[0]
+    assert snapshot["version"] == 1
+    assert snapshot["state"]["last_observation_index"] == 4
+    assert snapshot["state"]["prediction_count"] == 1
+    assert snapshot["state"]["twin_state"]["soh"] == pytest.approx(0.92)
+    assert len(snapshot["history"]["prediction_history"]) == 1

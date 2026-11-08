@@ -1,5 +1,7 @@
 
 import math
+from copy import deepcopy
+from threading import RLock
 
 import numpy as np
 import torch
@@ -55,8 +57,22 @@ class TwinManager:
         )
 
         self.last_observation_index = None
+        self._lock = RLock()
+        self._version = 0
 
     def process_observation(
+        self,
+        feature_values,
+        observation_index=None,
+    ) -> dict:
+        """Process one observation atomically for this battery."""
+        with self._lock:
+            return self._process_observation_locked(
+                feature_values,
+                observation_index=observation_index,
+            )
+
+    def _process_observation_locked(
         self,
         feature_values,
         observation_index=None,
@@ -130,6 +146,7 @@ class TwinManager:
             predicted_soh=predicted_soh,
             observation_index=observation_index,
         )
+        self._version += 1
 
         if observation_index is not None:
             self.last_observation_index = observation_index
@@ -180,7 +197,10 @@ class TwinManager:
 
     def get_state(self) -> dict:
         """Return the latest operational Digital Twin state."""
+        with self._lock:
+            return self._get_state_locked()
 
+    def _get_state_locked(self) -> dict:
         prediction_history = [
             item["predicted_soh"]
             for item in self.twin.prediction_history
@@ -210,7 +230,10 @@ class TwinManager:
         }
     def get_history(self) -> dict:
         """Return prediction history for dashboard visualisations."""
+        with self._lock:
+            return deepcopy(self._get_history_locked())
 
+    def _get_history_locked(self) -> dict:
         return {
             "battery_id": self.twin.state.battery_id,
             "prediction_history": list(
@@ -224,3 +247,23 @@ class TwinManager:
             ),
             "state_source": "cnn_prediction",
         }
+
+    def get_snapshot(self) -> dict:
+        """Capture state, histories, assumptions and version atomically."""
+        with self._lock:
+            snapshot = {
+                "battery_id": self.twin.state.battery_id,
+                "version": self._version,
+                "state": self._get_state_locked(),
+                "history": self._get_history_locked(),
+                "simulation_assumptions": {
+                    "degradation_per_cycle": (
+                        self.twin.assumptions.degradation_per_cycle
+                    ),
+                    "maintenance_recovery": (
+                        self.twin.assumptions.maintenance_recovery
+                    ),
+                },
+                "_manager_identity": id(self),
+            }
+            return deepcopy(snapshot)
