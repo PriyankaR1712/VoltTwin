@@ -27,7 +27,7 @@ METADATA_PATH = REPO_ROOT / "frontend" / "src" / "data" / "feature_metadata.json
 
 def _load_features() -> list[dict[str, Any]]:
     try:
-        with METADATA_PATH.open("r", encoding="utf-8") as file:
+        with METADATA_PATH.open("r", encoding="utf-8-sig") as file:
             data = json.load(file)
     except FileNotFoundError as exc:
         raise HTTPException(
