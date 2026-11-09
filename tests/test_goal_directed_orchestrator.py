@@ -5,6 +5,7 @@ import torch
 
 from backend.twin_registry import TwinRegistry
 from digital_twin import goal_directed_orchestrator as planner
+from digital_twin import planner_tool_registry as tool_registry
 from digital_twin import twin_manager as twin_manager_module
 from digital_twin.baseline_relative_utility import UtilityRanking
 from digital_twin.counterfactual_service import simulate_registered_twin
@@ -112,12 +113,14 @@ def make_baseline_response(snapshot, horizon):
 class FakeManager:
     def __init__(self, snapshot=None):
         self.snapshot = snapshot or make_snapshot()
+        self.snapshot["_manager_identity"] = id(self)
         self.snapshot_calls = 0
         self.last_returned_snapshot = None
 
     def get_snapshot(self):
         self.snapshot_calls += 1
         self.last_returned_snapshot = deepcopy(self.snapshot)
+        self.last_returned_snapshot["_manager_identity"] = id(self)
         return self.last_returned_snapshot
 
 
@@ -161,9 +164,9 @@ def harness(monkeypatch):
         calls["policy"].append(kwargs)
         return calls["policy_result"]
 
-    monkeypatch.setattr(planner, "assess_registered_baseline", baseline_service)
-    monkeypatch.setattr(planner, "simulate_registered_twin", counterfactual_service)
-    monkeypatch.setattr(planner, "recommend_maintenance", policy_service)
+    monkeypatch.setattr(tool_registry, "assess_registered_baseline", baseline_service)
+    monkeypatch.setattr(tool_registry, "simulate_registered_twin", counterfactual_service)
+    monkeypatch.setattr(tool_registry, "recommend_maintenance", policy_service)
     return manager, registry, calls
 
 
@@ -183,6 +186,10 @@ def test_explicit_baseline_only_calls_baseline_once_with_captured_snapshot(harne
     assert calls["baseline"][0]["state_snapshot"] is manager.last_returned_snapshot
     assert result.assessment_path == "baseline_only"
     assert result.candidate_evaluations[0]["scenario"] == "No maintenance"
+    assert [item.tool_name for item in result.tool_outcomes] == [
+        "registered_twin_snapshot", "baseline_assessment"
+    ]
+    assert all(item.status == "success" for item in result.tool_outcomes)
 
 
 def test_baseline_only_never_calls_counterfactual_or_policy(harness):
@@ -201,7 +208,8 @@ def test_explicit_counterfactual_calls_service_once_and_policy_once(harness):
     )
 
     assert manager.snapshot_calls == 1
-    assert calls["baseline"] == []
+    assert len(calls["baseline"]) == 1
+    assert calls["baseline"][0]["state_snapshot"] is manager.last_returned_snapshot
     assert len(calls["counterfactual"]) == 1
     assert calls["counterfactual"][0]["state_snapshot"] is manager.last_returned_snapshot
     assert len(calls["policy"]) == 1
@@ -209,18 +217,24 @@ def test_explicit_counterfactual_calls_service_once_and_policy_once(harness):
     assert [row["scenario"] for row in result.candidate_evaluations] == list(
         EXPECTED_SCENARIOS
     )
+    assert [item.tool_name for item in result.tool_outcomes] == [
+        "registered_twin_snapshot", "baseline_assessment",
+        "counterfactual_simulation", "maintenance_policy",
+    ]
+    assert all(item.status == "success" for item in result.tool_outcomes)
+    assert "history" not in result.tool_outcomes[0].result
 
 
 def test_counterfactual_requires_complete_valid_scenario_set(harness, monkeypatch):
     _, _, calls = harness
-    original = planner.simulate_registered_twin
+    original = tool_registry.simulate_registered_twin
 
     def partial_service(**kwargs):
         response = original(**kwargs)
         response["scenarios"].pop()
         return response
 
-    monkeypatch.setattr(planner, "simulate_registered_twin", partial_service)
+    monkeypatch.setattr(tool_registry, "simulate_registered_twin", partial_service)
     result = run(GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"), harness)
 
     assert result.termination_status == "invalid_scenario_evidence"
@@ -229,7 +243,7 @@ def test_counterfactual_requires_complete_valid_scenario_set(harness, monkeypatc
 
 
 def test_counterfactual_rejects_pairwise_inconsistent_initial_soh(harness, monkeypatch):
-    original = planner.simulate_registered_twin
+    original = tool_registry.simulate_registered_twin
 
     def inconsistent_service(**kwargs):
         response = original(**kwargs)
@@ -237,7 +251,7 @@ def test_counterfactual_rejects_pairwise_inconsistent_initial_soh(harness, monke
         response["scenarios"][1]["initial_soh"] -= 0.00009
         return response
 
-    monkeypatch.setattr(planner, "simulate_registered_twin", inconsistent_service)
+    monkeypatch.setattr(tool_registry, "simulate_registered_twin", inconsistent_service)
     result = run(
         GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
         harness,
@@ -398,7 +412,7 @@ def test_baseline_missing_target_is_unavailable(harness):
 
 def test_equal_utility_preserves_tie_and_selects_no_unique_candidate(harness):
     _, _, _ = harness
-    original_response = planner.simulate_registered_twin
+    original_response = tool_registry.simulate_registered_twin
 
     def tied_service(**kwargs):
         response = original_response(**kwargs)
@@ -411,14 +425,14 @@ def test_equal_utility_preserves_tie_and_selects_no_unique_candidate(harness):
         return response
 
     # The harness service is already a fake; the service contract/utility remain real.
-    planner.simulate_registered_twin = tied_service
+    tool_registry.simulate_registered_twin = tied_service
     try:
         result = run(
             GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
             harness,
         )
     finally:
-        planner.simulate_registered_twin = original_response
+        tool_registry.simulate_registered_twin = original_response
 
     assert result.utility_ranking["ranked_groups"][0] == [
         "Maintenance A",
@@ -434,6 +448,30 @@ def test_equal_utility_preserves_tie_and_selects_no_unique_candidate(harness):
     assert result.policy_comparison["comparison_status"] == "tie"
     assert result.policy_comparison["policy_availability"] == "available"
     assert result.policy_comparison["policy_matches_utility_tie"] is True
+
+
+def test_counterfactual_baseline_must_match_the_single_baseline_assessment(
+    harness, monkeypatch
+):
+    _, _, calls = harness
+    original = tool_registry.simulate_registered_twin
+
+    def mismatched_baseline(**kwargs):
+        response = original(**kwargs)
+        for row in response["scenarios"]:
+            row["projected_soh"] += 0.01
+        return response
+
+    monkeypatch.setattr(tool_registry, "simulate_registered_twin", mismatched_baseline)
+    result = run(
+        GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
+        harness,
+    )
+    assert result.termination_status == "invalid_scenario_evidence"
+    assert result.errors[0]["code"] == "invalid_counterfactual_result"
+    assert len(calls["baseline"]) == 1
+    assert len(calls["counterfactual"]) == 1
+    assert result.tool_outcomes[2].status == "invalid_result"
 
 
 def test_valid_scenarios_keep_utility_analysis_but_unknown_feasibility_is_not_selected(
@@ -523,6 +561,32 @@ def test_policy_without_recommendation_is_unavailable_not_disagreement(harness):
     assert result.policy_comparison["policy_availability"] == "unavailable"
     assert result.policy_comparison["policy_recommended_scenario"] is None
     assert result.policy_comparison["policy_output"]["recommended_scenario"] is None
+    assert result.tool_outcomes[-1].status == "success"
+    assert result.errors == []
+
+
+@pytest.mark.parametrize(
+    "policy_result",
+    [
+        None,
+        [],
+        {},
+        {"recommended_scenario": "Maintenance C", "recommended_action": "Review", "status": "ok", "reason": "test"},
+        {"recommended_scenario": None, "recommended_action": "Review"},
+    ],
+)
+def test_malformed_policy_results_are_structured_failures(harness, policy_result):
+    _, _, calls = harness
+    calls["policy_result"] = policy_result
+    result = run(
+        GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
+        harness,
+    )
+    assert result.tool_outcomes[-1].status == "execution_failure"
+    assert result.tool_outcomes[-1].error["code"] == "invalid_tool_result"
+    assert result.errors[-1]["code"] == "maintenance_policy_invalid_result"
+    assert result.policy_comparison["policy_availability"] == "unavailable"
+    assert result.utility_ranking["utilities"]
 
 
 def test_policy_exception_preserves_analytical_result_and_reports_unavailable(
@@ -531,7 +595,7 @@ def test_policy_exception_preserves_analytical_result_and_reports_unavailable(
     def failing_policy(**kwargs):
         raise RuntimeError("policy unavailable")
 
-    monkeypatch.setattr(planner, "recommend_maintenance", failing_policy)
+    monkeypatch.setattr(tool_registry, "recommend_maintenance", failing_policy)
     result = run(
         GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
         harness,
@@ -552,7 +616,7 @@ def test_tied_planner_and_unavailable_policy_are_both_reported(harness, monkeypa
         **calls["policy_result"],
         "recommended_scenario": None,
     }
-    original = planner.simulate_registered_twin
+    original = tool_registry.simulate_registered_twin
 
     def tied_service(**kwargs):
         response = original(**kwargs)
@@ -564,7 +628,7 @@ def test_tied_planner_and_unavailable_policy_are_both_reported(harness, monkeypa
         ][1]["difference_vs_baseline"]
         return response
 
-    monkeypatch.setattr(planner, "simulate_registered_twin", tied_service)
+    monkeypatch.setattr(tool_registry, "simulate_registered_twin", tied_service)
     result = run(
         GoalSpec("tie-unavailable", 100, assessment_scope="counterfactual_comparison"),
         harness,
@@ -630,7 +694,7 @@ def test_invalid_counterfactual_result_abstains_without_policy(
     harness, monkeypatch, bad_response
 ):
     _, _, calls = harness
-    original = planner.simulate_registered_twin
+    original = tool_registry.simulate_registered_twin
 
     def malformed_service(**kwargs):
         response = original(**kwargs)
@@ -648,7 +712,7 @@ def test_invalid_counterfactual_result_abstains_without_policy(
             response["scenarios"][1] = {"scenario": "Maintenance A"}
         return response
 
-    monkeypatch.setattr(planner, "simulate_registered_twin", malformed_service)
+    monkeypatch.setattr(tool_registry, "simulate_registered_twin", malformed_service)
     result = run(
         GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
         harness,
@@ -659,7 +723,7 @@ def test_invalid_counterfactual_result_abstains_without_policy(
     assert result.policy_comparison["status"] == "unavailable"
     assert result.candidate_evaluations == []
     assert len(calls["counterfactual"]) == 1
-    assert calls["baseline"] == []
+    assert len(calls["baseline"]) == 1
     assert calls["policy"] == []
 
 
@@ -689,15 +753,17 @@ def test_counterfactual_service_failure_is_reported_without_retry(harness, monke
         calls["counterfactual"].append(kwargs)
         raise RuntimeError("simulator unavailable")
 
-    monkeypatch.setattr(planner, "simulate_registered_twin", failing_service)
+    monkeypatch.setattr(tool_registry, "simulate_registered_twin", failing_service)
     result = run(
         GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
         harness,
     )
     assert result.termination_status == "service_failure"
     assert result.errors[0]["code"] == "counterfactual_simulation_failed"
+    assert result.tool_outcomes[-1].status == "execution_failure"
+    assert result.tool_outcomes[-1].error["message"] == "Tool execution failed."
     assert len(calls["counterfactual"]) == 1
-    assert calls["baseline"] == []
+    assert len(calls["baseline"]) == 1
     assert calls["policy"] == []
     assert manager.snapshot_calls == 1
 
@@ -758,3 +824,26 @@ def test_invalid_snapshot_returns_structured_error_without_assessment(harness):
     assert result.termination_status == "invalid_snapshot"
     assert calls["baseline"] == []
     assert calls["counterfactual"] == []
+
+
+def test_utility_calculation_failure_preserves_snapshot_and_tool_outcomes(
+    harness, monkeypatch
+):
+    manager, _, calls = harness
+
+    def fail_utility(*args, **kwargs):
+        raise ValueError("utility calculation failed")
+
+    monkeypatch.setattr(planner, "calculate_baseline_relative_utility", fail_utility)
+    result = run(
+        GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
+        harness,
+    )
+
+    assert result.termination_status == "invalid_service_result"
+    assert result.errors[0]["code"] == "utility_calculation_failed"
+    assert [outcome.tool_name for outcome in result.tool_outcomes] == [
+        "registered_twin_snapshot", "baseline_assessment", "counterfactual_simulation"
+    ]
+    assert result.snapshot_metadata["version"] == manager.last_returned_snapshot["version"]
+    assert calls["policy"] == []
