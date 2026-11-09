@@ -5,6 +5,28 @@ from typing import Any, Optional
 
 
 @dataclass
+class ToolExecutionOutcome:
+    """Safe record of one allowlisted planner tool invocation."""
+
+    tool_name: str
+    status: str
+    execution_order: int
+    validated_arguments: dict[str, Any] = field(default_factory=dict)
+    result: Any = None
+    error: Optional[dict[str, str]] = None
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.tool_name, str) or not self.tool_name.strip():
+            raise ValueError("tool_name cannot be empty.")
+        if self.status not in {
+            "success", "unavailable", "invalid_arguments", "unknown_tool", "execution_failure", "invalid_result"
+        }:
+            raise ValueError("Unsupported tool execution status.")
+        if type(self.execution_order) is not int or self.execution_order < 1:
+            raise ValueError("execution_order must be a positive integer.")
+
+
+@dataclass
 class ExperimentalDecisionResult:
     """Result envelope with explicit unavailable and not-applicable states."""
 
@@ -23,6 +45,7 @@ class ExperimentalDecisionResult:
     explanation: list[str] = field(default_factory=list)
     snapshot_metadata: dict[str, Any] = field(default_factory=dict)
     errors: list[dict[str, Any]] = field(default_factory=list)
+    tool_outcomes: list[ToolExecutionOutcome] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         if not isinstance(self.decision_id, str) or not self.decision_id.strip():

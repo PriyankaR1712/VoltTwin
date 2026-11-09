@@ -1,4 +1,5 @@
 from copy import deepcopy
+from dataclasses import replace
 import pytest
 
 from digital_twin.baseline_relative_utility import (
@@ -7,7 +8,12 @@ from digital_twin.baseline_relative_utility import (
 from digital_twin.decision_models import ExperimentalDecisionResult
 from digital_twin.goal_spec import GoalSpec
 from digital_twin.planner_config import DEFAULT_PLANNER_CONFIG
-from digital_twin.planner_tool_registry import PLANNER_TOOLS, get_planner_tool
+from digital_twin import planner_tool_registry as tool_registry
+from digital_twin.planner_tool_registry import (
+    PLANNER_TOOLS,
+    execute_planner_tool,
+    get_planner_tool,
+)
 from digital_twin.scenario_validation import validate_counterfactual_response
 
 
@@ -105,6 +111,182 @@ def test_tool_registry_is_an_allowlist_of_existing_callables():
     assert callable(get_planner_tool("counterfactual_simulation").function)
     with pytest.raises(ValueError, match="not allowed"):
         get_planner_tool("other")
+
+
+def test_registry_executes_only_registered_callable_and_returns_structured_outcome(monkeypatch):
+    tool = get_planner_tool("maintenance_policy")
+    monkeypatch.setitem(
+        tool_registry._TOOLS,
+        "maintenance_policy",
+        replace(tool, function=lambda **kwargs: {"recommended_action": "review"}),
+    )
+    outcome = execute_planner_tool(
+        "maintenance_policy",
+        {"scenario_results": [{"scenario": "No maintenance"}]},
+        execution_order=3,
+    )
+    assert outcome.status == "success"
+    assert outcome.execution_order == 3
+    assert outcome.result == {"recommended_action": "review"}
+    assert outcome.validated_arguments["scenario_results"] == ["No maintenance"]
+
+
+def test_registry_rejects_unknown_invalid_and_unexpected_tool_arguments():
+    unknown = execute_planner_tool("not_allowed", {}, 1)
+    invalid = execute_planner_tool("counterfactual_simulation", {}, 2)
+    invalid_horizon = execute_planner_tool(
+        "counterfactual_simulation",
+        {
+            "twin_registry": object(),
+            "battery_id": "battery-1",
+            "additional_cycles": True,
+            "state_snapshot": {},
+        },
+        3,
+    )
+    unexpected = execute_planner_tool(
+        "maintenance_policy",
+        {"scenario_results": [{"scenario": "No maintenance"}], "callable": lambda: None},
+        4,
+    )
+    assert unknown.status == "unknown_tool"
+    assert invalid.status == "invalid_arguments"
+    assert invalid_horizon.status == "invalid_arguments"
+    assert unexpected.status == "invalid_arguments"
+
+
+def test_registry_reports_unavailable_preconditions_without_execution():
+    class EmptyRegistry:
+        def get(self, battery_id):
+            raise KeyError(battery_id)
+
+    outcome = execute_planner_tool(
+        "registered_twin_snapshot",
+        {"twin_registry": EmptyRegistry(), "battery_id": "missing"},
+        1,
+    )
+    assert outcome.status == "unavailable"
+    assert outcome.error["code"] == "tool_unavailable"
+
+
+@pytest.mark.parametrize("prediction_count", ["4", None, True, False, -1, 1.5, [], {}])
+def test_registry_rejects_malformed_snapshot_prediction_counts(prediction_count):
+    class Manager:
+        pass
+
+    manager = Manager()
+    snapshot = {
+        "battery_id": "battery-1",
+        "version": 1,
+        "_manager_identity": id(manager),
+        "state": {
+            "battery_id": "battery-1",
+            "state_source": "cnn_prediction",
+            "prediction_count": prediction_count,
+        },
+        "history": {
+            "battery_id": "battery-1",
+            "state_source": "cnn_prediction",
+            "prediction_history": [],
+        },
+    }
+    outcome = execute_planner_tool(
+        "baseline_assessment",
+        {
+            "twin_registry": object(),
+            "battery_id": "battery-1",
+            "additional_cycles": 10,
+            "state_snapshot": snapshot,
+        },
+        1,
+    )
+    assert outcome.status == "invalid_arguments"
+    assert outcome.error["code"] == "invalid_arguments"
+
+
+def test_registry_reports_zero_predictions_as_unavailable_not_malformed():
+    class Manager:
+        pass
+
+    manager = Manager()
+
+    class Registry:
+        def get(self, battery_id):
+            return manager
+
+    snapshot = {
+        "battery_id": "battery-1",
+        "version": 1,
+        "_manager_identity": id(manager),
+        "state": {
+            "battery_id": "battery-1",
+            "state_source": "cnn_prediction",
+            "prediction_count": 0,
+        },
+        "history": {
+            "battery_id": "battery-1",
+            "state_source": "cnn_prediction",
+            "prediction_history": [],
+        },
+    }
+    outcome = execute_planner_tool(
+        "baseline_assessment",
+        {
+            "twin_registry": Registry(),
+            "battery_id": "battery-1",
+            "additional_cycles": 10,
+            "state_snapshot": snapshot,
+        },
+        1,
+    )
+    assert outcome.status == "unavailable"
+    assert outcome.error["code"] == "tool_unavailable"
+
+
+@pytest.mark.parametrize(
+    "evidence",
+    [
+        {"unknown_fault": True},
+        {"thermal_alert": "true"},
+        {"bms_fault_codes": "E42"},
+    ],
+)
+def test_registry_rejects_invalid_diagnostic_evidence_before_execution(
+    monkeypatch, evidence
+):
+    tool = get_planner_tool("maintenance_policy")
+
+    def should_not_run(**kwargs):
+        raise AssertionError("invalid evidence must be rejected before execution")
+
+    monkeypatch.setitem(tool_registry._TOOLS, "maintenance_policy", replace(tool, function=should_not_run))
+    outcome = execute_planner_tool(
+        "maintenance_policy",
+        {
+            "scenario_results": [{"scenario": "No maintenance"}],
+            "diagnostic_evidence": evidence,
+        },
+        1,
+    )
+    assert outcome.status == "invalid_arguments"
+    assert outcome.error["code"] == "invalid_arguments"
+
+
+def test_registry_hides_internal_exception_details(monkeypatch):
+    tool = get_planner_tool("maintenance_policy")
+
+    def fail(**kwargs):
+        raise RuntimeError("private path and traceback details")
+
+    monkeypatch.setitem(tool_registry._TOOLS, "maintenance_policy", replace(tool, function=fail))
+    outcome = execute_planner_tool(
+        "maintenance_policy", {"scenario_results": [{"scenario": "x"}]}, 1
+    )
+    assert outcome.status == "execution_failure"
+    assert outcome.error == {
+        "code": "tool_execution_failed",
+        "message": "Tool execution failed.",
+    }
 
 
 def test_planner_configuration_centralizes_versioned_limits():
