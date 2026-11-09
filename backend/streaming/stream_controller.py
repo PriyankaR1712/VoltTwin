@@ -1,110 +1,121 @@
+from threading import RLock
 
 from backend.streaming.stream_reader import XJTUBatchReader
 
 
 class StreamController:
-    """
-    Controls sequential replay of XJTU battery observations.
-    """
-
-    def __init__(self, batch_number=1, sheet_name="Sheet1"):
-
-        self.reader = XJTUBatchReader(
+    def __init__(self, batch_number=1, sheet_name="Sheet1", reader=None):
+        self.reader = reader or XJTUBatchReader(
             batch_number=batch_number,
             sheet_name=sheet_name
         )
 
         self.current_index = 0
         self.status = "stopped"
+        self._lock = RLock()
 
     def start(self):
-        """Start streaming observations."""
+        with self._lock:
+            if self.status == "completed":
+                return {
+                    "status": self.status,
+                    "message": "Stream completed. Reset before starting again."
+                }
 
-        if self.status == "completed":
+            self.status = "running"
             return {
                 "status": self.status,
-                "message": "Stream completed. Reset before starting again."
+                "message": "Stream started."
             }
-
-        self.status = "running"
-
-        return {
-            "status": self.status,
-            "message": "Streaming started."
-        }
 
     def pause(self):
-        """Pause the stream."""
+        with self._lock:
+            if self.status != "running":
+                return {
+                    "status": self.status,
+                    "message": "Stream is not running."
+                }
 
-        if self.status != "running":
+            self.status = "paused"
             return {
                 "status": self.status,
-                "message": "Stream is not running."
+                "message": "Stream paused."
             }
-
-        self.status = "paused"
-
-        return {
-            "status": self.status,
-            "message": "Streaming paused."
-        }
 
     def resume(self):
-        """Resume a paused stream."""
+        with self._lock:
+            if self.status != "paused":
+                return {
+                    "status": self.status,
+                    "message": "Stream is not paused."
+                }
 
-        if self.status != "paused":
+            self.status = "running"
             return {
                 "status": self.status,
-                "message": "Stream is not paused."
+                "message": "Stream resumed."
             }
 
-        self.status = "running"
-
-        return {
-            "status": self.status,
-            "message": "Streaming resumed."
-        }
-
     def reset(self):
-        """Reset the stream to the first observation."""
+        with self._lock:
+            self.current_index = 0
+            self.status = "stopped"
 
-        self.current_index = 0
-        self.status = "stopped"
+            return {
+                "status": self.status,
+                "current_index": self.current_index,
+                "message": "Stream cursor reset."
+            }
 
-        return {
-            "status": self.status,
-            "message": "Stream reset."
-        }
+    def peek_observation(self):
+        """
+        Read the current observation without advancing the cursor.
 
-    def next_observation(self):
-        """Read and return the next observation."""
+        The cursor advances only after successful TwinManager processing
+        through commit_observation().
+        """
+        with self._lock:
+            if self.status != "running":
+                return None
 
-        if self.status != "running":
-            return None
+            if self.current_index >= self.reader.total_observations:
+                self.status = "completed"
+                return None
 
-        if self.current_index >= self.reader.total_observations:
-            self.status = "completed"
-            return None
+            return self.reader.read_observation(self.current_index)
 
-        observation = self.reader.read_observation(
-            self.current_index
-        )
+    def commit_observation(self, observation_index):
+        """
+        Commit a successfully processed observation and advance the cursor.
+        """
+        with self._lock:
+            if self.status != "running":
+                raise RuntimeError(
+                    "Cannot commit an observation when the stream is not running."
+                )
 
-        self.current_index += 1
+            if observation_index != self.current_index:
+                raise ValueError(
+                    f"Cannot commit observation {observation_index}. "
+                    f"Expected observation {self.current_index}."
+                )
 
-        if self.current_index >= self.reader.total_observations:
-            self.status = "completed"
+            self.current_index += 1
 
-        return observation
+            if self.current_index >= self.reader.total_observations:
+                self.status = "completed"
+
+            return self.get_status()
 
     def get_status(self):
-        """Return the current streaming status."""
+        with self._lock:
+            total = self.reader.total_observations
 
-        return {
-            "status": self.status,
-            "current_index": self.current_index,
-            "total_observations": self.reader.total_observations,
-            "remaining_observations": (
-                self.reader.total_observations - self.current_index
-            )
-        }
+            return {
+                "status": self.status,
+                "current_index": self.current_index,
+                "total_observations": total,
+                "remaining_observations": max(
+                    0, total - self.current_index
+                )
+            }

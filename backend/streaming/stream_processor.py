@@ -1,44 +1,63 @@
-
-import torch
+from threading import RLock
 
 from backend.streaming.stream_controller import StreamController
-from models.soh_predictor import SOHPredictor
-from digital_twin.battery_twin import BatteryState, BatteryTwin
 
 
 class StreamProcessor:
-    """
-    Processes each streamed battery observation through
-    the CNN and updates the Digital Twin.
-    """
-
     def __init__(
         self,
         batch_number=1,
         sheet_name="Sheet1",
         battery_id=None,
+        twin_manager=None,
+        registry=None,
+        reader=None,
     ):
+        self.batch_number = batch_number
+        self.sheet_name = sheet_name
+
+        self.battery_id = battery_id or (
+            f"XJTU-B{batch_number}-{sheet_name}"
+        )
+
         self.controller = StreamController(
             batch_number=batch_number,
             sheet_name=sheet_name,
+            reader=reader,
         )
 
-        self.predictor = SOHPredictor()
+        # Use the existing registered TwinManager.
+        # Never create another predictor or BatteryTwin here.
+        if twin_manager is None:
+            if registry is None:
+                try:
+                    from backend.twin_registry import twin_registry
+                    registry = twin_registry
+                except ImportError as exc:
+                    raise RuntimeError(
+                        "The shared TwinRegistry is not available in this "
+                        "branch yet. Integrate the approved TwinRegistry "
+                        "baseline before starting the stream."
+                    ) from exc
 
-        self.battery_id = (
-            battery_id or f"XJTU-B{batch_number}-{sheet_name}"
-        )
+            try:
+                twin_manager = registry.get(self.battery_id)
+            except KeyError as exc:
+                raise ValueError(
+                    f"No registered Digital Twin found for "
+                    f"'{self.battery_id}'. Register this battery before "
+                    f"starting its stream."
+                ) from exc
 
-        # Initialize the twin using the first observation's actual SOH.
-        first_observation = self.controller.reader.read_observation(0)
-        initial_soh = first_observation["label"] / 2.0
+        self.twin_manager = twin_manager
+        self._lock = RLock()
 
-        self.twin = BatteryTwin(
-            state=BatteryState(
-                battery_id=self.battery_id,
-                soh=initial_soh,
-                cycle_count=0,
-            )
+        # The manager enforces strictly increasing observation indices.
+        # Do not replay from index zero into a manager that has already
+        # processed observations.
+        self._replay_blocked = (
+            getattr(self.twin_manager, "last_observation_index", None)
+            is not None
         )
 
     def start(self):
@@ -51,82 +70,89 @@ class StreamProcessor:
         return self.controller.resume()
 
     def reset(self):
-        result = self.controller.reset()
+        with self._lock:
+            result = self.controller.reset()
 
-        first_observation = self.controller.reader.read_observation(0)
-        initial_soh = first_observation["label"] / 2.0
-
-        self.twin = BatteryTwin(
-            state=BatteryState(
-                battery_id=self.battery_id,
-                soh=initial_soh,
-                cycle_count=0,
+            last_index = getattr(
+                self.twin_manager,
+                "last_observation_index",
+                None,
             )
-        )
 
-        return result
+            self._replay_blocked = last_index is not None
+
+            if self._replay_blocked:
+                result["replay_requires_new_twin"] = True
+                result["message"] = (
+                    "Replay cursor reset. This registered TwinManager "
+                    "has already processed observations and cannot safely "
+                    "replay from index 0. Register a new battery ID to "
+                    "start a fresh replay."
+                )
+
+            return result
 
     def process_next(self):
-        """
-        Process one observation and return its prediction
-        and updated Digital Twin state.
-        """
+        with self._lock:
+            if self._replay_blocked:
+                raise RuntimeError(
+                    "Replay is blocked because this TwinManager has already "
+                    "processed observations. Use a newly registered battery "
+                    "ID for a fresh replay."
+                )
 
-        observation = self.controller.next_observation()
+            # Read without advancing the cursor.
+            observation = self.controller.peek_observation()
 
-        if observation is None:
-            return None
+            if observation is None:
+                return None
 
-        index = observation["observation_index"]
-        features = observation["features"]
-        capacity = observation["label"]
+            observation_index = observation["observation_index"]
+            features = observation["features"]
+            capacity = float(observation["label"])
 
-        # Convert raw features to a PyTorch tensor.
-        feature_tensor = torch.tensor(
-            [features],
-            dtype=torch.float32,
-        )
+            # Actual dataset SOH is only for comparison/output.
+            # It is never passed to TwinManager.
+            actual_soh = capacity / 2.0
 
-        # CNN applies its own saved checkpoint normalization.
-        prediction = self.predictor.predict(feature_tensor)
+            if not 0.0 <= actual_soh <= 1.0:
+                raise ValueError(
+                    f"Invalid actual SOH comparison value: {actual_soh}"
+                )
 
-        predicted_soh = float(prediction.item())
-
-        # Match the existing sequential replay conversion.
-        actual_soh = float(capacity / 2.0)
-
-        if not 0.0 <= actual_soh <= 1.0:
-            raise ValueError(
-                f"Invalid actual SOH at observation {index}: "
-                f"{actual_soh}"
+            # Exactly one call per successfully processed observation.
+            # TwinManager performs CNN inference and updates the registered
+            # operational Digital Twin from the CNN prediction.
+            manager_result = self.twin_manager.process_observation(
+                features,
+                observation_index=observation_index,
             )
 
-        # Record prediction separately from observed SOH.
-        prediction_record = self.twin.record_prediction(
-            predicted_soh=predicted_soh,
-            observation_index=index,
-        )
+            # Advance only after TwinManager processing succeeds.
+            stream_status = self.controller.commit_observation(
+                observation_index
+            )
 
-        observation_record = self.twin.update_from_observation(
-            observed_soh=actual_soh,
-            observation_index=index,
-        )
+            prediction = manager_result["prediction"]
 
-        return {
-            "battery_id": self.battery_id,
-            "observation_index": index,
-            "capacity": capacity,
-            "predicted_soh": prediction_record["predicted_soh"],
-            "predicted_soh_percent": (
-                prediction_record["predicted_soh_percent"]
-            ),
-            "actual_soh": observation_record["observed_soh"],
-            "actual_soh_percent": (
-                observation_record["observed_soh_percent"]
-            ),
-            "twin_state": self.twin.get_state(),
-            "stream_status": self.controller.get_status(),
-        }
+            return {
+                "battery_id": self.battery_id,
+                "observation_index": observation_index,
+                "capacity": capacity,
+                "actual_soh": actual_soh,
+                "actual_soh_percent": round(actual_soh * 100, 2),
+                "prediction": prediction,
+                "predicted_soh": prediction["predicted_soh"],
+                "predicted_soh_percent": prediction[
+                    "predicted_soh_percent"
+                ],
+                "twin_state": manager_result["twin_state"],
+                "degradation": manager_result["degradation"],
+                "rul": manager_result["rul"],
+                "prediction_count": manager_result["prediction_count"],
+                "state_source": manager_result["state_source"],
+                "stream_status": stream_status,
+            }
 
     def get_status(self):
         return self.controller.get_status()
