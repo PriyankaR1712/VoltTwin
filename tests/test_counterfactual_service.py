@@ -12,6 +12,7 @@ from digital_twin.counterfactual_service import (
     simulate_registered_twin,
 )
 from digital_twin.twin_manager import TwinManager
+from digital_twin.scenario_validation import validate_counterfactual_response
 
 
 class FakePredictor:
@@ -344,3 +345,35 @@ def test_counterfactual_api_requires_a_cnn_prediction(client):
     )
 
     assert response.status_code == 409
+
+def test_real_counterfactual_response_validates_against_captured_snapshot():
+    manager = make_manager()
+    registry = FakeRegistry({"counterfactual-test": manager})
+    snapshot = manager.get_snapshot()
+    state_before = copy.deepcopy(snapshot["state"])
+    history_before = copy.deepcopy(snapshot["history"])
+    observation_index_before = manager.last_observation_index
+
+    response = simulate_registered_twin(
+        registry,
+        "counterfactual-test",
+        additional_cycles=125,
+        state_snapshot=snapshot,
+    )
+    validated = validate_counterfactual_response(
+        response,
+        captured_snapshot=snapshot,
+        requested_horizon=125,
+    )
+
+    after = manager.get_snapshot()
+    assert set(validated.scenarios) == {
+        "No maintenance",
+        "Maintenance A",
+        "Maintenance B",
+    }
+    assert validated.snapshot_version == snapshot["version"]
+    assert response["snapshot_version"] == snapshot["version"]
+    assert after["state"] == state_before
+    assert after["history"] == history_before
+    assert manager.last_observation_index == observation_index_before

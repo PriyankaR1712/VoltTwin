@@ -15,12 +15,16 @@ from digital_twin.counterfactual_service import (
     CounterfactualStateUnavailable,
     simulate_registered_twin,
 )
+from backend.streaming.stream_routes import router as streaming_router
+from backend.agent_api import router as agent_router
 app = FastAPI(
     title="VoltTwin API",
     description="API for EV battery SOH simulation and maintenance scenarios.",
     version="0.1.0",
 )
 app.include_router(features_router)
+app.include_router(streaming_router)
+app.include_router(agent_router)
 
 class SOHFeatureInput(BaseModel):
     features: list[float] = Field(
