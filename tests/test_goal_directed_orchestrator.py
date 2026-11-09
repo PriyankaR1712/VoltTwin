@@ -200,6 +200,65 @@ def test_baseline_only_never_calls_counterfactual_or_policy(harness):
     assert calls["policy"] == []
 
 
+def test_plan_recorder_receives_baseline_plan_once_and_in_execution_order(harness):
+    plans = []
+    result = run(
+        GoalSpec("baseline", 100, assessment_scope="baseline_only"),
+        harness,
+        plan_recorder=plans.append,
+    )
+
+    assert plans == [("registered_twin_snapshot", "baseline_assessment")]
+    assert [outcome.tool_name for outcome in result.tool_outcomes] == list(plans[0])
+
+
+def test_comparison_plan_keeps_unreached_policy_tool(harness, monkeypatch):
+    plans = []
+
+    def fail_simulation(**kwargs):
+        raise RuntimeError("simulation unavailable")
+
+    monkeypatch.setattr(tool_registry, "simulate_registered_twin", fail_simulation)
+    result = run(
+        GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
+        harness,
+        plan_recorder=plans.append,
+    )
+
+    assert plans == [
+        (
+            "registered_twin_snapshot",
+            "baseline_assessment",
+            "counterfactual_simulation",
+            "maintenance_policy",
+        )
+    ]
+    assert [outcome.tool_name for outcome in result.tool_outcomes] == list(plans[0][:3])
+    assert result.termination_status == "service_failure"
+
+
+def test_plan_recorder_exception_does_not_change_decision_or_execution(harness):
+    _, _, calls = harness
+
+    def fail_recording(_plan):
+        raise RuntimeError("in-memory recorder failed")
+
+    result = run(
+        GoalSpec("baseline", 100, assessment_scope="baseline_only"),
+        harness,
+        plan_recorder=fail_recording,
+    )
+
+    assert result.termination_status == "completed"
+    assert [outcome.tool_name for outcome in result.tool_outcomes] == [
+        "registered_twin_snapshot",
+        "baseline_assessment",
+    ]
+    assert len(calls["baseline"]) == 1
+    assert calls["counterfactual"] == []
+    assert calls["policy"] == []
+
+
 def test_explicit_counterfactual_calls_service_once_and_policy_once(harness):
     manager, _, calls = harness
     result = run(

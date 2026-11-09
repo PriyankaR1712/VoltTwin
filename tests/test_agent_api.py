@@ -1,8 +1,11 @@
 import pytest
 import torch
+from fastapi.encoders import jsonable_encoder
 from fastapi.testclient import TestClient
 
 from backend.main import app
+from backend import agent_api
+from backend.decision_history_store import DecisionHistoryStore
 from backend.twin_registry import twin_registry
 from digital_twin import twin_manager as twin_manager_module
 from digital_twin import goal_directed_orchestrator as planner
@@ -23,11 +26,16 @@ class SequencePredictor:
 
 
 @pytest.fixture
-def client(monkeypatch):
+def client(monkeypatch, tmp_path):
     monkeypatch.setattr(
         twin_manager_module,
         "SOHPredictor",
         lambda checkpoint_path=None: SequencePredictor(),
+    )
+    monkeypatch.setattr(
+        agent_api,
+        "_history_store",
+        DecisionHistoryStore(tmp_path / "test-decision-history.db"),
     )
     twin_registry._twins.clear()
     with TestClient(app) as test_client:
@@ -70,6 +78,7 @@ def test_decision_api_returns_baseline_only_result(client):
     assert result["utility_ranking"] is None
     assert result["policy_comparison"]["status"] == "not_applicable_baseline_only"
     assert result["snapshot_metadata"]["prediction_count"] == 1
+    assert response.headers["X-Decision-Persistence-Status"] == "saved"
 
 
 def test_decision_api_counterfactual_uses_one_snapshot_and_does_not_mutate_twin(client, monkeypatch):
@@ -191,4 +200,170 @@ def test_decision_api_route_is_in_openapi(client):
     assert operation["requestBody"]
     assert operation["responses"]["200"]["content"]["application/json"]["schema"]["$ref"].endswith(
         "/ExperimentalDecisionResult"
+    )
+
+
+def test_persistence_failure_preserves_decision_body_status_and_single_execution(
+    client, monkeypatch
+):
+    battery_id = "agent-persistence-failure"
+    _initialize_with_observations(client, battery_id, 1)
+    calls = []
+    original_orchestrator = agent_api.run_goal_directed_orchestrator
+
+    def counted_orchestrator(**kwargs):
+        result = original_orchestrator(**kwargs)
+        calls.append(result)
+        return result
+
+    def fail_persistence(_payload):
+        raise RuntimeError("database unavailable")
+
+    monkeypatch.setattr(agent_api, "run_goal_directed_orchestrator", counted_orchestrator)
+    monkeypatch.setattr(agent_api._history_store, "save", fail_persistence)
+    response = client.post(
+        "/api/agent/decide",
+        json=_request(
+            battery_id,
+            {"goal_id": "baseline", "horizon_cycles": 10, "assessment_scope": "baseline_only"},
+        ),
+    )
+
+    assert len(calls) == 1
+    assert response.status_code == 200
+    assert response.json() == jsonable_encoder(calls[0])
+    assert response.headers["X-Decision-Persistence-Status"] == "failed"
+
+
+def test_plan_recorder_failure_is_persisted_as_unavailable_without_changing_decision(
+    client, monkeypatch
+):
+    battery_id = "agent-plan-recorder-failure"
+    _initialize_with_observations(client, battery_id, 1)
+
+    def fail_recording(_state, _plan):
+        raise RuntimeError("in-memory recorder unavailable")
+
+    monkeypatch.setattr(agent_api, "_record_plan_in_memory", fail_recording)
+    response = client.post(
+        "/api/agent/decide",
+        json=_request(
+            battery_id,
+            {"goal_id": "baseline", "horizon_cycles": 10, "assessment_scope": "baseline_only"},
+        ),
+    )
+
+    assert response.status_code == 200
+    assert response.json()["termination_status"] == "completed"
+    record = agent_api._history_store.get_decision(response.json()["decision_id"])
+    assert record["plan_evidence_available"] is False
+    assert record["planned_tools"] is None
+    assert all(tool["planned"] is None for tool in record["tool_outcomes"])
+
+
+def test_decision_history_routes_return_summary_and_full_record(client):
+    battery_id = "agent-history-api"
+    _initialize_with_observations(client, battery_id, 1)
+    decision = client.post(
+        "/api/agent/decide",
+        json=_request(battery_id, {"goal_id": "history-goal", "horizon_cycles": 10}),
+    )
+    decision_id = decision.json()["decision_id"]
+    twin_registry._twins.pop(battery_id)
+
+    history = client.get(f"/api/agent/batteries/{battery_id}/decisions?limit=1")
+    detail = client.get(f"/api/agent/decisions/{decision_id}")
+
+    assert history.status_code == 200
+    summary = history.json()["items"][0]
+    assert summary["decision_id"] == decision_id
+    assert summary["battery_id"] == battery_id
+    assert summary["created_at"]
+    assert summary["decision_status"] == "completed"
+    assert summary["termination_status"] == "completed"
+    assert summary["goal_id"] == "history-goal"
+    assert history.json()["has_more"] is False
+    assert detail.status_code == 200
+    assert detail.json()["goal_spec"]["goal_id"] == "history-goal"
+    assert detail.json()["tool_outcomes"][0]["tool_name"] == "registered_twin_snapshot"
+    assert len(detail.json()["scenarios"]) == 1
+
+
+def test_decision_history_routes_validate_cursor_and_missing_detail(client):
+    bad_cursor = client.get(
+        "/api/agent/batteries/battery/decisions?cursor=not%20a%20cursor"
+    )
+    missing = client.get("/api/agent/decisions/not-found")
+    assert bad_cursor.status_code == 422
+    assert missing.status_code == 404
+
+
+def test_baseline_failure_is_persisted_as_failed_without_losing_stage3_status(
+    client, monkeypatch
+):
+    battery_id = "agent-baseline-failure-status"
+    _initialize_with_observations(client, battery_id, 1)
+
+    def fail_baseline(**_kwargs):
+        raise RuntimeError("baseline unavailable")
+
+    monkeypatch.setattr(planner.planner_tool_registry, "assess_registered_baseline", fail_baseline)
+    response = client.post(
+        "/api/agent/decide",
+        json=_request(
+            battery_id,
+            {"goal_id": "baseline-failure", "horizon_cycles": 10, "assessment_scope": "baseline_only"},
+        ),
+    )
+    record = agent_api._history_store.get_decision(response.json()["decision_id"])
+    assert response.status_code == 500
+    assert record["decision_status"] == "failed"
+    assert record["termination_status"] == "service_failure"
+
+
+def test_counterfactual_failure_after_baseline_is_persisted_as_incomplete(
+    client, monkeypatch
+):
+    battery_id = "agent-counterfactual-failure-status"
+    _initialize_with_observations(client, battery_id, 1)
+
+    def fail_counterfactual(**_kwargs):
+        raise RuntimeError("counterfactual unavailable")
+
+    monkeypatch.setattr(planner.planner_tool_registry, "simulate_registered_twin", fail_counterfactual)
+    response = client.post(
+        "/api/agent/decide",
+        json=_request(
+            battery_id,
+            {
+                "goal_id": "comparison-failure",
+                "horizon_cycles": 10,
+                "assessment_scope": "counterfactual_comparison",
+            },
+        ),
+    )
+    record = agent_api._history_store.get_decision(response.json()["decision_id"])
+    assert response.status_code == 500
+    assert record["decision_status"] == "incomplete"
+    assert record["termination_status"] == "service_failure"
+    cf_tool = next(
+        tool for tool in record["tool_outcomes"]
+        if tool["tool_name"] == "counterfactual_simulation"
+    )
+    assert cf_tool["status"] == "execution_failure"
+    assert cf_tool["planned"] is True
+    assert cf_tool["executed"] is True
+    assert cf_tool["error_details"] is not None
+    assert cf_tool["result_summary"] is None
+    assert cf_tool["execution_order"] == 3
+    assert cf_tool["validated_arguments"] is not None
+    assert any(
+        tool["tool_name"] == "maintenance_policy"
+        and tool["status"] == "not_executed"
+        and tool["planned"] is True
+        and tool["executed"] is False
+        and tool["validated_arguments"] is None
+        and tool["result_summary"] is None
+        and tool["error_details"] is None
+        for tool in record["tool_outcomes"]
     )

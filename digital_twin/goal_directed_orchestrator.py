@@ -2,7 +2,7 @@
 
 import math
 import uuid
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 from backend.twin_registry import twin_registry as shared_twin_registry
 from digital_twin.baseline_relative_utility import (
@@ -292,12 +292,44 @@ def _error_result(
     )
 
 
+def _tool_plan(assessment_path: Optional[str] = None) -> tuple[str, ...]:
+    """Return the ordered registry dispatch plan for a selected path."""
+    snapshot_and_baseline = (
+        "registered_twin_snapshot",
+        "baseline_assessment",
+    )
+    if assessment_path == "counterfactual_comparison":
+        return snapshot_and_baseline + (
+            "counterfactual_simulation",
+            "maintenance_policy",
+        )
+    return snapshot_and_baseline if assessment_path == "baseline_only" else (
+        "registered_twin_snapshot",
+    )
+
+
+def _record_plan(
+    plan_recorder: Optional[Callable[[tuple[str, ...]], None]],
+    plan: tuple[str, ...],
+) -> None:
+    """Report an immutable plan without allowing the observer to affect execution."""
+    if plan_recorder is None:
+        return
+    try:
+        plan_recorder(plan)
+    except Exception:
+        # Plan recording is auxiliary evidence and must never alter a decision.
+        return
+
+
 def run_goal_directed_orchestrator(
     battery_id: str,
     goal: GoalSpec,
     minimum_acceptable_soh: float = 0.80,
     twin_registry=None,
     config: PlannerConfig = DEFAULT_PLANNER_CONFIG,
+    *,
+    plan_recorder: Optional[Callable[[tuple[str, ...]], None]] = None,
 ) -> ExperimentalDecisionResult:
     """Execute a goal-directed decision through the allowlisted tool registry."""
     outcomes = []
@@ -316,11 +348,13 @@ def run_goal_directed_orchestrator(
         outcomes.append(outcome)
         return outcome
 
+    snapshot_plan = _tool_plan()
     snapshot_outcome = execute(
-        "registered_twin_snapshot",
+        snapshot_plan[0],
         {"twin_registry": registry, "battery_id": battery_id},
     )
     if snapshot_outcome.status != "success":
+        _record_plan(plan_recorder, snapshot_plan)
         return _error_result(
             battery_id, "invalid_snapshot", snapshot_outcome.error["code"],
             snapshot_outcome.error["message"], tool_outcomes=outcomes,
@@ -329,6 +363,7 @@ def run_goal_directed_orchestrator(
     try:
         snapshot = _validate_snapshot(snapshot, battery_id)
     except (TypeError, ValueError) as exc:
+        _record_plan(plan_recorder, snapshot_plan)
         snapshot_outcome.status = "invalid_result"
         snapshot_outcome.error = {"code": "invalid_snapshot", "message": str(exc)}
         snapshot_outcome.result = None
@@ -346,13 +381,15 @@ def run_goal_directed_orchestrator(
 
     trend_per_sample, trend_status = _trend(snapshot)
     path = _select_path(validated_goal, snapshot, trend_status)
+    tool_plan = _tool_plan(path)
+    _record_plan(plan_recorder, tool_plan)
     metadata = _snapshot_metadata(snapshot, trend_per_sample, trend_status)
     available_evidence = _available_evidence(validated_goal, trend_per_sample, trend_status)
     current_soh = snapshot["state"]["twin_state"]["soh"]
     diagnostic_evidence = validated_goal.diagnostic_evidence or {}
 
     baseline_outcome = execute(
-        "baseline_assessment",
+        tool_plan[1],
         {
             "twin_registry": registry,
             "battery_id": battery_id,
@@ -400,7 +437,7 @@ def run_goal_directed_orchestrator(
         )
 
     counterfactual_outcome = execute(
-        "counterfactual_simulation",
+        tool_plan[2],
         {
             "twin_registry": registry,
             "battery_id": battery_id,
@@ -480,7 +517,7 @@ def run_goal_directed_orchestrator(
     ]
 
     policy_outcome = execute(
-        "maintenance_policy",
+        tool_plan[3],
         {
             "scenario_results": list(scenarios.scenarios.values()),
             "minimum_acceptable_soh": minimum_acceptable_soh,
