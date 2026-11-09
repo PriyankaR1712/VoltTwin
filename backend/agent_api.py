@@ -1,6 +1,8 @@
 """HTTP API for the existing goal-directed Agentic AI workflow."""
 
 from datetime import datetime, timezone
+import math
+import os
 from threading import Lock
 from typing import Any, Literal, Optional
 
@@ -15,10 +17,14 @@ from backend.twin_registry import twin_registry
 from digital_twin.goal_directed_orchestrator import run_goal_directed_orchestrator
 from digital_twin.decision_models import ExperimentalDecisionResult
 from digital_twin.goal_spec import GoalSpec
+from backend.adaptive_decision_service import AdaptiveDecisionService
+from backend.adaptive_evaluation_store import AdaptiveEvaluationStore
 
 router = APIRouter(prefix="/api/agent", tags=["Agentic AI"])
 _history_store: Optional[DecisionHistoryStore] = None
 _history_store_lock = Lock()
+_adaptive_service: Optional[AdaptiveDecisionService] = None
+_adaptive_service_lock = Lock()
 
 
 def _get_history_store() -> DecisionHistoryStore:
@@ -28,6 +34,48 @@ def _get_history_store() -> DecisionHistoryStore:
             if _history_store is None:
                 _history_store = DecisionHistoryStore()
     return _history_store
+
+
+def _get_adaptive_service() -> AdaptiveDecisionService:
+    global _adaptive_service
+    if _adaptive_service is None:
+        with _adaptive_service_lock:
+            if _adaptive_service is None:
+                path = os.environ.get("VOLTTWIN_ADAPTIVE_DB_PATH")
+                minimum_gap = os.environ.get("VOLTTWIN_ADAPTIVE_MINIMUM_GAP")
+                epsilon_soh = os.environ.get("VOLTTWIN_ADAPTIVE_EPSILON_SOH")
+                policy_version = os.environ.get("VOLTTWIN_ADAPTIVE_POLICY_VERSION")
+                if minimum_gap is None or epsilon_soh is None or not policy_version:
+                    raise RuntimeError("Frozen adaptive policy configuration is not set.")
+                try:
+                    configured_gap = int(minimum_gap)
+                    configured_epsilon = float(epsilon_soh)
+                except (TypeError, ValueError, OverflowError) as exc:
+                    raise RuntimeError("Frozen adaptive policy configuration is invalid.") from exc
+                if configured_gap < 1 or not math.isfinite(configured_epsilon) or not 0 <= configured_epsilon < 1:
+                    raise RuntimeError("Frozen adaptive policy configuration is invalid.")
+                _adaptive_service = AdaptiveDecisionService(
+                    store=AdaptiveEvaluationStore(path) if path else AdaptiveEvaluationStore(),
+                    minimum_gap=configured_gap,
+                    epsilon_soh=configured_epsilon,
+                    policy_version=policy_version,
+                )
+    return _adaptive_service
+
+
+def initialize_adaptive_service_if_configured() -> None:
+    """Acquire the adaptive database worker lease during application startup.
+
+    An unset policy keeps the feature opt-in. Partial configuration fails
+    startup rather than activating a process with ambiguous recovery state.
+    """
+    config_keys = (
+        "VOLTTWIN_ADAPTIVE_MINIMUM_GAP",
+        "VOLTTWIN_ADAPTIVE_EPSILON_SOH",
+        "VOLTTWIN_ADAPTIVE_POLICY_VERSION",
+    )
+    if any(os.environ.get(key) is not None for key in config_keys):
+        _get_adaptive_service()
 
 
 def _record_plan_in_memory(state: dict[str, Any], plan: tuple[str, ...]) -> None:
@@ -64,6 +112,18 @@ class AgentDecisionRequest(BaseModel):
             return GoalSpec(**value)
         except (TypeError, ValueError) as exc:
             raise ValueError(str(exc)) from exc
+
+
+class AdaptiveWatermarkRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    prediction_count: int = Field(ge=0, strict=True)
+    version: int = Field(ge=0, strict=True)
+    observation_index: Optional[int] = Field(default=None, ge=0, strict=True)
+
+
+class AdaptiveDecisionRequest(AgentDecisionRequest):
+    event_watermark: AdaptiveWatermarkRequest
 
 
 class DecisionSummaryResponse(BaseModel):
@@ -143,11 +203,22 @@ def decide(request: AgentDecisionRequest):
     snapshot capture, prediction-history checks and simulation do not block
     the asynchronous event loop.
     """
+    result, persistence_status, status_code = _run_and_persist_decision(
+        request.battery_id, request.goal
+    )
+    return JSONResponse(
+        status_code=status_code,
+        content=jsonable_encoder(result),
+        headers={"X-Decision-Persistence-Status": persistence_status},
+    )
+
+
+def _run_and_persist_decision(battery_id: str, goal: GoalSpec):
+    """Run Stage 3 once and persist its immutable Stage 4 record once."""
     try:
-        twin_registry.get(request.battery_id)
+        twin_registry.get(battery_id)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
-
     plan_state: dict[str, Any] = {"available": False, "tools": None}
 
     def record_plan(plan: tuple[str, ...]) -> None:
@@ -155,8 +226,8 @@ def decide(request: AgentDecisionRequest):
 
     decision_started_at = datetime.now(timezone.utc)
     result = run_goal_directed_orchestrator(
-        battery_id=request.battery_id,
-        goal=request.goal,
+        battery_id=battery_id,
+        goal=goal,
         twin_registry=twin_registry,
         plan_recorder=record_plan,
     )
@@ -176,7 +247,7 @@ def decide(request: AgentDecisionRequest):
     persistence_status = "failed"
     try:
         payload = freeze_decision_payload(
-            goal=request.goal,
+            goal=goal,
             result=result,
             decision_started_at=decision_started_at,
             planned_tools=plan_state["tools"],
@@ -193,10 +264,43 @@ def decide(request: AgentDecisionRequest):
         # Persistence is auxiliary: never alter the Stage 3 response or rerun it.
         persistence_status = "failed"
 
+    return result, persistence_status, status_code
+
+
+@router.post("/adaptive-decide")
+def adaptive_decide(request: AdaptiveDecisionRequest):
+    """Opt-in observation-event-triggered decision reassessment."""
+    try:
+        service = _get_adaptive_service()
+        response = service.evaluate(
+            battery_id=request.battery_id,
+            goal=request.goal,
+            event_watermark=request.event_watermark.model_dump(),
+            twin_registry=twin_registry,
+            run_decision=lambda: _run_and_persist_decision(
+                request.battery_id, request.goal
+            ),
+        )
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Adaptive evaluation is unavailable or indeterminate.",
+        ) from exc
+    headers = {}
+    persistence_status = response.get("decision_persistence_status")
+    if persistence_status in {"saved", "already_saved", "failed", "idempotency_conflict"}:
+        headers["X-Decision-Persistence-Status"] = persistence_status
+    status_code = response.get("decision_http_status", 200)
     return JSONResponse(
         status_code=status_code,
-        content=jsonable_encoder(result),
-        headers={"X-Decision-Persistence-Status": persistence_status},
+        content=jsonable_encoder(response),
+        headers=headers,
     )
 
 

@@ -1,5 +1,6 @@
 
 from fastapi import FastAPI, HTTPException
+from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 import torch
@@ -16,11 +17,21 @@ from digital_twin.counterfactual_service import (
     simulate_registered_twin,
 )
 from backend.streaming.stream_routes import router as streaming_router
+from backend import agent_api
 from backend.agent_api import router as agent_router
+
+
+@asynccontextmanager
+async def app_lifespan(_app):
+    agent_api.initialize_adaptive_service_if_configured()
+    yield
+
+
 app = FastAPI(
     title="VoltTwin API",
     description="API for EV battery SOH simulation and maintenance scenarios.",
     version="0.1.0",
+    lifespan=app_lifespan,
 )
 app.include_router(features_router)
 app.include_router(streaming_router)
