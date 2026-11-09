@@ -6,6 +6,7 @@ from backend.main import app
 from backend.twin_registry import twin_registry
 from digital_twin import twin_manager as twin_manager_module
 from digital_twin import goal_directed_orchestrator as planner
+from digital_twin import planner_tool_registry as planner_tools
 
 
 class SequencePredictor:
@@ -169,7 +170,7 @@ def test_decision_api_maps_counterfactual_service_failure_to_500(client, monkeyp
     def fail_simulation(**kwargs):
         raise RuntimeError("simulation unavailable")
 
-    monkeypatch.setattr(planner, "simulate_registered_twin", fail_simulation)
+    monkeypatch.setattr(planner_tools, "simulate_registered_twin", fail_simulation)
     response = client.post(
         "/api/agent/decide",
         json=_request(
