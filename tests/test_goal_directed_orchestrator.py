@@ -327,6 +327,18 @@ def test_invalid_prediction_history_makes_trend_unknown(harness, invalid_soh):
     assert calls["counterfactual"] == []
 
 
+def test_latest_observed_soh_mismatch_makes_trend_unknown(harness):
+    manager, _, calls = harness
+    manager.snapshot["state"]["degradation"]["latest_observed_soh"] += 0.001
+
+    result = run(GoalSpec("stale-latest-soh", 100), harness)
+
+    assert result.snapshot_metadata["trend_status"] == "unknown"
+    assert result.snapshot_metadata["trend_per_sample"] is None
+    assert result.assessment_path == "baseline_only"
+    assert calls["counterfactual"] == []
+
+
 @pytest.mark.parametrize("trend", [0.0, 0.0001])
 def test_stable_or_increasing_trend_does_not_trigger_comparison(harness, trend):
     manager, _, calls = harness
@@ -413,9 +425,46 @@ def test_equal_utility_preserves_tie_and_selects_no_unique_candidate(harness):
         "Maintenance B",
     ]
     assert result.utility_ranking["selection_status"] == "tie"
+    assert result.utility_ranking["feasibility_status"] == "unknown"
+    assert result.utility_ranking["analytical_preferred_candidate"] is None
+    assert result.utility_ranking["selected_candidate"] is None
     assert result.selected_action is None
     assert result.termination_status == "tie"
     assert result.policy_comparison["status"] == "tie"
+    assert result.policy_comparison["comparison_status"] == "tie"
+    assert result.policy_comparison["policy_availability"] == "available"
+    assert result.policy_comparison["policy_matches_utility_tie"] is True
+
+
+def test_valid_scenarios_keep_utility_analysis_but_unknown_feasibility_is_not_selected(
+    harness,
+):
+    result = run(
+        GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
+        harness,
+    )
+
+    assert result.termination_status == "completed"
+    assert result.selected_action is None
+    assert result.utility_ranking["utilities"]
+    assert result.utility_ranking["ranked_groups"] == [["Maintenance B"], ["Maintenance A"]]
+    assert result.utility_ranking["analytical_preferred_candidate"] == "Maintenance B"
+    assert result.utility_ranking["selected_candidate"] is None
+    assert result.utility_ranking["selection_status"] == "feasibility_unknown"
+    assert result.utility_ranking["feasibility_status"] == "unknown"
+    intervention_rows = [
+        row
+        for row in result.candidate_evaluations
+        if row["scenario"] in {"Maintenance A", "Maintenance B"}
+    ]
+    assert len(intervention_rows) == 2
+    assert all(row["feasibility_status"] == "unknown" for row in intervention_rows)
+    assert all(
+        row["eligibility"] == "not_eligible_unknown_feasibility"
+        for row in intervention_rows
+    )
+    assert any("analytical only" in line and "feasibility is unknown" in line
+               for line in result.explanation)
 
 
 def test_policy_agreement_is_reported_without_replacing_utility_selection(harness):
@@ -424,8 +473,14 @@ def test_policy_agreement_is_reported_without_replacing_utility_selection(harnes
         GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
         harness,
     )
-    assert result.selected_action == "Maintenance B"
+    assert result.selected_action is None
+    assert result.utility_ranking["analytical_preferred_candidate"] == "Maintenance B"
+    assert result.utility_ranking["selected_candidate"] is None
     assert result.policy_comparison["status"] == "agreement"
+    assert result.policy_comparison["comparison_status"] == "agreement"
+    assert result.policy_comparison["policy_availability"] == "available"
+    assert result.policy_comparison["utility_preferred_candidate"] == "Maintenance B"
+    assert result.policy_comparison["utility_selected_candidate"] is None
     assert result.policy_comparison["policy_recommended_scenario"] == "Maintenance B"
     assert len(calls["policy"]) == 1
 
@@ -440,14 +495,101 @@ def test_policy_disagreement_preserves_both_recommendations(harness):
         GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
         harness,
     )
-    assert result.selected_action == "Maintenance B"
+    assert result.selected_action is None
+    assert result.utility_ranking["analytical_preferred_candidate"] == "Maintenance B"
     assert result.policy_comparison["status"] == "disagreement"
+    assert result.policy_comparison["comparison_status"] == "disagreement"
+    assert result.policy_comparison["policy_availability"] == "available"
+    assert result.policy_comparison["utility_preferred_candidate"] == "Maintenance B"
     assert result.policy_comparison["policy_recommended_scenario"] == "Maintenance A"
 
 
+def test_policy_without_recommendation_is_unavailable_not_disagreement(harness):
+    _, _, calls = harness
+    calls["policy_result"] = {
+        **calls["policy_result"],
+        "recommended_scenario": None,
+    }
+
+    result = run(
+        GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
+        harness,
+    )
+
+    assert result.selected_action is None
+    assert result.utility_ranking["analytical_preferred_candidate"] == "Maintenance B"
+    assert result.policy_comparison["status"] == "unavailable"
+    assert result.policy_comparison["comparison_status"] == "unavailable"
+    assert result.policy_comparison["policy_availability"] == "unavailable"
+    assert result.policy_comparison["policy_recommended_scenario"] is None
+    assert result.policy_comparison["policy_output"]["recommended_scenario"] is None
+
+
+def test_policy_exception_preserves_analytical_result_and_reports_unavailable(
+    harness, monkeypatch
+):
+    def failing_policy(**kwargs):
+        raise RuntimeError("policy unavailable")
+
+    monkeypatch.setattr(planner, "recommend_maintenance", failing_policy)
+    result = run(
+        GoalSpec("compare", 100, assessment_scope="counterfactual_comparison"),
+        harness,
+    )
+
+    assert result.selected_action is None
+    assert result.utility_ranking["analytical_preferred_candidate"] == "Maintenance B"
+    assert result.policy_comparison["status"] == "unavailable"
+    assert result.policy_comparison["comparison_status"] == "unavailable"
+    assert result.policy_comparison["policy_availability"] == "unavailable"
+    assert result.policy_comparison["utility_preferred_candidate"] == "Maintenance B"
+    assert result.errors[0]["code"] == "maintenance_policy_failed"
+
+
+def test_tied_planner_and_unavailable_policy_are_both_reported(harness, monkeypatch):
+    _, _, calls = harness
+    calls["policy_result"] = {
+        **calls["policy_result"],
+        "recommended_scenario": None,
+    }
+    original = planner.simulate_registered_twin
+
+    def tied_service(**kwargs):
+        response = original(**kwargs)
+        response["scenarios"][2]["projected_soh"] = response["scenarios"][1][
+            "projected_soh"
+        ]
+        response["scenarios"][2]["difference_vs_baseline"] = response[
+            "scenarios"
+        ][1]["difference_vs_baseline"]
+        return response
+
+    monkeypatch.setattr(planner, "simulate_registered_twin", tied_service)
+    result = run(
+        GoalSpec("tie-unavailable", 100, assessment_scope="counterfactual_comparison"),
+        harness,
+    )
+
+    assert result.utility_ranking["selection_status"] == "tie"
+    assert result.utility_ranking["ranked_groups"][0] == [
+        "Maintenance A",
+        "Maintenance B",
+    ]
+    assert result.selected_action is None
+    assert result.policy_comparison["status"] == "tie"
+    assert result.policy_comparison["comparison_status"] == "tie"
+    assert result.policy_comparison["policy_availability"] == "unavailable"
+    assert result.policy_comparison["policy_recommended_scenario"] is None
+    assert result.policy_comparison["policy_matches_utility_tie"] is None
+
+
 def test_baseline_policy_status_is_not_applicable(harness):
+    _, _, calls = harness
     result = run(GoalSpec("baseline", 100, assessment_scope="baseline_only"), harness)
     assert result.policy_comparison["status"] == "not_applicable_baseline_only"
+    assert result.policy_comparison["comparison_status"] == "not_applicable"
+    assert result.policy_comparison["policy_availability"] == "not_invoked"
+    assert calls["policy"] == []
 
 
 def test_both_paths_return_the_shared_result_model(harness):
