@@ -24,6 +24,7 @@ def test_event_reservation_and_recovery_are_idempotent(tmp_path):
     latest = store.get_latest("b1", "gen-1")
     assert latest["status"] == "held"
     assert latest["decision_snapshot_watermark"]["prediction_count"] == 1
+    assert store.get_latest_decision_id("b1", "gen-1") is None
 
     restarted = AdaptiveEvaluationStore(path)
     assert restarted.get_event("event-1")["status"] == "held"

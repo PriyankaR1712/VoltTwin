@@ -116,7 +116,7 @@ class AdaptiveDecisionService:
                 event_watermark=current_watermark, predicted_soh=predicted_soh,
                 minimum_gap=self.minimum_gap, epsilon_soh=self.epsilon_soh,
                 policy_version=self.policy_version,
-                prior_decision_id=previous_row.get("decision_id") if previous_row else None,
+                prior_decision_id=self.store.get_latest_decision_id(battery_id, generation),
             )
             if existing is not None:
                 status = existing["status"]

@@ -90,6 +90,86 @@ def test_hold_then_reassess_using_actual_decision_watermark(tmp_path):
     assert calls == [1, 4]
 
 
+def test_decision_reference_survives_one_and_multiple_holds(tmp_path):
+    service, manager = make_service(tmp_path, gap=3), Manager()
+    goal, registry = GoalSpec("g", 4), Registry(manager)
+
+    def assess():
+        return service.evaluate(battery_id="b", goal=goal, event_watermark=event(manager),
+                                twin_registry=registry,
+                                run_decision=lambda: decision(manager.count))
+
+    assess()  # D1 at watermark 1
+    manager.count, manager.index = 2, 11
+    assert assess()["evaluation_status"] == "held"
+    assert service.store.get_latest("b", service._generation(manager))["decision_id"] is None
+    manager.count, manager.index = 3, 12
+    assert assess()["evaluation_status"] == "held"
+    assert service.store.get_latest("b", service._generation(manager))["decision_id"] is None
+    manager.count, manager.index = 4, 13
+    assess()
+    latest = service.store.get_latest("b", service._generation(manager))
+    assert latest["prior_decision_id"] == "decision-1"
+
+
+def test_decision_reference_survives_single_hold(tmp_path):
+    service, manager = make_service(tmp_path, gap=3), Manager()
+    goal, registry = GoalSpec("g", 4), Registry(manager)
+
+    def assess():
+        return service.evaluate(battery_id="b", goal=goal, event_watermark=event(manager),
+                                twin_registry=registry,
+                                run_decision=lambda: decision(manager.count))
+
+    assess()
+    manager.count, manager.index = 2, 11
+    assert assess()["evaluation_status"] == "held"
+    manager.count, manager.index = 4, 13
+    assert assess()["evaluation_status"] == "reassessed"
+    latest = service.store.get_latest("b", service._generation(manager))
+    assert latest["prior_decision_id"] == "decision-1"
+
+
+def test_new_decision_replaces_prior_reference_after_holds(tmp_path):
+    service, manager = make_service(tmp_path, gap=3), Manager()
+    goal, registry = GoalSpec("g", 4), Registry(manager)
+
+    def assess():
+        return service.evaluate(battery_id="b", goal=goal, event_watermark=event(manager),
+                                twin_registry=registry,
+                                run_decision=lambda: decision(manager.count))
+
+    assess()
+    manager.count, manager.index = 2, 11
+    assess()
+    manager.count, manager.index = 4, 13
+    assess()  # D2
+    manager.count, manager.index = 5, 14
+    assert assess()["evaluation_status"] == "held"
+    manager.count, manager.index = 7, 16
+    assess()  # next assessment must refer to D2
+    latest = service.store.get_latest("b", service._generation(manager))
+    assert latest["prior_decision_id"] == "decision-4"
+
+
+def test_no_previous_decision_reference_is_invented(tmp_path):
+    service = make_service(tmp_path)
+    generation = "generation-with-only-holds"
+    for index in range(2):
+        event_id, existing = service.store.reserve(
+            event_key=f"held-{index}", battery_id="b", generation_id=generation,
+            goal_fingerprint="goal", goal_spec={"goal_id": "g"},
+            event_watermark={"prediction_count": index, "version": index,
+                             "observation_index": index},
+            predicted_soh=None, minimum_gap=3, epsilon_soh=.01,
+            policy_version="v1", prior_decision_id=None,
+        )
+        assert existing is None
+        service.store.finish(event_id, status="held", reasons=["not_ready"])
+    assert service.store.get_latest_decision_id("b", generation) is None
+    assert service.store.get_latest("b", generation)["prior_decision_id"] is None
+
+
 def test_failed_callback_is_indeterminate_and_never_retried(tmp_path):
     service, manager = make_service(tmp_path), Manager()
     calls = []

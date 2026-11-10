@@ -215,6 +215,17 @@ class AdaptiveEvaluationStore:
             ).fetchone()
         return self._decode(dict(row)) if row else None
 
+    def get_latest_decision_id(self, battery_id: str, generation_id: str) -> str | None:
+        """Return the latest decision from a completed reassessment event."""
+        with closing(self._connect()) as db:
+            row = db.execute(
+                """SELECT decision_id FROM adaptive_evaluation_events
+                WHERE battery_id=? AND generation_id=? AND status='reassessed'
+                AND decision_id IS NOT NULL ORDER BY sequence DESC LIMIT 1""",
+                (battery_id,generation_id),
+            ).fetchone()
+        return row["decision_id"] if row else None
+
     def get_event(self, event_key: str) -> dict | None:
         with closing(self._connect()) as db:
             row = db.execute("SELECT * FROM adaptive_evaluation_events WHERE event_key=?", (event_key,)).fetchone()
