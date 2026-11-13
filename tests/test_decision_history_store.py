@@ -95,6 +95,69 @@ def test_persisted_records_match_agent_api_response_models(store):
     assert DecisionListResponse.model_validate(listing).items[0].goal_id == "g"
 
 
+def test_model_feasibility_round_trips_without_schema_change(store):
+    assessment = {
+        "status": "unknown",
+        "rule_id": "documented_intervention_eligibility",
+        "rule_version": "v1",
+        "reasons": [{"code": "intervention_definition_undocumented"}],
+        "evidence_used": [],
+        "evidence_provenance": [],
+        "missing_evidence": ["documented_intervention_definition"],
+        "assessment_label": "model_based_not_physical_safety_or_effectiveness_validation",
+        "is_physical_safety_validation": False,
+        "proves_maintenance_effectiveness": False,
+    }
+    result = ExperimentalDecisionResult(
+        decision_id="feasibility-round-trip",
+        battery_id="battery-1",
+        assessment_path="counterfactual_comparison",
+        termination_status="completed",
+        goal_status="target_unavailable",
+        candidate_evaluations=[
+            {"scenario": "No maintenance", "projected_soh": 0.89,
+             "feasibility_status": "not_applicable_baseline_comparator"},
+            {"scenario": "Maintenance A", "projected_soh": 0.90,
+             "utility": 1.0, "feasibility_status": "unknown", "feasibility": assessment},
+        ],
+        utility_ranking={"utilities": {"Maintenance A": 1.0}, "ranked_groups": [["Maintenance A"]]},
+        intervention_feasibility={"Maintenance A": assessment},
+        final_recommendation={"status": "no_recommendation", "candidate": None,
+                              "reason": "No candidate passed documented rules."},
+        policy_comparison={"status": "available", "policy_recommended_scenario": "Maintenance A"},
+        snapshot_metadata={"version": 2},
+        tool_outcomes=[
+            ToolExecutionOutcome("registered_twin_snapshot", "success", 1,
+                                 result={"battery_id": "battery-1", "version": 2}),
+            ToolExecutionOutcome("baseline_assessment", "success", 2,
+                                 result={"scenario": "No maintenance", "snapshot_version": 2,
+                                         "projected_soh": 0.89}),
+            ToolExecutionOutcome("counterfactual_simulation", "success", 3,
+                                 result={"scenarios": [
+                                     {"scenario": "No maintenance", "projected_soh": 0.89},
+                                     {"scenario": "Maintenance A", "projected_soh": 0.90},
+                                 ]}),
+        ],
+    )
+    frozen = freeze_decision_payload(
+        goal=GoalSpec("g", 10, assessment_scope="counterfactual_comparison"),
+        result=result,
+        decision_started_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+        planned_tools=("registered_twin_snapshot", "baseline_assessment",
+                       "counterfactual_simulation", "maintenance_policy"),
+        plan_evidence_available=True,
+    )
+    assert store.save(frozen) == "saved"
+    record = store.get_decision("feasibility-round-trip")
+    assert record["feasibility"]["Maintenance A"] == assessment
+    scenario = next(row for row in record["scenarios"] if row["scenario_name"] == "Maintenance A")
+    assert scenario["feasibility"] == assessment
+    assert scenario["result_data"]["feasibility"]["missing_evidence"] == [
+        "documented_intervention_definition"
+    ]
+    assert record["final_decision"]["model_based_recommendation"]["status"] == "no_recommendation"
+
+
 def test_same_id_with_different_frozen_content_is_conflict(store):
     assert store.save(payload(goal_id="original")) == "saved"
     assert store.save(payload(goal_id="changed")) == "idempotency_conflict"

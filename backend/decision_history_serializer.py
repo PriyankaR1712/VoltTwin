@@ -263,7 +263,9 @@ def _scenario_rows(result: ExperimentalDecisionResult) -> list[dict[str, Any]]:
                 "scenario_name": name,
                 "projected_soh": projected_soh,
                 "utility": _json_value(row.get("utility")),
-                "feasibility": _json_value(row.get("feasibility_status")),
+                "feasibility": _json_value(
+                    row.get("feasibility", row.get("feasibility_status"))
+                ),
                 "result_data": _json_value(row),
             }
         )
@@ -320,8 +322,21 @@ def _explanation(
         for group in ranking.get("ranked_groups", []):
             if isinstance(group, list) and len(group) > 1:
                 lines.append("Utility tie preserved between: " + ", ".join(group) + ".")
-        if ranking.get("feasibility_status") == "unknown":
-            lines.append("Intervention feasibility is unknown; no physical feasibility was established.")
+    for candidate, assessment in result.intervention_feasibility.items():
+        lines.append(
+            f"{candidate} model-based feasibility: {assessment['status']}; "
+            "this is not physical safety validation or proof of maintenance effectiveness."
+        )
+        for reason in assessment.get("reasons", []):
+            if isinstance(reason, dict) and reason.get("explanation"):
+                lines.append(f"{candidate} feasibility reason: {reason['explanation']}")
+    if result.final_recommendation:
+        lines.append(
+            "Final model-based recommendation: "
+            + str(result.final_recommendation.get("candidate") or "none")
+            + ". "
+            + str(result.final_recommendation.get("reason", ""))
+        )
 
     if decision_status == "incomplete":
         lines.append("The decision attempt is incomplete; recorded results and errors are preserved.")
@@ -358,11 +373,11 @@ def freeze_decision_payload(
     decision_status = map_decision_status(result)
     tools = _tool_outcome_rows(result, planned_tools)
     scenarios = _scenario_rows(result)
-    feasibility = (
-        _json_value(result.utility_ranking.get("feasibility_status"))
-        if isinstance(result.utility_ranking, dict)
-        else None
-    )
+    feasibility = _json_value(result.intervention_feasibility) or None
+    if feasibility is None and isinstance(result.utility_ranking, dict):
+        # Preserve serialization of historical callers that predate the
+        # separate feasibility assessment field.
+        feasibility = _json_value(result.utility_ranking.get("feasibility_status"))
     explanation = _explanation(goal_data, result, decision_status, scenarios)
     payload = {
         "decision_id": result.decision_id,
@@ -383,6 +398,7 @@ def freeze_decision_payload(
         "scenarios": scenarios,
         "final_decision": {
             "selected_action": result.selected_action,
+            "model_based_recommendation": _json_value(result.final_recommendation),
             "policy_comparison": _json_value(result.policy_comparison),
         },
         "termination_status": result.termination_status,

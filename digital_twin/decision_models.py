@@ -39,6 +39,8 @@ class ExperimentalDecisionResult:
     available_evidence: list[Any] = field(default_factory=list)
     candidate_evaluations: list[dict[str, Any]] = field(default_factory=list)
     utility_ranking: Optional[dict[str, Any]] = None
+    intervention_feasibility: dict[str, dict[str, Any]] = field(default_factory=dict)
+    final_recommendation: dict[str, Any] = field(default_factory=dict)
     policy_comparison: dict[str, Any] = field(
         default_factory=lambda: {"status": "unavailable"}
     )
@@ -77,3 +79,24 @@ class ExperimentalDecisionResult:
                 raise ValueError(
                     "Baseline-only policy comparison must be explicitly not applicable."
                 )
+        if not isinstance(self.intervention_feasibility, dict):
+            raise ValueError("intervention_feasibility must be an object.")
+        for candidate, assessment in self.intervention_feasibility.items():
+            if not isinstance(candidate, str) or not isinstance(assessment, dict):
+                raise ValueError("Each intervention feasibility result must be an object keyed by candidate.")
+            if assessment.get("status") not in {"feasible", "infeasible", "unknown"}:
+                raise ValueError("Unsupported intervention feasibility status.")
+        if not isinstance(self.final_recommendation, dict):
+            raise ValueError("final_recommendation must be an object.")
+        if self.final_recommendation:
+            recommendation_status = self.final_recommendation.get("status")
+            if recommendation_status not in {
+                "recommended", "no_recommendation", "not_assessed_baseline_only"
+            }:
+                raise ValueError("Unsupported final recommendation status.")
+            if recommendation_status == "recommended":
+                candidate = self.final_recommendation.get("candidate")
+                if not isinstance(candidate, str) or not candidate.strip() or self.selected_action != candidate:
+                    raise ValueError("A recommended candidate must match selected_action.")
+            elif self.final_recommendation.get("candidate") is not None or self.selected_action is not None:
+                raise ValueError("A non-recommendation cannot select an intervention.")

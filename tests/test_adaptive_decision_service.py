@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+from threading import Event
 from types import SimpleNamespace
 
 import pytest
@@ -5,6 +7,10 @@ import pytest
 from backend.adaptive_decision_service import AdaptiveDecisionService
 from backend.adaptive_evaluation_store import AdaptiveEvaluationStore
 from digital_twin.goal_spec import GoalSpec
+from backend import agent_api
+from backend.decision_history_store import DecisionHistoryStore
+from backend.twin_registry import TwinRegistry
+from digital_twin import twin_manager as twin_manager_module
 
 
 class Manager:
@@ -16,6 +22,20 @@ class Manager:
             "prediction_count": self.count,
             "last_observation_index": self.index,
             "twin_state": {"soh": self.soh},
+        }
+
+    def get_snapshot(self):
+        state = self.get_state()
+        return {
+            "battery_id": "b",
+            "version": self.count,
+            "state": state,
+            "history": {
+                "battery_id": "b",
+                "state_source": "cnn_prediction",
+                "prediction_history": [{} for _ in range(self.count)],
+            },
+            "_manager_identity": id(self),
         }
 
 
@@ -50,7 +70,7 @@ def make_service(tmp_path, gap=3):
 def test_first_event_reassesses_once_and_reuses_duplicate(tmp_path):
     service, manager = make_service(tmp_path), Manager()
     calls = []
-    run = lambda: (calls.append(manager.count) or decision(manager.count))
+    run = lambda _snapshot: (calls.append(manager.count) or decision(manager.count))
     first = service.evaluate(battery_id="b", goal=GoalSpec("g", 4),
                              event_watermark=event(manager), twin_registry=Registry(manager),
                              run_decision=run)
@@ -63,11 +83,98 @@ def test_first_event_reassesses_once_and_reuses_duplicate(tmp_path):
     assert calls == [1]
 
 
+
+def test_event_snapshot_is_used_when_twin_advances_before_stage3(tmp_path, monkeypatch):
+    class ConstantPredictor:
+        def predict(self, _features):
+            return 0.9
+
+    monkeypatch.setattr(
+        twin_manager_module, "SOHPredictor",
+        lambda checkpoint_path=None: ConstantPredictor(),
+    )
+    registry = TwinRegistry()
+    manager = registry.initialize("concurrent-snapshot-test")
+    for index in range(3):
+        manager.process_observation([0.5] * 67, observation_index=index)
+
+    event_snapshot = manager.get_snapshot()
+    event_watermark = {
+        "prediction_count": event_snapshot["state"]["prediction_count"],
+        "version": event_snapshot["version"],
+        "observation_index": event_snapshot["state"]["last_observation_index"],
+    }
+    goal = GoalSpec("snapshot-race", 25, assessment_scope="baseline_only")
+    service = make_service(tmp_path)
+    monkeypatch.setattr(agent_api, "twin_registry", registry)
+    monkeypatch.setattr(
+        agent_api, "_history_store",
+        DecisionHistoryStore(tmp_path / "stage4-history.db"),
+    )
+
+    callback_entered = Event()
+    continue_callback = Event()
+    original_run = agent_api._run_and_persist_decision
+    callback_snapshots = []
+
+    def pause_before_stage3(battery, requested_goal, captured_snapshot=None):
+        callback_snapshots.append(captured_snapshot)
+        callback_entered.set()
+        if not continue_callback.wait(timeout=5):
+            raise TimeoutError("Timed out waiting to resume Stage 3 callback.")
+        return original_run(
+            battery, requested_goal, captured_snapshot=captured_snapshot
+        )
+
+    monkeypatch.setattr(agent_api, "_run_and_persist_decision", pause_before_stage3)
+
+    def evaluate_event():
+        return service.evaluate(
+            battery_id="concurrent-snapshot-test",
+            goal=goal,
+            event_watermark=event_watermark,
+            twin_registry=registry,
+            run_decision=lambda captured: agent_api._run_and_persist_decision(
+                "concurrent-snapshot-test", goal, captured_snapshot=captured
+            ),
+        )
+
+    try:
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(evaluate_event)
+            assert callback_entered.wait(timeout=5)
+            manager.process_observation([0.5] * 67, observation_index=3)
+            assert manager.get_snapshot()["state"]["prediction_count"] == (
+                event_watermark["prediction_count"] + 1
+            )
+            continue_callback.set()
+            outcome = future.result(timeout=10)
+
+        assert outcome["evaluation_status"] == "reassessed"
+        assert callback_snapshots == [event_snapshot]
+        assert outcome["event_watermark"] == event_watermark
+        assert outcome["decision_snapshot_watermark"] == event_watermark
+        assert outcome["decision_result"].snapshot_metadata["prediction_count"] == (
+            event_watermark["prediction_count"]
+        )
+        assert outcome["decision_result"].snapshot_metadata["version"] == event_watermark["version"]
+        assert manager.get_snapshot()["state"]["prediction_count"] == (
+            event_watermark["prediction_count"] + 1
+        )
+
+        stored = agent_api._history_store.get_decision(outcome["decision_id"])
+        assert stored is not None
+        assert stored["snapshot_metadata"]["prediction_count"] == event_watermark["prediction_count"]
+        assert stored["snapshot_metadata"]["version"] == event_watermark["version"]
+    finally:
+        continue_callback.set()
+        service.store.close()
+
 def test_hold_then_reassess_using_actual_decision_watermark(tmp_path):
     service, manager = make_service(tmp_path, gap=3), Manager()
     calls = []
 
-    def run():
+    def run(_snapshot):
         calls.append(manager.count)
         # Deliberately return an actual decision snapshot behind event intake.
         return SimpleNamespace(decision_id=f"d{manager.count}", snapshot_metadata={
@@ -97,7 +204,7 @@ def test_decision_reference_survives_one_and_multiple_holds(tmp_path):
     def assess():
         return service.evaluate(battery_id="b", goal=goal, event_watermark=event(manager),
                                 twin_registry=registry,
-                                run_decision=lambda: decision(manager.count))
+                                run_decision=lambda _snapshot: decision(manager.count))
 
     assess()  # D1 at watermark 1
     manager.count, manager.index = 2, 11
@@ -119,7 +226,7 @@ def test_decision_reference_survives_single_hold(tmp_path):
     def assess():
         return service.evaluate(battery_id="b", goal=goal, event_watermark=event(manager),
                                 twin_registry=registry,
-                                run_decision=lambda: decision(manager.count))
+                                run_decision=lambda _snapshot: decision(manager.count))
 
     assess()
     manager.count, manager.index = 2, 11
@@ -137,7 +244,7 @@ def test_new_decision_replaces_prior_reference_after_holds(tmp_path):
     def assess():
         return service.evaluate(battery_id="b", goal=goal, event_watermark=event(manager),
                                 twin_registry=registry,
-                                run_decision=lambda: decision(manager.count))
+                                run_decision=lambda _snapshot: decision(manager.count))
 
     assess()
     manager.count, manager.index = 2, 11
@@ -174,7 +281,7 @@ def test_failed_callback_is_indeterminate_and_never_retried(tmp_path):
     service, manager = make_service(tmp_path), Manager()
     calls = []
 
-    def crash():
+    def crash(_snapshot):
         calls.append(1)
         raise RuntimeError("crash after possible Stage 3 execution")
 
@@ -196,7 +303,7 @@ def test_indeterminate_event_is_not_retried_after_service_and_generation_restart
         AdaptiveEvaluationStore(path), minimum_gap=3, epsilon_soh=.01,
         policy_version="policy-v1",
     )
-    def crash():
+    def crash(_snapshot):
         calls.append(1)
         raise RuntimeError("simulated process interruption")
     with pytest.raises(RuntimeError):
@@ -214,7 +321,7 @@ def test_indeterminate_event_is_not_retried_after_service_and_generation_restart
     result = restarted_service.evaluate(
         battery_id="b", goal=GoalSpec("g", 4), event_watermark=event(restarted_manager),
         twin_registry=Registry(restarted_manager),
-        run_decision=lambda: (calls.append(2) or decision(1)),
+        run_decision=lambda _snapshot: (calls.append(2) or decision(1)),
     )
     assert result["evaluation_status"] == "indeterminate"
     assert calls == [1]
@@ -225,4 +332,4 @@ def test_event_watermark_must_match_registered_twin(tmp_path):
     with pytest.raises(ValueError):
         service.evaluate(battery_id="b", goal=GoalSpec("g", 4),
                          event_watermark={"prediction_count": 0, "version": 0, "observation_index": 9},
-                         twin_registry=Registry(manager), run_decision=lambda: decision(1))
+                         twin_registry=Registry(manager), run_decision=lambda _snapshot: decision(1))

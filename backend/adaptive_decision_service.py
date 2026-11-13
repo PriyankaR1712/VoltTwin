@@ -52,15 +52,18 @@ class AdaptiveDecisionService:
 
     def evaluate(self, *, battery_id: str, goal: GoalSpec, event_watermark: dict,
                  twin_registry: Any,
-                 run_decision: Callable[[], tuple[Any, str, int]]) -> dict:
+                 run_decision: Callable[[dict[str, Any]], tuple[Any, str, int]]) -> dict:
         """Validate one event and invoke Stage 3 at most once for its event key."""
         with self._lock_for(battery_id):
             manager = twin_registry.get(battery_id)
-            state = manager.get_state()
+            event_snapshot = manager.get_snapshot()
+            state = event_snapshot.get("state") if isinstance(event_snapshot, dict) else None
+            if not isinstance(state, dict):
+                raise ValueError("Registered Twin returned an invalid event snapshot.")
             current_watermark = validate_watermark({
-                "prediction_count": state["prediction_count"],
-                "version": state["prediction_count"],
-                "observation_index": state["last_observation_index"],
+                "prediction_count": state.get("prediction_count"),
+                "version": event_snapshot.get("version"),
+                "observation_index": state.get("last_observation_index"),
             })
             requested = validate_watermark(event_watermark)
             if requested != current_watermark:
@@ -151,7 +154,7 @@ class AdaptiveDecisionService:
                         "trigger_reasons": trigger["reasons"]}
 
             try:
-                result, persistence_status, http_status = run_decision()
+                result, persistence_status, http_status = run_decision(event_snapshot)
             except BaseException:
                 # Stage 3 may already have executed. Never retry this reserved key.
                 self.store.finish(reserve_id, status="indeterminate", reasons=["decision_execution_interrupted"],

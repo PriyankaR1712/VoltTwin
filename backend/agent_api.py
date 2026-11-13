@@ -213,7 +213,9 @@ def decide(request: AgentDecisionRequest):
     )
 
 
-def _run_and_persist_decision(battery_id: str, goal: GoalSpec):
+def _run_and_persist_decision(
+    battery_id: str, goal: GoalSpec, captured_snapshot: Optional[dict[str, Any]] = None
+):
     """Run Stage 3 once and persist its immutable Stage 4 record once."""
     try:
         twin_registry.get(battery_id)
@@ -230,6 +232,7 @@ def _run_and_persist_decision(battery_id: str, goal: GoalSpec):
         goal=goal,
         twin_registry=twin_registry,
         plan_recorder=record_plan,
+        captured_snapshot=captured_snapshot,
     )
 
     status_code = 200
@@ -277,8 +280,8 @@ def adaptive_decide(request: AdaptiveDecisionRequest):
             goal=request.goal,
             event_watermark=request.event_watermark.model_dump(),
             twin_registry=twin_registry,
-            run_decision=lambda: _run_and_persist_decision(
-                request.battery_id, request.goal
+            run_decision=lambda captured_snapshot: _run_and_persist_decision(
+                request.battery_id, request.goal, captured_snapshot=captured_snapshot
             ),
         )
     except KeyError as exc:

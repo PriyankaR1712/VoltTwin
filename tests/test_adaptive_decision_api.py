@@ -2,6 +2,9 @@ import asyncio
 import json
 
 from backend import agent_api
+from backend.decision_history_store import DecisionHistoryStore
+from backend.twin_registry import TwinRegistry
+from digital_twin import twin_manager as twin_manager_module
 from backend.adaptive_decision_service import AdaptiveDecisionService
 from backend.adaptive_evaluation_store import AdaptiveEvaluationStore
 from backend.main import app
@@ -17,6 +20,16 @@ class Manager:
     def get_state(self):
         return {"prediction_count": self.count, "last_observation_index": self.index,
                 "twin_state": {"soh": 0.9}}
+
+    def get_snapshot(self):
+        return {
+            "battery_id": "b",
+            "version": self.count,
+            "state": self.get_state(),
+            "history": {"battery_id": "b", "state_source": "cnn_prediction",
+                        "prediction_history": [{} for _ in range(self.count)]},
+            "_manager_identity": id(self),
+        }
 
 
 async def _asgi_post(path, body):
@@ -51,7 +64,7 @@ def test_adaptive_http_route_reuses_same_event_without_rerunning_stage3(monkeypa
     )
     monkeypatch.setattr(agent_api, "_adaptive_service", service)
     calls = []
-    def run(_battery, _goal):
+    def run(_battery, _goal, captured_snapshot=None):
         calls.append(1)
         return ExperimentalDecisionResult(
             decision_id="d1", battery_id="b", assessment_path="baseline_only",
@@ -120,6 +133,39 @@ def test_configured_application_startup_acquires_adaptive_worker_lease(monkeypat
     monkeypatch.setattr(agent_api, "_adaptive_service", None)
 
 
+
+def test_ordinary_decide_captures_registered_snapshot_without_override(
+    monkeypatch, tmp_path
+):
+    class ConstantPredictor:
+        def predict(self, _features):
+            return 0.91
+
+    monkeypatch.setattr(
+        twin_manager_module, "SOHPredictor",
+        lambda checkpoint_path=None: ConstantPredictor(),
+    )
+    registry = TwinRegistry()
+    manager = registry.initialize("ordinary-decide-snapshot")
+    manager.process_observation([0.5] * 67, observation_index=0)
+    monkeypatch.setattr(agent_api, "twin_registry", registry)
+    history = DecisionHistoryStore(tmp_path / "ordinary-decision-history.db")
+    monkeypatch.setattr(agent_api, "_history_store", history)
+
+    status, headers, body = asyncio.run(_asgi_post("/api/agent/decide", {
+        "battery_id": "ordinary-decide-snapshot",
+        "goal": {"goal_id": "ordinary", "horizon_cycles": 2,
+                 "assessment_scope": "baseline_only"},
+    }))
+
+    assert status == 200
+    assert headers[b"x-decision-persistence-status"] == b"saved"
+    assert body["snapshot_metadata"]["prediction_count"] == 1
+    assert body["snapshot_metadata"]["version"] == 1
+    stored = history.get_decision(body["decision_id"])
+    assert stored["snapshot_metadata"]["prediction_count"] == 1
+    assert stored["snapshot_metadata"]["version"] == 1
+
 def test_existing_decide_contract_keeps_body_status_and_persistence_header(monkeypatch):
     result = ExperimentalDecisionResult(
         decision_id="preserved-id", battery_id="b", assessment_path="baseline_only",
@@ -127,7 +173,7 @@ def test_existing_decide_contract_keeps_body_status_and_persistence_header(monke
         policy_comparison={"status": "not_applicable_baseline_only"},
     )
     calls = []
-    def run(_battery, _goal):
+    def run(_battery, _goal, captured_snapshot=None):
         calls.append(1)
         return result, "failed", 409
     monkeypatch.setattr(agent_api, "_run_and_persist_decision", run)

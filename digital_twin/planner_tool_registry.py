@@ -15,11 +15,15 @@ from digital_twin.twin_manager import TwinManager
 from digital_twin.decision_models import ToolExecutionOutcome
 
 
-def _capture_snapshot(twin_registry, battery_id):
+def _capture_snapshot(twin_registry, battery_id, state_snapshot=None):
     manager = twin_registry.get(battery_id)
-    snapshot = manager.get_snapshot()
-    if isinstance(snapshot, dict) and snapshot.get("_manager_identity") != id(manager):
+    snapshot = manager.get_snapshot() if state_snapshot is None else state_snapshot
+    if not isinstance(snapshot, dict):
+        raise ValueError("Captured snapshot must be an object.")
+    if snapshot.get("_manager_identity") != id(manager):
         raise ValueError("Captured snapshot manager identity is inconsistent.")
+    if snapshot.get("battery_id") != battery_id:
+        raise ValueError("Captured snapshot battery identity is inconsistent.")
     return snapshot
 
 
@@ -54,7 +58,7 @@ _TOOLS = {
         expected_output="A versioned atomic snapshot dictionary.",
         function=_capture_snapshot,
         required_arguments=frozenset({"twin_registry", "battery_id"}),
-        allowed_arguments=frozenset({"twin_registry", "battery_id"}),
+        allowed_arguments=frozenset({"twin_registry", "battery_id", "state_snapshot"}),
     ),
     "baseline_assessment": PlannerTool(
         name="baseline_assessment",
@@ -142,6 +146,12 @@ def _argument_error(name: str, arguments: object, tool: PlannerTool) -> str | No
             return "battery_id must be a non-empty string."
         if not callable(getattr(arguments.get("twin_registry"), "get", None)):
             return "A registered twin registry is unavailable."
+        if "state_snapshot" in arguments:
+            snapshot_error = _snapshot_argument_error(
+                arguments["state_snapshot"], arguments["battery_id"]
+            )
+            if snapshot_error:
+                return snapshot_error
     if name == "maintenance_policy":
         rows = arguments.get("scenario_results")
         if not isinstance(rows, list) or not rows or any(not isinstance(row, dict) for row in rows):

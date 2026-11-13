@@ -285,9 +285,18 @@ def test_explanation_preserves_ties_and_unknown_feasibility():
         ],
         ranking={
             "ranked_groups": [["Maintenance A", "Maintenance B"]],
-            "feasibility_status": "unknown",
         },
     )
+    result.intervention_feasibility = {
+        "Maintenance A": {
+            "status": "unknown",
+            "reasons": [{"explanation": "Intervention definition is undocumented."}],
+        }
+    }
+    result.final_recommendation = {
+        "status": "no_recommendation", "candidate": None,
+        "reason": "No candidate passed documented rules.",
+    }
     payload = freeze_decision_payload(
         goal=GoalSpec("g", 10),
         result=result,
@@ -297,5 +306,48 @@ def test_explanation_preserves_ties_and_unknown_feasibility():
     )
     explanation = json.loads(payload.database_json)["explanation"]
     assert "Utility tie preserved between: Maintenance A, Maintenance B." in explanation
-    assert "Intervention feasibility is unknown; no physical feasibility was established." in explanation
-    assert not any("safe" in line.lower() or "recommended" in line.lower() for line in explanation)
+    assert any("Maintenance A model-based feasibility: unknown" in line for line in explanation)
+    assert any("Final model-based recommendation: none." in line for line in explanation)
+    assert "Final model-based recommendation: none. No candidate passed documented rules." in explanation
+
+
+def test_structured_model_feasibility_and_recommendation_are_serialized():
+    assessment = {
+        "status": "unknown",
+        "rule_id": "documented_intervention_eligibility",
+        "rule_version": "v1",
+        "reasons": [{"code": "intervention_definition_undocumented", "explanation": "Definition missing."}],
+        "evidence_used": [],
+        "evidence_provenance": [],
+        "missing_evidence": ["documented_intervention_definition"],
+        "assessment_label": "model_based_not_physical_safety_or_effectiveness_validation",
+        "is_physical_safety_validation": False,
+        "proves_maintenance_effectiveness": False,
+    }
+    result = result_for(
+        candidates=[
+            {"scenario": "No maintenance", "projected_soh": 0.89},
+            {"scenario": "Maintenance A", "projected_soh": 0.90,
+             "utility": 1.0, "feasibility_status": "unknown", "feasibility": assessment},
+        ],
+        ranking={"utilities": {"Maintenance A": 1.0}, "ranked_groups": [["Maintenance A"]]},
+    )
+    result.intervention_feasibility = {"Maintenance A": assessment}
+    result.final_recommendation = {
+        "status": "no_recommendation", "candidate": None,
+        "reason": "No candidate passed documented rules.",
+        "is_physical_safety_validation": False,
+        "proves_maintenance_effectiveness": False,
+    }
+    payload = freeze_decision_payload(
+        goal=GoalSpec("g", 10, assessment_scope="counterfactual_comparison"),
+        result=result,
+        decision_started_at=datetime(2026, 1, 2, tzinfo=timezone.utc),
+        planned_tools=("registered_twin_snapshot", "baseline_assessment", "counterfactual_simulation"),
+        plan_evidence_available=True,
+    )
+    serialized = json.loads(payload.database_json)
+    assert serialized["scenarios"][1]["feasibility"] == assessment
+    assert serialized["result"]["intervention_feasibility"]["Maintenance A"] == assessment
+    assert serialized["final_decision"]["model_based_recommendation"]["status"] == "no_recommendation"
+    assert serialized["utility_ranking"]["ranked_groups"] == [["Maintenance A"]]

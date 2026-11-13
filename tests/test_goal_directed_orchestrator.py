@@ -497,10 +497,8 @@ def test_equal_utility_preserves_tie_and_selects_no_unique_candidate(harness):
         "Maintenance A",
         "Maintenance B",
     ]
-    assert result.utility_ranking["selection_status"] == "tie"
-    assert result.utility_ranking["feasibility_status"] == "unknown"
     assert result.utility_ranking["analytical_preferred_candidate"] is None
-    assert result.utility_ranking["selected_candidate"] is None
+    assert result.final_recommendation["status"] == "no_recommendation"
     assert result.selected_action is None
     assert result.termination_status == "tie"
     assert result.policy_comparison["status"] == "tie"
@@ -546,9 +544,21 @@ def test_valid_scenarios_keep_utility_analysis_but_unknown_feasibility_is_not_se
     assert result.utility_ranking["utilities"]
     assert result.utility_ranking["ranked_groups"] == [["Maintenance B"], ["Maintenance A"]]
     assert result.utility_ranking["analytical_preferred_candidate"] == "Maintenance B"
-    assert result.utility_ranking["selected_candidate"] is None
-    assert result.utility_ranking["selection_status"] == "feasibility_unknown"
-    assert result.utility_ranking["feasibility_status"] == "unknown"
+    assert set(result.utility_ranking) == {
+        "formula_version", "formula", "utilities", "ranked_groups",
+        "analytical_preferred_candidate", "target_attainment",
+        "is_simulated_utility", "is_physically_validated",
+    }
+    assert result.final_recommendation["status"] == "no_recommendation"
+    assert result.final_recommendation["candidate"] is None
+    assert set(result.intervention_feasibility) == {"Maintenance A", "Maintenance B"}
+    assert all(
+        result.intervention_feasibility[name]["missing_evidence"] == [
+            "documented_intervention_definition",
+            "documented_eligibility_requirements",
+        ]
+        for name in ("Maintenance A", "Maintenance B")
+    )
     intervention_rows = [
         row
         for row in result.candidate_evaluations
@@ -560,8 +570,28 @@ def test_valid_scenarios_keep_utility_analysis_but_unknown_feasibility_is_not_se
         row["eligibility"] == "not_eligible_unknown_feasibility"
         for row in intervention_rows
     )
-    assert any("analytical only" in line and "feasibility is unknown" in line
+    assert any("model-based" in line and "not physical safety validation" in line
                for line in result.explanation)
+
+
+def test_user_diagnostic_is_recorded_as_unverified_provenance(harness):
+    result = run(
+        GoalSpec(
+            "diagnostic-feasibility", 100,
+            assessment_scope="counterfactual_comparison",
+            diagnostic_evidence={"thermal_alert": True},
+        ),
+        harness,
+    )
+    for name in ("Maintenance A", "Maintenance B"):
+        assessment = result.intervention_feasibility[name]
+        assert assessment["status"] == "unknown"
+        assert assessment["evidence_available"] == [{
+            "evidence_key": "thermal_alert",
+            "value": True,
+            "provenance": {"source": "user_provided", "verification": "unverified"},
+        }]
+        assert assessment["evidence_used"] == []
 
 
 def test_policy_agreement_is_reported_without_replacing_utility_selection(harness):
@@ -572,7 +602,7 @@ def test_policy_agreement_is_reported_without_replacing_utility_selection(harnes
     )
     assert result.selected_action is None
     assert result.utility_ranking["analytical_preferred_candidate"] == "Maintenance B"
-    assert result.utility_ranking["selected_candidate"] is None
+    assert result.final_recommendation["status"] == "no_recommendation"
     assert result.policy_comparison["status"] == "agreement"
     assert result.policy_comparison["comparison_status"] == "agreement"
     assert result.policy_comparison["policy_availability"] == "available"
@@ -693,7 +723,7 @@ def test_tied_planner_and_unavailable_policy_are_both_reported(harness, monkeypa
         harness,
     )
 
-    assert result.utility_ranking["selection_status"] == "tie"
+    assert len(result.utility_ranking["ranked_groups"][0]) == 2
     assert result.utility_ranking["ranked_groups"][0] == [
         "Maintenance A",
         "Maintenance B",
@@ -801,7 +831,8 @@ def test_no_eligible_candidate_does_not_select_intervention(harness, monkeypatch
         harness,
     )
     assert result.selected_action is None
-    assert result.utility_ranking["selection_status"] == "no_eligible_candidates"
+    assert result.utility_ranking["ranked_groups"] == []
+    assert result.final_recommendation["status"] == "no_recommendation"
     assert result.policy_comparison["status"] == "unavailable"
 
 

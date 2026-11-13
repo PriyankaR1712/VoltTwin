@@ -123,8 +123,20 @@ def test_decision_api_counterfactual_uses_one_snapshot_and_does_not_mutate_twin(
         row["initial_soh"] == pytest.approx(before["state"]["twin_state"]["soh"])
         for row in result["candidate_evaluations"]
     )
-    assert result["utility_ranking"]["feasibility_status"] == "unknown"
-    assert result["utility_ranking"]["selected_candidate"] is None
+    assert set(result["intervention_feasibility"]) == {"Maintenance A", "Maintenance B"}
+    assert all(
+        result["intervention_feasibility"][name]["status"] == "unknown"
+        for name in ("Maintenance A", "Maintenance B")
+    )
+    assert result["final_recommendation"]["status"] == "no_recommendation"
+    assert result["final_recommendation"]["candidate"] is None
+    assert "feasibility_status" not in result["utility_ranking"]
+    assert result["intervention_feasibility"]["Maintenance A"]["rule_id"] == (
+        "documented_intervention_eligibility"
+    )
+    assert result["intervention_feasibility"]["Maintenance B"]["assessment_label"] == (
+        "model_based_not_physical_safety_or_effectiveness_validation"
+    )
     assert all(
         row["feasibility_status"] in {"unknown", "not_applicable_baseline_comparator"}
         for row in result["candidate_evaluations"]

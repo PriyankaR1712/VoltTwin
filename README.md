@@ -86,7 +86,7 @@ The project combines a convolutional neural network (CNN) for SOH prediction wit
 - Set the request's cycle-count field and the future simulation horizon.
 - Run the SOH prediction and scenario simulation.
 
-The sample loader uses the last row in the selected sheet. The row's position is an observation index; it should not be treated as a verified physical cycle number unless the dataset's cycle ordering has been independently confirmed. The feature columns must match the model's expected input order, and the label must not be included among the model inputs.
+The sample loader uses the last row in the selected sheet. Sequential replay processes recorded XJTU dataset rows offline; it is a simulated dataset replay, not live EV telemetry and it does not connect to a vehicle or BMS. The row's position is an observation index; it should not be treated as a verified physical cycle number unless the dataset's cycle ordering has been independently confirmed. The feature columns must match the model's expected input order, and the label must not be included among the model inputs.
 
 ### 2. Battery Health Estimate
 
@@ -187,7 +187,7 @@ Wang et al. (2024), *Open access dataset, code library and benchmarking deep lea
 - **Reference implementation:** https://github.com/wang-fujin/SOHbenchmark
 - **Dataset information:** https://wang-fujin.github.io/
 
-The project uses the XJTU handcrafted-feature workbook for the current workflow. The dataset and trained model checkpoint are not included in this repository; obtain required data and reference files from their original sources and place them at the paths expected by the project.
+The current workflow requires the external XJTU handcrafted-feature workbook and a trained CNN checkpoint. Neither asset, nor the reference dataset repository, is included in this Git repository. Obtain them from their original sources. The current backend expects the workbook at `reference/SOHbenchmark/data/XJTU/handcraft_features/batch-1_features.xlsx` and the checkpoint at `models/soh_cnn_xjtu_batch1_clean.pt`; keep these local assets out of Git.
 
 ## Running the Project Locally
 
@@ -196,10 +196,10 @@ The project uses the XJTU handcrafted-feature workbook for the current workflow.
 - Git
 - Python 3.11
 - Node.js and npm
-- The XJTU Batch 1 handcrafted-features workbook
-- The trained CNN checkpoint expected by the project
+- The external XJTU Batch 1 handcrafted-features workbook
+- The external trained CNN checkpoint
 
-The dataset and trained checkpoint are not included in this repository. Confirm that required files exist at the paths expected by the backend before starting the application.
+These assets are not included in this repository. For the current backend configuration, place the workbook at `reference/SOHbenchmark/data/XJTU/handcraft_features/batch-1_features.xlsx` and the checkpoint at `models/soh_cnn_xjtu_batch1_clean.pt`. Obtain both from their original sources; do not commit them.
 
 ### 1. Clone the repository
 
@@ -217,6 +217,8 @@ py -3.11 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
+# Needed for the Starlette TestClient-based API tests:
+python -m pip install -r requirements-dev.txt
 python -m uvicorn backend.main:app --reload
 ```
 
@@ -224,8 +226,77 @@ The API is available at `http://127.0.0.1:8000`. Interactive API documentation i
 
 Keep this terminal running.
 
-> If your existing local environment is named `.venv311`, activate that environment instead of creating a new one. Use the environment in which your dependencies and trained-model setup are installed.
+> `requirements.txt` declares the Python application dependencies. `requirements-dev.txt` adds the `httpx2` dependency used by Starlette's TestClient in API tests. Install both files in a test environment with `python -m pip install -r requirements.txt -r requirements-dev.txt`.
 
+If your existing local environment is named `.venv311`, activate that environment instead of creating a new one. Use the environment in which your dependencies are installed.
+
+### Stage 5 adaptive workflow demonstration
+
+For the Stage 5 demonstration, run `scripts/start_stage5_demo.ps1` from the repository root in a PowerShell window. The launcher uses the active virtual environment, if one is activated; otherwise it uses the repository's `.venv` or `.venv311` when present, then falls back to the current `python` command. To select the existing VoltTwin environment explicitly, run:
+
+```powershell
+.\scripts\start_stage5_demo.ps1 -PythonExe '.\.venv311\Scripts\python.exe'
+```
+
+When `-PythonExe` is supplied, the launcher verifies that the path exists and uses that executable. It starts Uvicorn from this worktree with exactly one worker and without reload mode. The demo configuration is scoped to that launched process.
+
+The launcher supplies the following **illustrative demonstration values only**. They are not calibrated thresholds and are not approved for operational use:
+
+```text
+VOLTTWIN_ADAPTIVE_MINIMUM_GAP=3
+VOLTTWIN_ADAPTIVE_EPSILON_SOH=0.01
+VOLTTWIN_ADAPTIVE_POLICY_VERSION=volttwin-demo-v1
+```
+
+It sets `VOLTTWIN_ADAPTIVE_DB_PATH` to `data/stage5-demo/adaptive_evaluation.db`. The Stage 5 store may also create the adjacent `.worker.lock` file. This is a dedicated demo event store; the existing Stage 4 decision history remains at `data/decision_history.db`. Do not remove or replace either database to repeat the demonstration. Stage 5's existing validation, event reservation, recovery, idempotency, and process-lease safeguards remain in effect.
+
+The demonstration battery ID is `STAGE5-DEMO`. The launcher checks that the API port is available before starting. If another backend is already listening, it checks that battery's state and stops visibly if the ID is registered; it also stops if the port is occupied even when that ID is absent, so it cannot accidentally use a different running process. With no server already running, the launcher does not query a live registry; the new process will start with a fresh in-memory TwinRegistry. Before initializing the Twin, verify `GET /twin/STAGE5-DEMO/state` returns 404 (not initialized); if it returns 200, stop the demonstration and choose a new ID rather than resetting the Twin.
+
+With the backend running, use a second PowerShell window. Supply exactly 67 numeric feature values from a valid input row for each observation; the placeholders below are not valid model input. Use the same feature row if no separate rows are being replayed, and label observations with increasing indices.
+
+1. Initialize the fresh Twin:
+
+   ```powershell
+   Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/twin/STAGE5-DEMO/initialize -ContentType 'application/json' -Body '{"initial_soh":1.0}'
+   ```
+
+2. Process at least one observation by posting `{"observation_index":0,"features":[...67 numeric values...]}` to `/twin/STAGE5-DEMO/observation`. Then run the first Stage 3 assessment by posting the goal below to `/api/agent/decide`:
+
+   ```json
+   {"battery_id":"STAGE5-DEMO","goal":{"goal_id":"stage5-demo","horizon_cycles":100,"assessment_scope":"baseline_only"}}
+   ```
+
+   Confirm the response header `X-Decision-Persistence-Status` is `saved` or `already_saved`, and note the returned `decision_id`.
+
+3. Confirm that Stage 4 saved the first decision:
+
+   ```text
+   GET /api/agent/batteries/STAGE5-DEMO/decisions
+   ```
+
+   The response should list the decision ID from Stage 3.
+
+4. Process at least three additional observations for `STAGE5-DEMO`, with increasing `observation_index` values and valid 67-value feature arrays. After processing them, fetch `GET /twin/STAGE5-DEMO/state` and use its current `prediction_count` and `last_observation_index`. The state endpoint does not expose the snapshot version; in this Twin, each accepted prediction advances the version once, so the adaptive API watermark requires `version` to equal `prediction_count`. Use those current values as `prediction_count`, `version`, and `observation_index` in the next request. Do not reuse a stale watermark.
+
+5. Post to `/api/agent/adaptive-decide` with the same goal and that exact latest watermark:
+
+   ```json
+   {
+     "battery_id":"STAGE5-DEMO",
+     "goal":{"goal_id":"stage5-demo","horizon_cycles":100,"assessment_scope":"baseline_only"},
+     "event_watermark":{"prediction_count":4,"version":4,"observation_index":3}
+   }
+   ```
+
+   The numeric watermark above is only an illustration; substitute the values returned by the Twin.
+
+6. Check the adaptive response and then list Stage 4 history again using the GET request above. `evaluation_status: reassessed` means Stage 3 ran and Stage 4 should contain its associated decision ID. `evaluation_status: held` means no reassessment was required for that event; the Stage 4 list should not gain a decision from that held event. `evaluation_status: indeterminate` means the event outcome cannot safely be retried as if it had not run; preserve the event record and inspect the returned IDs and server logs. HTTP 409 indicates a stale or mismatched watermark/request, while HTTP 503 indicates adaptive evaluation is unavailable or indeterminate; startup/configuration errors are reported in the launcher/backend terminal. A reassessment is not guaranteed: the minimum gap must be met, or another existing trigger condition must apply.
+
+The supplied policy values are for repeatable demonstration mechanics only. They do not establish calibrated SOH hysteresis or a suitable operational reassessment interval.
+
+#### Stage 5 feasibility scope
+
+Stage 5 feasibility is a model-based eligibility assessment against documented intervention rules. It is not physical safety validation and does not establish that an intervention is safe or effective in operation. The production intervention-rule registry is currently empty, so undocumented interventions such as Maintenance A and Maintenance B remain `unknown`; when documented rules and evidence do not support an eligible candidate, the system returns no intervention recommendation.
 ### 3. Set up and start the frontend
 
 Open a second terminal from the project root:

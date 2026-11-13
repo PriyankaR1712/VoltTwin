@@ -10,6 +10,11 @@ from digital_twin.baseline_relative_utility import (
 )
 from digital_twin.decision_models import ExperimentalDecisionResult
 from digital_twin.goal_spec import GoalSpec
+from digital_twin.intervention_feasibility import (
+    DOCUMENTED_INTERVENTION_RULES,
+    assess_intervention_feasibility,
+    recommend_highest_utility_feasible,
+)
 from digital_twin.planner_config import DEFAULT_PLANNER_CONFIG, PlannerConfig
 from digital_twin import planner_tool_registry
 from digital_twin.scenario_validation import (
@@ -330,6 +335,7 @@ def run_goal_directed_orchestrator(
     config: PlannerConfig = DEFAULT_PLANNER_CONFIG,
     *,
     plan_recorder: Optional[Callable[[tuple[str, ...]], None]] = None,
+    captured_snapshot: Optional[dict] = None,
 ) -> ExperimentalDecisionResult:
     """Execute a goal-directed decision through the allowlisted tool registry."""
     outcomes = []
@@ -349,10 +355,10 @@ def run_goal_directed_orchestrator(
         return outcome
 
     snapshot_plan = _tool_plan()
-    snapshot_outcome = execute(
-        snapshot_plan[0],
-        {"twin_registry": registry, "battery_id": battery_id},
-    )
+    snapshot_arguments = {"twin_registry": registry, "battery_id": battery_id}
+    if captured_snapshot is not None:
+        snapshot_arguments["state_snapshot"] = captured_snapshot
+    snapshot_outcome = execute(snapshot_plan[0], snapshot_arguments)
     if snapshot_outcome.status != "success":
         _record_plan(plan_recorder, snapshot_plan)
         return _error_result(
@@ -492,17 +498,27 @@ def run_goal_directed_orchestrator(
         )
     ranked_groups = [list(group) for group in utility.ranked_groups]
     utility_preferred = utility.ranked_groups[0][0] if utility.ranked_groups and len(utility.ranked_groups[0]) == 1 else None
-    selection_status = "tie" if utility.ranked_groups and len(utility.ranked_groups[0]) > 1 else "feasibility_unknown" if utility_preferred else "no_eligible_candidates"
+    utility_tied = bool(utility.ranked_groups and len(utility.ranked_groups[0]) > 1)
     utility_payload = {
         "formula_version": utility.formula_version,
         "formula": "100 * (projected_soh_i - projected_soh_baseline)",
         "utilities": dict(utility.utilities), "ranked_groups": ranked_groups,
-        "selection_status": selection_status,
         "analytical_preferred_candidate": utility_preferred,
-        "selected_candidate": None, "feasibility_status": "unknown",
         "target_attainment": dict(utility.target_attainment),
         "is_simulated_utility": True, "is_physically_validated": False,
-        "is_feasibility_assessed": False,
+    }
+    feasibility_evidence = {
+        key: {
+            "value": value,
+            "provenance": {"source": "user_provided", "verification": "unverified"},
+        }
+        for key, value in diagnostic_evidence.items()
+    }
+    intervention_feasibility = {
+        name: assess_intervention_feasibility(
+            name, DOCUMENTED_INTERVENTION_RULES.get(name), feasibility_evidence
+        )
+        for name in scenarios.interventions
     }
     candidate_evaluations = [
         {
@@ -510,11 +526,27 @@ def run_goal_directed_orchestrator(
             "projected_soh": row["projected_soh"], "additional_cycles": row["additional_cycles"],
             "recovery_assumption": row["recovery_assumption"],
             "utility": utility.utilities.get(name), "target_attainment": utility.target_attainment[name],
-            "eligibility": "baseline_comparator" if name == "No maintenance" else "not_eligible_unknown_feasibility",
-            "feasibility_status": "not_applicable_baseline_comparator" if name == "No maintenance" else "unknown",
+            "eligibility": (
+                "baseline_comparator" if name == "No maintenance"
+                else "eligible_model_based" if intervention_feasibility[name]["status"] == "feasible"
+                else "not_eligible_unknown_feasibility" if intervention_feasibility[name]["status"] == "unknown"
+                else f"not_eligible_{intervention_feasibility[name]['status']}"
+            ),
+            "feasibility_status": (
+                "not_applicable_baseline_comparator"
+                if name == "No maintenance" else intervention_feasibility[name]["status"]
+            ),
+            "feasibility": None if name == "No maintenance" else intervention_feasibility[name],
         }
         for name, row in scenarios.scenarios.items()
     ]
+    final_recommendation = recommend_highest_utility_feasible(
+        utility.utilities, intervention_feasibility
+    )
+    selected_action = (
+        final_recommendation["candidate"]
+        if final_recommendation["status"] == "recommended" else None
+    )
 
     policy_outcome = execute(
         tool_plan[3],
@@ -557,7 +589,7 @@ def run_goal_directed_orchestrator(
     if policy_outcome.status == "success":
         policy_scenario = policy.get("recommended_scenario") if isinstance(policy, dict) else None
         policy_availability = "available" if policy_scenario in EXPECTED_SCENARIOS else "unavailable"
-        comparison_status = "tie" if selection_status == "tie" else "unavailable" if utility_preferred is None or policy_availability == "unavailable" else "agreement" if policy_scenario == utility_preferred else "disagreement"
+        comparison_status = "tie" if utility_tied else "unavailable" if utility_preferred is None or policy_availability == "unavailable" else "agreement" if policy_scenario == utility_preferred else "disagreement"
         policy_comparison = {
             "status": comparison_status, "comparison_status": comparison_status,
             "policy_availability": policy_availability, "utility_selected_candidate": None,
@@ -566,11 +598,11 @@ def run_goal_directed_orchestrator(
             "policy_recommended_action": policy.get("recommended_action") if isinstance(policy, dict) else None,
             "policy_status": policy.get("status") if isinstance(policy, dict) else None,
             "policy_reason": policy.get("reason") if isinstance(policy, dict) else None,
-            "policy_matches_utility_tie": policy_scenario in utility.ranked_groups[0] if selection_status == "tie" and policy_availability == "available" else None,
+            "policy_matches_utility_tie": policy_scenario in utility.ranked_groups[0] if utility_tied and policy_availability == "available" else None,
             "policy_output": policy,
         }
     else:
-        comparison_status = "tie" if selection_status == "tie" else "unavailable"
+        comparison_status = "tie" if utility_tied else "unavailable"
         policy_comparison = {
             "status": comparison_status, "comparison_status": comparison_status,
             "policy_availability": "unavailable", "utility_selected_candidate": None,
@@ -593,14 +625,18 @@ def run_goal_directed_orchestrator(
         goal_status = "goal_unmet"
     return _new_result(
         battery_id, assessment_path=path,
-        termination_status="completed_with_policy_error" if errors else "tie" if selection_status == "tie" else "completed",
-        goal_status=goal_status, selected_action=None, available_evidence=available_evidence,
+        termination_status="completed_with_policy_error" if errors else "tie" if utility_tied else "completed",
+        goal_status=goal_status, selected_action=selected_action, available_evidence=available_evidence,
         candidate_evaluations=candidate_evaluations, utility_ranking=utility_payload,
+        intervention_feasibility=intervention_feasibility,
+        final_recommendation=final_recommendation,
         policy_comparison=policy_comparison,
         explanation=[
             "Counterfactual utility compares simulated projected SOH against No maintenance.",
             "Utility is relative to illustrative assumptions and is not a physical-safety guarantee.",
-            "Utility ranking is analytical only; intervention feasibility is unknown, so no intervention is selected.",
+            "Utility ranking is analytical only and is independent of intervention feasibility.",
+            "Feasibility and any final recommendation are model-based, not physical safety validation or proof of maintenance effectiveness.",
+            final_recommendation["reason"],
             "The maintenance-policy recommendation is preserved separately from the utility ranking.",
         ],
         snapshot_metadata={**metadata, "snapshot_version": scenarios.snapshot_version, "is_simulation": response.get("is_simulation"), "is_physically_validated": response.get("is_physically_validated")},
