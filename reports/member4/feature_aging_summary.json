@@ -1,0 +1,3287 @@
+{
+  "analysis": "Within-profile descriptive aging analysis of the current 67 candidate features on prepared XJTU charge traces.",
+  "original_benchmark_reproduction": false,
+  "data": {
+    "profiles": 55,
+    "prepared_cycles": 27535,
+    "workbook_rows": 26937,
+    "capacity_target_interpretation": "Raw capacity_label is used as a within-profile aging proxy. Neither its local unit nor a per-cell initial-capacity denominator is established here; values are not called SOH.",
+    "capacity_initialization": {
+      "initial_capacity_verified": false,
+      "per_cell_first_observed_capacity_is_nominal_reference": false,
+      "per_cell_normalization_applied": false,
+      "reason": "No authoritative beginning-of-life capacity reference or target normalization lineage was available."
+    },
+    "workbook_cycle_mapping_used": false,
+    "profile_capacity_summaries": [
+      {
+        "cell_id": "batch-1:Sheet1",
+        "batch": 1,
+        "cycles": 389,
+        "first_observed_capacity": 1.863,
+        "minimum_capacity": 1.592,
+        "maximum_capacity": 1.971,
+        "capacity_change_first_to_last": -0.2709999999999999,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-1:Sheet2",
+        "batch": 1,
+        "cycles": 406,
+        "first_observed_capacity": 1.861,
+        "minimum_capacity": 1.598,
+        "maximum_capacity": 1.969,
+        "capacity_change_first_to_last": -0.2629999999999999,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-1:Sheet3",
+        "batch": 1,
+        "cycles": 392,
+        "first_observed_capacity": 1.861,
+        "minimum_capacity": 1.581,
+        "maximum_capacity": 1.965,
+        "capacity_change_first_to_last": -0.28,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-1:Sheet4",
+        "batch": 1,
+        "cycles": 395,
+        "first_observed_capacity": 1.858,
+        "minimum_capacity": 1.601,
+        "maximum_capacity": 1.966,
+        "capacity_change_first_to_last": -0.2570000000000001,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-1:Sheet5",
+        "batch": 1,
+        "cycles": 402,
+        "first_observed_capacity": 1.901,
+        "minimum_capacity": 1.597,
+        "maximum_capacity": 1.969,
+        "capacity_change_first_to_last": -0.30400000000000005,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-1:Sheet6",
+        "batch": 1,
+        "cycles": 407,
+        "first_observed_capacity": 1.906,
+        "minimum_capacity": 1.597,
+        "maximum_capacity": 1.97,
+        "capacity_change_first_to_last": -0.30899999999999994,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-1:Sheet7",
+        "batch": 1,
+        "cycles": 401,
+        "first_observed_capacity": 1.938,
+        "minimum_capacity": 1.597,
+        "maximum_capacity": 1.974,
+        "capacity_change_first_to_last": -0.34099999999999997,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-1:Sheet8",
+        "batch": 1,
+        "cycles": 419,
+        "first_observed_capacity": 1.893,
+        "minimum_capacity": 1.598,
+        "maximum_capacity": 1.962,
+        "capacity_change_first_to_last": -0.29499999999999993,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet1",
+        "batch": 2,
+        "cycles": 298,
+        "first_observed_capacity": 1.866,
+        "minimum_capacity": 1.599,
+        "maximum_capacity": 1.965,
+        "capacity_change_first_to_last": -0.2670000000000001,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet10",
+        "batch": 2,
+        "cycles": 163,
+        "first_observed_capacity": 1.81,
+        "minimum_capacity": 1.599,
+        "maximum_capacity": 1.921,
+        "capacity_change_first_to_last": -0.21100000000000008,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet11",
+        "batch": 2,
+        "cycles": 130,
+        "first_observed_capacity": 1.8,
+        "minimum_capacity": 1.596,
+        "maximum_capacity": 1.911,
+        "capacity_change_first_to_last": -0.20399999999999996,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet12",
+        "batch": 2,
+        "cycles": 211,
+        "first_observed_capacity": 1.793,
+        "minimum_capacity": 1.598,
+        "maximum_capacity": 1.918,
+        "capacity_change_first_to_last": -0.19499999999999984,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet13",
+        "batch": 2,
+        "cycles": 225,
+        "first_observed_capacity": 1.801,
+        "minimum_capacity": 1.599,
+        "maximum_capacity": 1.926,
+        "capacity_change_first_to_last": -0.20199999999999996,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet14",
+        "batch": 2,
+        "cycles": 146,
+        "first_observed_capacity": 1.794,
+        "minimum_capacity": 1.594,
+        "maximum_capacity": 1.907,
+        "capacity_change_first_to_last": -0.19999999999999996,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet15",
+        "batch": 2,
+        "cycles": 167,
+        "first_observed_capacity": 1.787,
+        "minimum_capacity": 1.598,
+        "maximum_capacity": 1.898,
+        "capacity_change_first_to_last": -0.18899999999999983,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet2",
+        "batch": 2,
+        "cycles": 291,
+        "first_observed_capacity": 1.883,
+        "minimum_capacity": 1.595,
+        "maximum_capacity": 1.984,
+        "capacity_change_first_to_last": -0.28800000000000003,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet3",
+        "batch": 2,
+        "cycles": 285,
+        "first_observed_capacity": 1.878,
+        "minimum_capacity": 1.598,
+        "maximum_capacity": 1.976,
+        "capacity_change_first_to_last": -0.2799999999999998,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet4",
+        "batch": 2,
+        "cycles": 321,
+        "first_observed_capacity": 1.865,
+        "minimum_capacity": 1.599,
+        "maximum_capacity": 1.96,
+        "capacity_change_first_to_last": -0.266,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet5",
+        "batch": 2,
+        "cycles": 296,
+        "first_observed_capacity": 1.87,
+        "minimum_capacity": 1.598,
+        "maximum_capacity": 1.967,
+        "capacity_change_first_to_last": -0.272,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet6",
+        "batch": 2,
+        "cycles": 321,
+        "first_observed_capacity": 1.861,
+        "minimum_capacity": 1.594,
+        "maximum_capacity": 1.966,
+        "capacity_change_first_to_last": -0.2669999999999999,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet7",
+        "batch": 2,
+        "cycles": 318,
+        "first_observed_capacity": 1.877,
+        "minimum_capacity": 1.598,
+        "maximum_capacity": 1.979,
+        "capacity_change_first_to_last": -0.2789999999999999,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet8",
+        "batch": 2,
+        "cycles": 269,
+        "first_observed_capacity": 1.863,
+        "minimum_capacity": 1.596,
+        "maximum_capacity": 1.967,
+        "capacity_change_first_to_last": -0.2669999999999999,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-2:Sheet9",
+        "batch": 2,
+        "cycles": 286,
+        "first_observed_capacity": 1.802,
+        "minimum_capacity": 1.597,
+        "maximum_capacity": 1.924,
+        "capacity_change_first_to_last": -0.20500000000000007,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-3:Sheet1",
+        "batch": 3,
+        "cycles": 591,
+        "first_observed_capacity": 1.912,
+        "minimum_capacity": 1.599,
+        "maximum_capacity": 2.011,
+        "capacity_change_first_to_last": -0.31299999999999994,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-3:Sheet2",
+        "batch": 3,
+        "cycles": 551,
+        "first_observed_capacity": 1.912,
+        "minimum_capacity": 1.59,
+        "maximum_capacity": 2.01,
+        "capacity_change_first_to_last": -0.32199999999999984,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-3:Sheet3",
+        "batch": 3,
+        "cycles": 666,
+        "first_observed_capacity": 1.915,
+        "minimum_capacity": 1.584,
+        "maximum_capacity": 2.01,
+        "capacity_change_first_to_last": -0.33099999999999996,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-3:Sheet4",
+        "batch": 3,
+        "cycles": 556,
+        "first_observed_capacity": 1.912,
+        "minimum_capacity": 1.596,
+        "maximum_capacity": 2.018045150867599,
+        "capacity_change_first_to_last": -0.31599999999999984,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-3:Sheet5",
+        "batch": 3,
+        "cycles": 561,
+        "first_observed_capacity": 1.91,
+        "minimum_capacity": 1.589,
+        "maximum_capacity": 2.01,
+        "capacity_change_first_to_last": -0.32099999999999995,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-3:Sheet6",
+        "batch": 3,
+        "cycles": 541,
+        "first_observed_capacity": 1.908,
+        "minimum_capacity": 1.584,
+        "maximum_capacity": 2.0001032590246286,
+        "capacity_change_first_to_last": -0.32399999999999984,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-3:Sheet7",
+        "batch": 3,
+        "cycles": 526,
+        "first_observed_capacity": 1.904,
+        "minimum_capacity": 1.587,
+        "maximum_capacity": 1.998,
+        "capacity_change_first_to_last": -0.31699999999999995,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-3:Sheet8",
+        "batch": 3,
+        "cycles": 616,
+        "first_observed_capacity": 1.91,
+        "minimum_capacity": 1.597,
+        "maximum_capacity": 2.0050977336081286,
+        "capacity_change_first_to_last": -0.31299999999999994,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-4:Sheet1",
+        "batch": 4,
+        "cycles": 798,
+        "first_observed_capacity": 1.8822775096363151,
+        "minimum_capacity": 1.598,
+        "maximum_capacity": 1.9780093799363463,
+        "capacity_change_first_to_last": -0.28427750963631504,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-4:Sheet2",
+        "batch": 4,
+        "cycles": 672,
+        "first_observed_capacity": 1.8864794241224936,
+        "minimum_capacity": 1.599,
+        "maximum_capacity": 1.983,
+        "capacity_change_first_to_last": -0.2874794241224936,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-4:Sheet3",
+        "batch": 4,
+        "cycles": 672,
+        "first_observed_capacity": 1.9048580453021526,
+        "minimum_capacity": 1.593,
+        "maximum_capacity": 1.993,
+        "capacity_change_first_to_last": -0.31185804530215266,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-4:Sheet4",
+        "batch": 4,
+        "cycles": 726,
+        "first_observed_capacity": 1.9113431758494568,
+        "minimum_capacity": 1.594,
+        "maximum_capacity": 1.9922810268235551,
+        "capacity_change_first_to_last": -0.3173431758494567,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-4:Sheet5",
+        "batch": 4,
+        "cycles": 738,
+        "first_observed_capacity": 1.8829308992934408,
+        "minimum_capacity": 1.597,
+        "maximum_capacity": 1.977,
+        "capacity_change_first_to_last": -0.28593089929344084,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-4:Sheet6",
+        "batch": 4,
+        "cycles": 714,
+        "first_observed_capacity": 1.8828890206060684,
+        "minimum_capacity": 1.588,
+        "maximum_capacity": 1.98,
+        "capacity_change_first_to_last": -0.29488902060606836,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-4:Sheet7",
+        "batch": 4,
+        "cycles": 600,
+        "first_observed_capacity": 1.8812898545661498,
+        "minimum_capacity": 1.578,
+        "maximum_capacity": 1.969,
+        "capacity_change_first_to_last": -0.30328985456614976,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-4:Sheet8",
+        "batch": 4,
+        "cycles": 750,
+        "first_observed_capacity": 1.884188897982159,
+        "minimum_capacity": 1.588,
+        "maximum_capacity": 1.98,
+        "capacity_change_first_to_last": -0.29618889798215897,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-5:Sheet1",
+        "batch": 5,
+        "cycles": 196,
+        "first_observed_capacity": 1.7800088678449426,
+        "minimum_capacity": 1.598,
+        "maximum_capacity": 1.929,
+        "capacity_change_first_to_last": -0.18200886784494252,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-5:Sheet2",
+        "batch": 5,
+        "cycles": 306,
+        "first_observed_capacity": 1.8210548622266476,
+        "minimum_capacity": 1.578,
+        "maximum_capacity": 1.9385412503066124,
+        "capacity_change_first_to_last": -0.24305486222664752,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-5:Sheet3",
+        "batch": 5,
+        "cycles": 339,
+        "first_observed_capacity": 1.869125577353672,
+        "minimum_capacity": 1.56,
+        "maximum_capacity": 1.9424487590284372,
+        "capacity_change_first_to_last": -0.30912557735367185,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-5:Sheet4",
+        "batch": 5,
+        "cycles": 251,
+        "first_observed_capacity": 1.7747400629896346,
+        "minimum_capacity": 1.519,
+        "maximum_capacity": 1.940822094427732,
+        "capacity_change_first_to_last": -0.2557400629896347,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-5:Sheet5",
+        "batch": 5,
+        "cycles": 273,
+        "first_observed_capacity": 1.8814626023961258,
+        "minimum_capacity": 1.522,
+        "maximum_capacity": 1.9313630241797535,
+        "capacity_change_first_to_last": -0.3594626023961258,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-5:Sheet6",
+        "batch": 5,
+        "cycles": 218,
+        "first_observed_capacity": 1.7469356516496013,
+        "minimum_capacity": 1.544,
+        "maximum_capacity": 1.9316390565260466,
+        "capacity_change_first_to_last": -0.20293565164960126,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-5:Sheet7",
+        "batch": 5,
+        "cycles": 185,
+        "first_observed_capacity": 1.7931449467222456,
+        "minimum_capacity": 1.573,
+        "maximum_capacity": 1.9320881358124125,
+        "capacity_change_first_to_last": -0.2201449467222456,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-5:Sheet8",
+        "batch": 5,
+        "cycles": 207,
+        "first_observed_capacity": 1.7799929549055364,
+        "minimum_capacity": 1.484,
+        "maximum_capacity": 1.9360467577065583,
+        "capacity_change_first_to_last": -0.29599295490553645,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-6:Sheet1",
+        "batch": 6,
+        "cycles": 948,
+        "first_observed_capacity": 1.9707950249542263,
+        "minimum_capacity": 1.584,
+        "maximum_capacity": 1.999928162746709,
+        "capacity_change_first_to_last": -0.38679502495422624,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-6:Sheet2",
+        "batch": 6,
+        "cycles": 1225,
+        "first_observed_capacity": 1.9708763888605936,
+        "minimum_capacity": 1.596,
+        "maximum_capacity": 2.0018427983433877,
+        "capacity_change_first_to_last": -0.3748763888605935,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-6:Sheet3",
+        "batch": 6,
+        "cycles": 907,
+        "first_observed_capacity": 1.9673357794940105,
+        "minimum_capacity": 1.596,
+        "maximum_capacity": 1.9913040194853813,
+        "capacity_change_first_to_last": -0.3713357794940104,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-6:Sheet4",
+        "batch": 6,
+        "cycles": 939,
+        "first_observed_capacity": 1.9603559405524311,
+        "minimum_capacity": 1.594,
+        "maximum_capacity": 1.9915456649931307,
+        "capacity_change_first_to_last": -0.36635594055243104,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-6:Sheet5",
+        "batch": 6,
+        "cycles": 1287,
+        "first_observed_capacity": 1.9636905691166775,
+        "minimum_capacity": 1.5936088577647551,
+        "maximum_capacity": 1.977,
+        "capacity_change_first_to_last": -0.3606905691166775,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-6:Sheet6",
+        "batch": 6,
+        "cycles": 1062,
+        "first_observed_capacity": 2.007556545376967,
+        "minimum_capacity": 1.595,
+        "maximum_capacity": 2.024357325136015,
+        "capacity_change_first_to_last": -0.41255654537696684,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-6:Sheet7",
+        "batch": 6,
+        "cycles": 934,
+        "first_observed_capacity": 1.964207854733361,
+        "minimum_capacity": 1.597,
+        "maximum_capacity": 1.9842348402430319,
+        "capacity_change_first_to_last": -0.36720785473336104,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      },
+      {
+        "cell_id": "batch-6:Sheet8",
+        "batch": 6,
+        "cycles": 1042,
+        "first_observed_capacity": 1.964275208658108,
+        "minimum_capacity": 1.593,
+        "maximum_capacity": 1.9874100693434673,
+        "capacity_change_first_to_last": -0.3712752086581079,
+        "capacity_units_or_soh_status": "Capacity units and per-cell initial-capacity reference are not established; not SOH."
+      }
+    ]
+  },
+  "feature_availability": [
+    {
+      "feature": "CC_energy",
+      "available_cycles": 27426,
+      "unavailable_cycles": 109,
+      "availability_fraction": 0.9960414018521881,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9831223628691983
+    },
+    {
+      "feature": "CC_Q",
+      "available_cycles": 27426,
+      "unavailable_cycles": 109,
+      "availability_fraction": 0.9960414018521881,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9831223628691983
+    },
+    {
+      "feature": "CC_t_mean",
+      "available_cycles": 27426,
+      "unavailable_cycles": 109,
+      "availability_fraction": 0.9960414018521881,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9831223628691983
+    },
+    {
+      "feature": "CC_V_mean",
+      "available_cycles": 27426,
+      "unavailable_cycles": 109,
+      "availability_fraction": 0.9960414018521881,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9831223628691983
+    },
+    {
+      "feature": "CC_T_mean",
+      "available_cycles": 27426,
+      "unavailable_cycles": 109,
+      "availability_fraction": 0.9960414018521881,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9831223628691983
+    },
+    {
+      "feature": "CC_V_std",
+      "available_cycles": 27426,
+      "unavailable_cycles": 109,
+      "availability_fraction": 0.9960414018521881,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9831223628691983
+    },
+    {
+      "feature": "CC_T_std",
+      "available_cycles": 27426,
+      "unavailable_cycles": 109,
+      "availability_fraction": 0.9960414018521881,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9831223628691983
+    },
+    {
+      "feature": "CC_V_skewness",
+      "available_cycles": 27426,
+      "unavailable_cycles": 109,
+      "availability_fraction": 0.9960414018521881,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9831223628691983
+    },
+    {
+      "feature": "CC_T_skewness",
+      "available_cycles": 27426,
+      "unavailable_cycles": 109,
+      "availability_fraction": 0.9960414018521881,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9831223628691983
+    },
+    {
+      "feature": "CC_V_kurtosis",
+      "available_cycles": 27426,
+      "unavailable_cycles": 109,
+      "availability_fraction": 0.9960414018521881,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9831223628691983
+    },
+    {
+      "feature": "CC_T_kurtosis",
+      "available_cycles": 27426,
+      "unavailable_cycles": 109,
+      "availability_fraction": 0.9960414018521881,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9831223628691983
+    },
+    {
+      "feature": "CC_CCCT",
+      "available_cycles": 27424,
+      "unavailable_cycles": 111,
+      "availability_fraction": 0.9959687670237879,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9831223628691983
+    },
+    {
+      "feature": "CC_entropy",
+      "available_cycles": 27426,
+      "unavailable_cycles": 109,
+      "availability_fraction": 0.9960414018521881,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9831223628691983
+    },
+    {
+      "feature": "dV_energy",
+      "available_cycles": 27102,
+      "unavailable_cycles": 433,
+      "availability_fraction": 0.9842745596513528,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9338775510204081
+    },
+    {
+      "feature": "dV_Q",
+      "available_cycles": 27102,
+      "unavailable_cycles": 433,
+      "availability_fraction": 0.9842745596513528,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9338775510204081
+    },
+    {
+      "feature": "dV_t_mean",
+      "available_cycles": 27102,
+      "unavailable_cycles": 433,
+      "availability_fraction": 0.9842745596513528,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9338775510204081
+    },
+    {
+      "feature": "dV_V_mean",
+      "available_cycles": 27102,
+      "unavailable_cycles": 433,
+      "availability_fraction": 0.9842745596513528,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9338775510204081
+    },
+    {
+      "feature": "dV_T_mean",
+      "available_cycles": 27102,
+      "unavailable_cycles": 433,
+      "availability_fraction": 0.9842745596513528,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9338775510204081
+    },
+    {
+      "feature": "dV_V_std",
+      "available_cycles": 27102,
+      "unavailable_cycles": 433,
+      "availability_fraction": 0.9842745596513528,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9338775510204081
+    },
+    {
+      "feature": "dV_T_std",
+      "available_cycles": 27102,
+      "unavailable_cycles": 433,
+      "availability_fraction": 0.9842745596513528,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9338775510204081
+    },
+    {
+      "feature": "dV_V_skewness",
+      "available_cycles": 27102,
+      "unavailable_cycles": 433,
+      "availability_fraction": 0.9842745596513528,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9338775510204081
+    },
+    {
+      "feature": "dV_T_skewness",
+      "available_cycles": 27102,
+      "unavailable_cycles": 433,
+      "availability_fraction": 0.9842745596513528,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9338775510204081
+    },
+    {
+      "feature": "dV_V_kurtosis",
+      "available_cycles": 27102,
+      "unavailable_cycles": 433,
+      "availability_fraction": 0.9842745596513528,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9338775510204081
+    },
+    {
+      "feature": "dV_T_kurtosis",
+      "available_cycles": 27102,
+      "unavailable_cycles": 433,
+      "availability_fraction": 0.9842745596513528,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9338775510204081
+    },
+    {
+      "feature": "dV_dV_devide_dt",
+      "available_cycles": 27102,
+      "unavailable_cycles": 433,
+      "availability_fraction": 0.9842745596513528,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9338775510204081
+    },
+    {
+      "feature": "dV_entropy",
+      "available_cycles": 27102,
+      "unavailable_cycles": 433,
+      "availability_fraction": 0.9842745596513528,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.9338775510204081
+    },
+    {
+      "feature": "CV_energy",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "CV_Q",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "CV_t_mean",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "CV_C_mean",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "CV_T_mean",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "CV_C_std",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "CV_T_std",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "CV_C_skewness",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "CV_T_skewness",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "CV_C_kurtosis",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "CV_T_kurtosis",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "CV_CVCT",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "CV_entropy",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "dI_energy",
+      "available_cycles": 27460,
+      "unavailable_cycles": 75,
+      "availability_fraction": 0.9972761939349918,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.944954128440367
+    },
+    {
+      "feature": "dI_Q",
+      "available_cycles": 27460,
+      "unavailable_cycles": 75,
+      "availability_fraction": 0.9972761939349918,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.944954128440367
+    },
+    {
+      "feature": "dI_t_mean",
+      "available_cycles": 27460,
+      "unavailable_cycles": 75,
+      "availability_fraction": 0.9972761939349918,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.944954128440367
+    },
+    {
+      "feature": "dI_C_mean",
+      "available_cycles": 27460,
+      "unavailable_cycles": 75,
+      "availability_fraction": 0.9972761939349918,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.944954128440367
+    },
+    {
+      "feature": "dI_T_mean",
+      "available_cycles": 27460,
+      "unavailable_cycles": 75,
+      "availability_fraction": 0.9972761939349918,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.944954128440367
+    },
+    {
+      "feature": "dI_C_std",
+      "available_cycles": 27460,
+      "unavailable_cycles": 75,
+      "availability_fraction": 0.9972761939349918,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.944954128440367
+    },
+    {
+      "feature": "dI_T_std",
+      "available_cycles": 27460,
+      "unavailable_cycles": 75,
+      "availability_fraction": 0.9972761939349918,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.944954128440367
+    },
+    {
+      "feature": "dI_C_skewness",
+      "available_cycles": 27460,
+      "unavailable_cycles": 75,
+      "availability_fraction": 0.9972761939349918,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.944954128440367
+    },
+    {
+      "feature": "dI_T_skewness",
+      "available_cycles": 27460,
+      "unavailable_cycles": 75,
+      "availability_fraction": 0.9972761939349918,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.944954128440367
+    },
+    {
+      "feature": "dI_C_kurtosis",
+      "available_cycles": 27460,
+      "unavailable_cycles": 75,
+      "availability_fraction": 0.9972761939349918,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.944954128440367
+    },
+    {
+      "feature": "dI_T_kurtosis",
+      "available_cycles": 27460,
+      "unavailable_cycles": 75,
+      "availability_fraction": 0.9972761939349918,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.944954128440367
+    },
+    {
+      "feature": "dI_dI_devide_dt",
+      "available_cycles": 27460,
+      "unavailable_cycles": 75,
+      "availability_fraction": 0.9972761939349918,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.944954128440367
+    },
+    {
+      "feature": "dI_entropy",
+      "available_cycles": 27460,
+      "unavailable_cycles": 75,
+      "availability_fraction": 0.9972761939349918,
+      "profiles_with_any_unavailable": 8,
+      "minimum_profile_availability_fraction": 0.944954128440367
+    },
+    {
+      "feature": "Charge_energy",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_Q",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_t_mean",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_V_mean",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_C_mean",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_T_mean",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_C_std",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_V_std",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_T_std",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_C_skewness",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_V_skewness",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_T_skewness",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_C_kurtosis",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_V_kurtosis",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    },
+    {
+      "feature": "Charge_T_kurtosis",
+      "available_cycles": 27535,
+      "unavailable_cycles": 0,
+      "availability_fraction": 1.0,
+      "profiles_with_any_unavailable": 0,
+      "minimum_profile_availability_fraction": 1.0
+    }
+  ],
+  "within_profile_trends": [
+    {
+      "feature": "CC_energy",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.9359087841901296,
+      "cycle_direction_consistency": 0.8545454545454545,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.9497010202029641,
+      "capacity_direction_consistency": 0.8545454545454545
+    },
+    {
+      "feature": "CC_Q",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.935518316188075,
+      "cycle_direction_consistency": 0.8545454545454545,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.9591855570565572,
+      "capacity_direction_consistency": 0.8545454545454545
+    },
+    {
+      "feature": "CC_t_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.9354416177357102,
+      "cycle_direction_consistency": 0.8545454545454545,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.9591228648801859,
+      "capacity_direction_consistency": 0.8545454545454545
+    },
+    {
+      "feature": "CC_V_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.800073186294796,
+      "cycle_direction_consistency": 0.8545454545454545,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.869432533187566,
+      "capacity_direction_consistency": 0.8545454545454545
+    },
+    {
+      "feature": "CC_T_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.5549349487012236,
+      "cycle_direction_consistency": 0.7454545454545455,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.4695516500140466,
+      "capacity_direction_consistency": 0.8727272727272727
+    },
+    {
+      "feature": "CC_V_std",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.3738605982985065,
+      "cycle_direction_consistency": 0.7272727272727273,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.4563178607259336,
+      "capacity_direction_consistency": 0.6727272727272727
+    },
+    {
+      "feature": "CC_T_std",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.34285593323808233,
+      "cycle_direction_consistency": 0.9272727272727272,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.28994254476487985,
+      "capacity_direction_consistency": 0.9636363636363636
+    },
+    {
+      "feature": "CC_V_skewness",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.8194423415598181,
+      "cycle_direction_consistency": 0.8545454545454545,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.6197430046124535,
+      "capacity_direction_consistency": 0.8545454545454545
+    },
+    {
+      "feature": "CC_T_skewness",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.4337015374689648,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.3913706834464198,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "CC_V_kurtosis",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.26101103505625267,
+      "cycle_direction_consistency": 0.6363636363636364,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.16191766268260294,
+      "capacity_direction_consistency": 0.6
+    },
+    {
+      "feature": "CC_T_kurtosis",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.3041251298258713,
+      "cycle_direction_consistency": 0.8181818181818182,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.2594082645399257,
+      "capacity_direction_consistency": 0.8
+    },
+    {
+      "feature": "CC_CCCT",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.9354416177357102,
+      "cycle_direction_consistency": 0.8545454545454545,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.9591228648801859,
+      "capacity_direction_consistency": 0.8545454545454545
+    },
+    {
+      "feature": "CC_entropy",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.23056152254649862,
+      "cycle_direction_consistency": 0.7636363636363637,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.105897570958182,
+      "capacity_direction_consistency": 0.6909090909090909
+    },
+    {
+      "feature": "dV_energy",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.6016651562509633,
+      "cycle_direction_consistency": 0.8,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.6473243781601334,
+      "capacity_direction_consistency": 0.8
+    },
+    {
+      "feature": "dV_Q",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.6011816621749513,
+      "cycle_direction_consistency": 0.7818181818181819,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.6473935087573894,
+      "capacity_direction_consistency": 0.8
+    },
+    {
+      "feature": "dV_t_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.6011943350904891,
+      "cycle_direction_consistency": 0.7636363636363637,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.6473755619584434,
+      "capacity_direction_consistency": 0.8
+    },
+    {
+      "feature": "dV_V_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.39028246494513363,
+      "cycle_direction_consistency": 0.6,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.40066527495305465,
+      "capacity_direction_consistency": 0.6
+    },
+    {
+      "feature": "dV_T_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.5944244238656423,
+      "cycle_direction_consistency": 0.9090909090909091,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.5632337137323122,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "dV_V_std",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.7761164206804527,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.7120538295667475,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "dV_T_std",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.5331958650261508,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.5039347372415102,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "dV_V_skewness",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.41224242583036874,
+      "cycle_direction_consistency": 0.6,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.41454532399899985,
+      "capacity_direction_consistency": 0.6
+    },
+    {
+      "feature": "dV_T_skewness",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.06696930348641282,
+      "cycle_direction_consistency": 0.7818181818181819,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.0645612591028608,
+      "capacity_direction_consistency": 0.7818181818181819
+    },
+    {
+      "feature": "dV_V_kurtosis",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.5472318235030099,
+      "cycle_direction_consistency": 0.6727272727272727,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.5385865071376116,
+      "capacity_direction_consistency": 0.6727272727272727
+    },
+    {
+      "feature": "dV_T_kurtosis",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.05681071175294538,
+      "cycle_direction_consistency": 0.8363636363636363,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.04845782350755575,
+      "capacity_direction_consistency": 0.8181818181818182
+    },
+    {
+      "feature": "dV_dV_devide_dt",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.6011943350904891,
+      "cycle_direction_consistency": 0.7636363636363637,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.6473755619584434,
+      "capacity_direction_consistency": 0.8
+    },
+    {
+      "feature": "dV_entropy",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.39634133006455297,
+      "cycle_direction_consistency": 0.6,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.40335758609612377,
+      "capacity_direction_consistency": 0.6
+    },
+    {
+      "feature": "CV_energy",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.9725050101472628,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.8815056332701506,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "CV_Q",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.9725190673542001,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.8815292148709453,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "CV_t_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.9131814618040507,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.9404787145771873,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "CV_C_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.3988621092809065,
+      "cycle_direction_consistency": 0.7272727272727273,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.5207961089147163,
+      "capacity_direction_consistency": 0.9272727272727272
+    },
+    {
+      "feature": "CV_T_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.6148637918484215,
+      "cycle_direction_consistency": 0.8,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.5600241373250028,
+      "capacity_direction_consistency": 0.9090909090909091
+    },
+    {
+      "feature": "CV_C_std",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.2129041213786976,
+      "cycle_direction_consistency": 0.7272727272727273,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.2968390304875678,
+      "capacity_direction_consistency": 0.8727272727272727
+    },
+    {
+      "feature": "CV_T_std",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.8166515821688236,
+      "cycle_direction_consistency": 0.9818181818181818,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.7956077633689062,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "CV_C_skewness",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.3892109769547803,
+      "cycle_direction_consistency": 0.8,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.44219648552392604,
+      "capacity_direction_consistency": 0.7818181818181819
+    },
+    {
+      "feature": "CV_T_skewness",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.6713698968802129,
+      "cycle_direction_consistency": 0.9454545454545454,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.7028383962740902,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "CV_C_kurtosis",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.3656762607163583,
+      "cycle_direction_consistency": 0.8,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.44032493450060567,
+      "capacity_direction_consistency": 0.7818181818181819
+    },
+    {
+      "feature": "CV_T_kurtosis",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.688565913972253,
+      "cycle_direction_consistency": 0.8909090909090909,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.7407317709530234,
+      "capacity_direction_consistency": 0.9818181818181818
+    },
+    {
+      "feature": "CV_CVCT",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.9131814618040507,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.9404787145771873,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "CV_entropy",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.4800275095046484,
+      "cycle_direction_consistency": 0.8909090909090909,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.6010529527130976,
+      "capacity_direction_consistency": 0.9454545454545454
+    },
+    {
+      "feature": "dI_energy",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.5726691936504429,
+      "cycle_direction_consistency": 0.9636363636363636,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.4879078683407925,
+      "capacity_direction_consistency": 0.8545454545454545
+    },
+    {
+      "feature": "dI_Q",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.5726486901150146,
+      "cycle_direction_consistency": 0.9636363636363636,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.4878890807408815,
+      "capacity_direction_consistency": 0.8545454545454545
+    },
+    {
+      "feature": "dI_t_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.5729276120834538,
+      "cycle_direction_consistency": 0.9636363636363636,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.4872081617999741,
+      "capacity_direction_consistency": 0.8545454545454545
+    },
+    {
+      "feature": "dI_C_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.004829092016458537,
+      "cycle_direction_consistency": 0.509090909090909,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.0024362362977415055,
+      "capacity_direction_consistency": 0.509090909090909
+    },
+    {
+      "feature": "dI_T_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.5674169418034328,
+      "cycle_direction_consistency": 0.8545454545454545,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.5065386089059165,
+      "capacity_direction_consistency": 0.8727272727272727
+    },
+    {
+      "feature": "dI_C_std",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.044527427169647416,
+      "cycle_direction_consistency": 0.7090909090909091,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.055744924487508965,
+      "capacity_direction_consistency": 0.7090909090909091
+    },
+    {
+      "feature": "dI_T_std",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.32378134614268306,
+      "cycle_direction_consistency": 0.9636363636363636,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.23361410444246378,
+      "capacity_direction_consistency": 0.8909090909090909
+    },
+    {
+      "feature": "dI_C_skewness",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.011204699030576054,
+      "cycle_direction_consistency": 0.509090909090909,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.01719647527533365,
+      "capacity_direction_consistency": 0.5272727272727272
+    },
+    {
+      "feature": "dI_T_skewness",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.013141933933897117,
+      "cycle_direction_consistency": 0.5818181818181818,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.013758498460485335,
+      "capacity_direction_consistency": 0.5272727272727272
+    },
+    {
+      "feature": "dI_C_kurtosis",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.003967522303622479,
+      "cycle_direction_consistency": 0.5272727272727272,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.0047600316523231075,
+      "capacity_direction_consistency": 0.5272727272727272
+    },
+    {
+      "feature": "dI_T_kurtosis",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.004962191670529514,
+      "cycle_direction_consistency": 0.5272727272727272,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.015945439162975257,
+      "capacity_direction_consistency": 0.6
+    },
+    {
+      "feature": "dI_dI_devide_dt",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.5729276120834538,
+      "cycle_direction_consistency": 0.9636363636363636,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.5009314823107927,
+      "capacity_direction_consistency": 0.8545454545454545
+    },
+    {
+      "feature": "dI_entropy",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.02735213589232422,
+      "cycle_direction_consistency": 0.5636363636363636,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.010932669726583053,
+      "capacity_direction_consistency": 0.5272727272727272
+    },
+    {
+      "feature": "Charge_energy",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.8833804952930513,
+      "cycle_direction_consistency": 0.8545454545454545,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.9627797091995658,
+      "capacity_direction_consistency": 0.8545454545454545
+    },
+    {
+      "feature": "Charge_Q",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.8905313150672444,
+      "cycle_direction_consistency": 0.8545454545454545,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.9608457283304309,
+      "capacity_direction_consistency": 0.8545454545454545
+    },
+    {
+      "feature": "Charge_t_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.7989008845358541,
+      "cycle_direction_consistency": 0.9636363636363636,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.8234167030290745,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "Charge_V_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.8872826261632635,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.9528995752087017,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "Charge_C_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.8934274685087364,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.9642761677188008,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "Charge_T_mean",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.6270142333754822,
+      "cycle_direction_consistency": 0.8181818181818182,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.5834680026694616,
+      "capacity_direction_consistency": 0.9272727272727272
+    },
+    {
+      "feature": "Charge_C_std",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.48705203873614383,
+      "cycle_direction_consistency": 0.9454545454545454,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.5561842844789551,
+      "capacity_direction_consistency": 0.8727272727272727
+    },
+    {
+      "feature": "Charge_V_std",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.7978013532329383,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.8805714299816365,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "Charge_T_std",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.6113324931229086,
+      "cycle_direction_consistency": 0.9818181818181818,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.6133051711469041,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "Charge_C_skewness",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.90228456782957,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.9627573230391315,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "Charge_V_skewness",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": -0.9589669637085693,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": 0.9289662353832046,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "Charge_T_skewness",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.5708070782139315,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.5461998024603717,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "Charge_C_kurtosis",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.46063783338934977,
+      "cycle_direction_consistency": 0.9636363636363636,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.5422971242231281,
+      "capacity_direction_consistency": 0.9272727272727272
+    },
+    {
+      "feature": "Charge_V_kurtosis",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.9645943903367235,
+      "cycle_direction_consistency": 1.0,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.8782968774921134,
+      "capacity_direction_consistency": 1.0
+    },
+    {
+      "feature": "Charge_T_kurtosis",
+      "profiles_with_cycle_rho": 55,
+      "median_within_profile_spearman_vs_cycle": 0.1489933060117683,
+      "cycle_direction_consistency": 0.5636363636363636,
+      "profiles_with_capacity_rho": 55,
+      "median_within_profile_spearman_vs_capacity": -0.114991138692465,
+      "capacity_direction_consistency": 0.5636363636363636
+    }
+  ],
+  "potentially_informative_candidates": {
+    "selection_rule": "Rank by absolute median within-profile Spearman association with capacity_label among features with at least 10 profiles having defined correlations. Descriptive screening only.",
+    "features": [
+      {
+        "feature": "Charge_C_mean",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": -0.8934274685087364,
+        "cycle_direction_consistency": 1.0,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": 0.9642761677188008,
+        "capacity_direction_consistency": 1.0
+      },
+      {
+        "feature": "Charge_energy",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": -0.8833804952930513,
+        "cycle_direction_consistency": 0.8545454545454545,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": 0.9627797091995658,
+        "capacity_direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature": "Charge_C_skewness",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": 0.90228456782957,
+        "cycle_direction_consistency": 1.0,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": -0.9627573230391315,
+        "capacity_direction_consistency": 1.0
+      },
+      {
+        "feature": "Charge_Q",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": -0.8905313150672444,
+        "cycle_direction_consistency": 0.8545454545454545,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": 0.9608457283304309,
+        "capacity_direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature": "CC_Q",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": -0.935518316188075,
+        "cycle_direction_consistency": 0.8545454545454545,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": 0.9591855570565572,
+        "capacity_direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature": "CC_t_mean",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": -0.9354416177357102,
+        "cycle_direction_consistency": 0.8545454545454545,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": 0.9591228648801859,
+        "capacity_direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature": "CC_CCCT",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": -0.9354416177357102,
+        "cycle_direction_consistency": 0.8545454545454545,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": 0.9591228648801859,
+        "capacity_direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature": "Charge_V_mean",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": 0.8872826261632635,
+        "cycle_direction_consistency": 1.0,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": -0.9528995752087017,
+        "capacity_direction_consistency": 1.0
+      },
+      {
+        "feature": "CC_energy",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": -0.9359087841901296,
+        "cycle_direction_consistency": 0.8545454545454545,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": 0.9497010202029641,
+        "capacity_direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature": "CV_t_mean",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": 0.9131814618040507,
+        "cycle_direction_consistency": 1.0,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": -0.9404787145771873,
+        "capacity_direction_consistency": 1.0
+      },
+      {
+        "feature": "CV_CVCT",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": 0.9131814618040507,
+        "cycle_direction_consistency": 1.0,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": -0.9404787145771873,
+        "capacity_direction_consistency": 1.0
+      },
+      {
+        "feature": "Charge_V_skewness",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": -0.9589669637085693,
+        "cycle_direction_consistency": 1.0,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": 0.9289662353832046,
+        "capacity_direction_consistency": 1.0
+      },
+      {
+        "feature": "CV_Q",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": 0.9725190673542001,
+        "cycle_direction_consistency": 1.0,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": -0.8815292148709453,
+        "capacity_direction_consistency": 1.0
+      },
+      {
+        "feature": "CV_energy",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": 0.9725050101472628,
+        "cycle_direction_consistency": 1.0,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": -0.8815056332701506,
+        "capacity_direction_consistency": 1.0
+      },
+      {
+        "feature": "Charge_V_std",
+        "profiles_with_cycle_rho": 55,
+        "median_within_profile_spearman_vs_cycle": -0.7978013532329383,
+        "cycle_direction_consistency": 1.0,
+        "profiles_with_capacity_rho": 55,
+        "median_within_profile_spearman_vs_capacity": 0.8805714299816365,
+        "capacity_direction_consistency": 1.0
+      }
+    ],
+    "causal_or_predictive_claim": false
+  },
+  "within_profile_feature_redundancy": {
+    "threshold": 0.9,
+    "minimum_profiles": 10,
+    "method": "Median Spearman correlation for each feature pair calculated separately within each profile, then summarized across profiles.",
+    "pairs": [
+      {
+        "feature_a": "CC_t_mean",
+        "feature_b": "CC_CCCT",
+        "median_within_profile_spearman": 1.0,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dV_t_mean",
+        "feature_b": "dV_dV_devide_dt",
+        "median_within_profile_spearman": -1.0,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_t_mean",
+        "feature_b": "CV_CVCT",
+        "median_within_profile_spearman": 1.0,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dI_t_mean",
+        "feature_b": "dI_dI_devide_dt",
+        "median_within_profile_spearman": 1.0,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_energy",
+        "feature_b": "CV_Q",
+        "median_within_profile_spearman": 0.9999998837347198,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dI_energy",
+        "feature_b": "dI_Q",
+        "median_within_profile_spearman": 0.9999998041631009,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dV_Q",
+        "feature_b": "dV_t_mean",
+        "median_within_profile_spearman": 0.9999990212023876,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dV_Q",
+        "feature_b": "dV_dV_devide_dt",
+        "median_within_profile_spearman": -0.9999990212023876,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dV_energy",
+        "feature_b": "dV_Q",
+        "median_within_profile_spearman": 0.9999959188754053,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_Q",
+        "feature_b": "CC_t_mean",
+        "median_within_profile_spearman": 0.9999902536487902,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_Q",
+        "feature_b": "CC_CCCT",
+        "median_within_profile_spearman": 0.9999902536487902,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dV_energy",
+        "feature_b": "dV_t_mean",
+        "median_within_profile_spearman": 0.9999900324443936,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dV_energy",
+        "feature_b": "dV_dV_devide_dt",
+        "median_within_profile_spearman": -0.9999900324443936,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dI_energy",
+        "feature_b": "dI_t_mean",
+        "median_within_profile_spearman": 0.9999525916561315,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dI_Q",
+        "feature_b": "dI_t_mean",
+        "median_within_profile_spearman": 0.9999525916561315,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dI_energy",
+        "feature_b": "dI_dI_devide_dt",
+        "median_within_profile_spearman": 0.9999420519944078,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dI_Q",
+        "feature_b": "dI_dI_devide_dt",
+        "median_within_profile_spearman": 0.9999418680755756,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_C_mean",
+        "feature_b": "Charge_C_skewness",
+        "median_within_profile_spearman": -0.9996830326564788,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "CC_Q",
+        "median_within_profile_spearman": 0.9996523045057347,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "CC_t_mean",
+        "median_within_profile_spearman": 0.9990003668858789,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "CC_CCCT",
+        "median_within_profile_spearman": 0.9990003668858789,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_C_skewness",
+        "feature_b": "CV_C_kurtosis",
+        "median_within_profile_spearman": 0.9989135846565141,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_energy",
+        "feature_b": "Charge_Q",
+        "median_within_profile_spearman": 0.9989075366316623,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_V_mean",
+        "feature_b": "Charge_V_std",
+        "median_within_profile_spearman": -0.9957203271966942,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "Charge_V_skewness",
+        "feature_b": "Charge_V_kurtosis",
+        "median_within_profile_spearman": -0.9939237069054513,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dV_V_mean",
+        "feature_b": "dV_V_skewness",
+        "median_within_profile_spearman": -0.9921619127582775,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_V_mean",
+        "feature_b": "Charge_C_skewness",
+        "median_within_profile_spearman": 0.9916369772702157,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_V_mean",
+        "feature_b": "Charge_C_mean",
+        "median_within_profile_spearman": -0.9878848714549993,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_t_mean",
+        "feature_b": "Charge_C_mean",
+        "median_within_profile_spearman": -0.9876853496212664,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_CVCT",
+        "feature_b": "Charge_C_mean",
+        "median_within_profile_spearman": -0.9876853496212664,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_Q",
+        "feature_b": "Charge_Q",
+        "median_within_profile_spearman": 0.987627415619302,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_t_mean",
+        "feature_b": "Charge_Q",
+        "median_within_profile_spearman": 0.98761762605576,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_CCCT",
+        "feature_b": "Charge_Q",
+        "median_within_profile_spearman": 0.98761762605576,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_t_mean",
+        "feature_b": "Charge_C_skewness",
+        "median_within_profile_spearman": 0.9870433844515151,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_CVCT",
+        "feature_b": "Charge_C_skewness",
+        "median_within_profile_spearman": 0.9870433844515151,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dV_V_mean",
+        "feature_b": "dV_entropy",
+        "median_within_profile_spearman": 0.9868244569031149,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_Q",
+        "feature_b": "Charge_energy",
+        "median_within_profile_spearman": 0.9858038674111799,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_t_mean",
+        "feature_b": "Charge_energy",
+        "median_within_profile_spearman": 0.9857727862715318,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_CCCT",
+        "feature_b": "Charge_energy",
+        "median_within_profile_spearman": 0.9857727862715318,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "Charge_Q",
+        "median_within_profile_spearman": 0.9854254165376699,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "Charge_energy",
+        "median_within_profile_spearman": 0.9842146972520294,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_T_mean",
+        "feature_b": "Charge_T_mean",
+        "median_within_profile_spearman": 0.97721158390925,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dV_V_skewness",
+        "feature_b": "dV_entropy",
+        "median_within_profile_spearman": -0.97529134609156,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dV_T_mean",
+        "feature_b": "Charge_T_mean",
+        "median_within_profile_spearman": 0.9743054589400005,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_T_mean",
+        "feature_b": "dI_T_mean",
+        "median_within_profile_spearman": 0.9728469202444148,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_t_mean",
+        "feature_b": "Charge_V_mean",
+        "median_within_profile_spearman": 0.972694972406064,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_CVCT",
+        "feature_b": "Charge_V_mean",
+        "median_within_profile_spearman": 0.972694972406064,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_V_mean",
+        "feature_b": "Charge_V_std",
+        "median_within_profile_spearman": -0.9715785831404493,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_t_mean",
+        "feature_b": "Charge_C_skewness",
+        "median_within_profile_spearman": -0.9686022987700043,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_CCCT",
+        "feature_b": "Charge_C_skewness",
+        "median_within_profile_spearman": -0.9686022987700043,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_V_mean",
+        "feature_b": "Charge_V_mean",
+        "median_within_profile_spearman": 0.9663776629293871,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CV_T_skewness",
+        "feature_b": "CV_T_kurtosis",
+        "median_within_profile_spearman": 0.9659018940039815,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_Q",
+        "feature_b": "Charge_C_mean",
+        "median_within_profile_spearman": 0.9643362898230273,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_Q",
+        "feature_b": "Charge_C_skewness",
+        "median_within_profile_spearman": -0.9643124564234901,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_t_mean",
+        "feature_b": "Charge_C_mean",
+        "median_within_profile_spearman": 0.9642997341659283,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8181818181818182
+      },
+      {
+        "feature_a": "CC_CCCT",
+        "feature_b": "Charge_C_mean",
+        "median_within_profile_spearman": 0.9642997341659283,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8181818181818182
+      },
+      {
+        "feature_a": "CV_C_skewness",
+        "feature_b": "CV_entropy",
+        "median_within_profile_spearman": -0.9610404260022389,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_t_mean",
+        "feature_b": "Charge_V_mean",
+        "median_within_profile_spearman": -0.9609991196823966,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_CCCT",
+        "feature_b": "Charge_V_mean",
+        "median_within_profile_spearman": -0.9609991196823966,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "Charge_C_mean",
+        "median_within_profile_spearman": 0.9605610015583377,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "Charge_C_skewness",
+        "median_within_profile_spearman": -0.9605322792563312,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_Q",
+        "feature_b": "Charge_V_mean",
+        "median_within_profile_spearman": -0.958851536863497,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CV_energy",
+        "feature_b": "Charge_V_kurtosis",
+        "median_within_profile_spearman": 0.9571022161304975,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_Q",
+        "feature_b": "Charge_V_kurtosis",
+        "median_within_profile_spearman": 0.9571022161304975,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_T_std",
+        "feature_b": "Charge_T_std",
+        "median_within_profile_spearman": 0.9568141592920354,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dI_C_mean",
+        "feature_b": "dI_entropy",
+        "median_within_profile_spearman": 0.9560014338751524,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_t_mean",
+        "feature_b": "Charge_V_skewness",
+        "median_within_profile_spearman": 0.9555252661630268,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_CCCT",
+        "feature_b": "Charge_V_skewness",
+        "median_within_profile_spearman": 0.9555252661630268,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_T_mean",
+        "feature_b": "Charge_T_mean",
+        "median_within_profile_spearman": 0.9527785643602508,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "Charge_V_mean",
+        "median_within_profile_spearman": -0.9519820573634044,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "Charge_Q",
+        "feature_b": "Charge_C_mean",
+        "median_within_profile_spearman": 0.9519631998977774,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_Q",
+        "feature_b": "Charge_C_skewness",
+        "median_within_profile_spearman": -0.9517668028331941,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "Charge_V_skewness",
+        "median_within_profile_spearman": 0.9509593193953215,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CV_Q",
+        "feature_b": "Charge_V_skewness",
+        "median_within_profile_spearman": -0.9493804087763613,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_energy",
+        "feature_b": "Charge_V_skewness",
+        "median_within_profile_spearman": -0.9493792719812596,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_C_skewness",
+        "feature_b": "Charge_V_skewness",
+        "median_within_profile_spearman": -0.9492429835961645,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dI_C_mean",
+        "feature_b": "dI_C_skewness",
+        "median_within_profile_spearman": -0.9492330383480826,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_T_mean",
+        "feature_b": "dV_T_mean",
+        "median_within_profile_spearman": 0.9490503802338504,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_C_kurtosis",
+        "feature_b": "CV_entropy",
+        "median_within_profile_spearman": -0.9484668683220362,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dI_T_mean",
+        "feature_b": "Charge_T_mean",
+        "median_within_profile_spearman": 0.9464322149809268,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "dV_T_mean",
+        "feature_b": "dI_T_mean",
+        "median_within_profile_spearman": 0.9426452077397446,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_Q",
+        "feature_b": "Charge_V_mean",
+        "median_within_profile_spearman": -0.9426031791023387,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "Charge_energy",
+        "feature_b": "Charge_C_mean",
+        "median_within_profile_spearman": 0.9424662434051686,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_energy",
+        "feature_b": "Charge_C_skewness",
+        "median_within_profile_spearman": -0.9423082556475684,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_V_mean",
+        "feature_b": "Charge_C_skewness",
+        "median_within_profile_spearman": 0.9417131812408842,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "Charge_V_std",
+        "feature_b": "Charge_C_skewness",
+        "median_within_profile_spearman": -0.9392493026910731,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_V_mean",
+        "feature_b": "Charge_V_skewness",
+        "median_within_profile_spearman": -0.9374648081499971,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_Q",
+        "feature_b": "Charge_V_skewness",
+        "median_within_profile_spearman": 0.9353318584070797,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CV_t_mean",
+        "feature_b": "Charge_V_skewness",
+        "median_within_profile_spearman": -0.9316895027335,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_CVCT",
+        "feature_b": "Charge_V_skewness",
+        "median_within_profile_spearman": -0.9316895027335,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_V_mean",
+        "feature_b": "Charge_C_mean",
+        "median_within_profile_spearman": -0.9283280657395702,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_C_std",
+        "feature_b": "Charge_C_kurtosis",
+        "median_within_profile_spearman": -0.928118243855655,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_energy",
+        "feature_b": "Charge_V_mean",
+        "median_within_profile_spearman": -0.9276425532911051,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "dV_T_mean",
+        "feature_b": "CV_T_mean",
+        "median_within_profile_spearman": 0.9274516771319684,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_t_mean",
+        "feature_b": "CV_Q",
+        "median_within_profile_spearman": -0.9265819289163322,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.9818181818181818
+      },
+      {
+        "feature_a": "CC_CCCT",
+        "feature_b": "CV_Q",
+        "median_within_profile_spearman": -0.9265819289163322,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.9818181818181818
+      },
+      {
+        "feature_a": "CC_t_mean",
+        "feature_b": "CV_energy",
+        "median_within_profile_spearman": -0.9265547214190343,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.9818181818181818
+      },
+      {
+        "feature_a": "CC_CCCT",
+        "feature_b": "CV_energy",
+        "median_within_profile_spearman": -0.9265547214190343,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.9818181818181818
+      },
+      {
+        "feature_a": "Charge_C_mean",
+        "feature_b": "Charge_V_std",
+        "median_within_profile_spearman": 0.9261004668803529,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_t_mean",
+        "feature_b": "Charge_t_mean",
+        "median_within_profile_spearman": 0.9238390873264151,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_CVCT",
+        "feature_b": "Charge_t_mean",
+        "median_within_profile_spearman": 0.9238390873264151,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_C_skewness",
+        "feature_b": "Charge_V_kurtosis",
+        "median_within_profile_spearman": 0.921014955027782,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_V_kurtosis",
+        "feature_b": "CC_entropy",
+        "median_within_profile_spearman": -0.9188855046566672,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.9636363636363636
+      },
+      {
+        "feature_a": "CC_Q",
+        "feature_b": "CV_t_mean",
+        "median_within_profile_spearman": -0.9188748820010972,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_Q",
+        "feature_b": "CV_CVCT",
+        "median_within_profile_spearman": -0.9188748820010972,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_t_mean",
+        "feature_b": "CV_t_mean",
+        "median_within_profile_spearman": -0.9188625520029985,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_t_mean",
+        "feature_b": "CV_CVCT",
+        "median_within_profile_spearman": -0.9188625520029985,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_CCCT",
+        "feature_b": "CV_t_mean",
+        "median_within_profile_spearman": -0.9188625520029985,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_CCCT",
+        "feature_b": "CV_CVCT",
+        "median_within_profile_spearman": -0.9188625520029985,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CV_Q",
+        "feature_b": "CV_t_mean",
+        "median_within_profile_spearman": 0.9180476616061015,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_Q",
+        "feature_b": "CV_CVCT",
+        "median_within_profile_spearman": 0.9180476616061015,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_energy",
+        "feature_b": "CV_t_mean",
+        "median_within_profile_spearman": 0.9180305269491159,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_energy",
+        "feature_b": "CV_CVCT",
+        "median_within_profile_spearman": 0.9180305269491159,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_t_mean",
+        "feature_b": "Charge_V_kurtosis",
+        "median_within_profile_spearman": -0.9162391358465651,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_CCCT",
+        "feature_b": "Charge_V_kurtosis",
+        "median_within_profile_spearman": -0.9162391358465651,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_Q",
+        "feature_b": "CV_energy",
+        "median_within_profile_spearman": -0.9142335260542925,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_Q",
+        "feature_b": "CV_Q",
+        "median_within_profile_spearman": -0.9142335260542925,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "CV_t_mean",
+        "median_within_profile_spearman": -0.9139326724484207,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "CV_CVCT",
+        "median_within_profile_spearman": -0.9139326724484207,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "CV_Q",
+        "median_within_profile_spearman": -0.9138947599367938,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "CV_energy",
+        "median_within_profile_spearman": -0.9138914303344648,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CV_C_mean",
+        "feature_b": "CV_C_std",
+        "median_within_profile_spearman": 0.910579685958089,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_V_mean",
+        "feature_b": "CV_t_mean",
+        "median_within_profile_spearman": 0.9082764703325056,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "CC_V_mean",
+        "feature_b": "CV_CVCT",
+        "median_within_profile_spearman": 0.9082764703325056,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "dI_C_skewness",
+        "feature_b": "dI_entropy",
+        "median_within_profile_spearman": -0.9079249095702878,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "Charge_C_mean",
+        "feature_b": "Charge_V_skewness",
+        "median_within_profile_spearman": 0.9068942778718944,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.9636363636363636
+      },
+      {
+        "feature_a": "CC_energy",
+        "feature_b": "Charge_V_kurtosis",
+        "median_within_profile_spearman": -0.905888905514822,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      },
+      {
+        "feature_a": "Charge_V_mean",
+        "feature_b": "Charge_V_kurtosis",
+        "median_within_profile_spearman": 0.9058115071970035,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_t_mean",
+        "feature_b": "Charge_V_std",
+        "median_within_profile_spearman": -0.9047439098454687,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CV_CVCT",
+        "feature_b": "Charge_V_std",
+        "median_within_profile_spearman": -0.9047439098454687,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_t_mean",
+        "feature_b": "Charge_V_std",
+        "median_within_profile_spearman": 0.9039493411189142,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_CCCT",
+        "feature_b": "Charge_V_std",
+        "median_within_profile_spearman": 0.9039493411189142,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_V_mean",
+        "feature_b": "Charge_Q",
+        "median_within_profile_spearman": -0.9025551817392738,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 1.0
+      },
+      {
+        "feature_a": "CC_Q",
+        "feature_b": "Charge_V_std",
+        "median_within_profile_spearman": 0.9004575878837906,
+        "profiles_with_defined_correlation": 55,
+        "direction_consistency": 0.8545454545454545
+      }
+    ]
+  },
+  "batch_profile_differences": {
+    "batch_summaries": [
+      {
+        "batch": 1,
+        "profiles": 8,
+        "cycles": 3211,
+        "feature_medians": {
+          "CC_energy": 6.147240637026297,
+          "CC_Q": 1.5910200453956962,
+          "CC_t_mean": 11.933787776126925,
+          "CC_V_mean": 3.865764175537347,
+          "CC_T_mean": 28.089672269399593,
+          "CC_V_std": 0.15394661711428342,
+          "CC_T_std": 1.2072265322481877,
+          "CC_V_skewness": 0.2894347946267593,
+          "CC_T_skewness": -0.3781825438285066,
+          "CC_V_kurtosis": 2.517103883583936,
+          "CC_T_kurtosis": 1.8940746478843613,
+          "CC_CCCT": 23.86757555225385,
+          "CC_entropy": 2.5196298918145357,
+          "dV_energy": 0.8900224130013092,
+          "dV_Q": 0.2255052318771132,
+          "dV_t_mean": 1.691244464324391,
+          "dV_V_mean": 3.94651133379218,
+          "dV_T_mean": 28.88990390821085,
+          "dV_V_std": 0.02904090566083204,
+          "dV_T_std": 0.1403459242219931,
+          "dV_V_skewness": 0.14733428630426593,
+          "dV_T_skewness": -0.05276428847511672,
+          "dV_V_kurtosis": 1.8157032770840014,
+          "dV_T_kurtosis": 1.8862242404996128,
+          "dV_dV_devide_dt": 0.02956402876976971,
+          "dV_entropy": 2.764630448346662,
+          "CV_energy": 1.338822171489246,
+          "CV_Q": 0.31876970389558656,
+          "CV_t_mean": 12.993347660244837,
+          "CV_C_mean": 0.7151680596480787,
+          "CV_T_mean": 26.24699946851923,
+          "CV_C_std": 0.810376913112459,
+          "CV_T_std": 1.966232482533213,
+          "CV_C_skewness": 1.913358511877949,
+          "CV_T_skewness": 0.6914526247833903,
+          "CV_C_kurtosis": 6.146792466360102,
+          "CV_T_kurtosis": 2.0878246856257174,
+          "CV_CVCT": 25.986695320489677,
+          "CV_entropy": 1.881614729261759,
+          "dI_energy": 0.04616166037051238,
+          "dI_Q": 0.010991394916546594,
+          "dI_t_mean": 0.3477107277116235,
+          "dI_C_mean": 0.9481860877157589,
+          "dI_T_mean": 27.538504796981858,
+          "dI_C_std": 0.028939902176127595,
+          "dI_T_std": 0.09057907168395289,
+          "dI_C_skewness": 0.07633063865698524,
+          "dI_T_skewness": 3.801192423958055e-14,
+          "dI_C_kurtosis": 1.8075842882987367,
+          "dI_T_kurtosis": 1.8002363121937413,
+          "dI_dI_devide_dt": -0.14379769163023323,
+          "dI_entropy": 2.7697802556280537,
+          "Charge_energy": 7.499621369950102,
+          "Charge_Q": 1.9125268645347586,
+          "Charge_t_mean": 25.0905,
+          "Charge_V_mean": 4.038795669058313,
+          "Charge_C_mean": 2.298908229516884,
+          "Charge_T_mean": 27.15121050761254,
+          "Charge_C_std": 1.7341482512049977,
+          "Charge_V_std": 0.19908374868476134,
+          "Charge_T_std": 1.986733303695715,
+          "Charge_C_skewness": -0.1487850480660387,
+          "Charge_V_skewness": -0.7715402753510577,
+          "Charge_T_skewness": -0.17863505834138574,
+          "Charge_C_kurtosis": 1.1627248693356573,
+          "Charge_V_kurtosis": 2.1842106822080156,
+          "Charge_T_kurtosis": 1.641515806702842
+        }
+      },
+      {
+        "batch": 2,
+        "profiles": 15,
+        "cycles": 3727,
+        "feature_medians": {
+          "CC_energy": 5.887366593585745,
+          "CC_Q": 1.5053088598516462,
+          "CC_t_mean": 7.527315171729468,
+          "CC_V_mean": 3.9111981744026827,
+          "CC_T_mean": 31.01131973798789,
+          "CC_V_std": 0.14144402377704998,
+          "CC_T_std": 2.8452304897022413,
+          "CC_V_skewness": 0.07673254556491861,
+          "CC_T_skewness": -0.38334300778883273,
+          "CC_V_kurtosis": 2.8630362792671367,
+          "CC_T_kurtosis": 1.8831458002241301,
+          "CC_CCCT": 15.054630343458935,
+          "CC_entropy": 2.4473503845211737,
+          "dV_energy": 1.222503037857135,
+          "dV_Q": 0.3098698585742265,
+          "dV_t_mean": 1.5493219687613153,
+          "dV_V_mean": 3.9453254351289764,
+          "dV_T_mean": 32.47963320497092,
+          "dV_V_std": 0.02882221450166318,
+          "dV_T_std": 0.4868729257156708,
+          "dV_V_skewness": 0.19917776096032755,
+          "dV_T_skewness": -0.08267429864836609,
+          "dV_V_kurtosis": 1.8473530587294553,
+          "dV_T_kurtosis": 1.819881777028564,
+          "dV_dV_devide_dt": 0.032272181643415984,
+          "dV_entropy": 2.7590171754172497,
+          "CV_energy": 1.6058335425917738,
+          "CV_Q": 0.3823600287222016,
+          "CV_t_mean": 13.002408391538221,
+          "CV_C_mean": 0.8914810627787493,
+          "CV_T_mean": 28.010672267528726,
+          "CV_C_std": 1.1753497747695936,
+          "CV_T_std": 3.6276257610006892,
+          "CV_C_skewness": 2.222448212619754,
+          "CV_T_skewness": 0.7023764262740999,
+          "CV_C_kurtosis": 7.559327657081785,
+          "CV_T_kurtosis": 2.1025050571642856,
+          "CV_CVCT": 26.004816783076443,
+          "CV_entropy": 1.6891734930822304,
+          "dI_energy": 0.041620080344793475,
+          "dI_Q": 0.009910014844705337,
+          "dI_t_mean": 0.31350744989011053,
+          "dI_C_mean": 0.9487796759094567,
+          "dI_T_mean": 30.234149932059587,
+          "dI_C_std": 0.028959671266855606,
+          "dI_T_std": 0.1488276705851708,
+          "dI_C_skewness": 0.049392173274713215,
+          "dI_T_skewness": 6.155594637670335e-14,
+          "dI_C_kurtosis": 1.8044260416881017,
+          "dI_T_kurtosis": 1.8046618210366123,
+          "dI_dI_devide_dt": -0.1594858432152914,
+          "dI_entropy": 2.771031409970557,
+          "Charge_energy": 7.523159258275389,
+          "Charge_Q": 1.8952104177725788,
+          "Charge_t_mean": 20.596000000000004,
+          "Charge_V_mean": 4.0934586109938405,
+          "Charge_C_mean": 2.7624801348981904,
+          "Charge_T_mean": 29.11817272466544,
+          "Charge_C_std": 2.6328942936674777,
+          "Charge_V_std": 0.1646736822556486,
+          "Charge_T_std": 3.6642531505680767,
+          "Charge_C_skewness": 0.30899047157093273,
+          "Charge_V_skewness": -1.2844162378307376,
+          "Charge_T_skewness": 0.1826660063069497,
+          "Charge_C_kurtosis": 1.214883110746315,
+          "Charge_V_kurtosis": 3.4066048540809066,
+          "Charge_T_kurtosis": 1.6115749911516724
+        }
+      },
+      {
+        "batch": 3,
+        "profiles": 8,
+        "cycles": 4608,
+        "feature_medians": {
+          "CC_energy": 6.022464054557703,
+          "CC_Q": 1.5574056298896692,
+          "CC_t_mean": 11.680977815784786,
+          "CC_V_mean": 3.862338929217871,
+          "CC_T_mean": 28.472376101970866,
+          "CC_V_std": 0.16341356750974106,
+          "CC_T_std": 1.3161699427783247,
+          "CC_V_skewness": 0.08590898435539956,
+          "CC_T_skewness": 0.30611627259959595,
+          "CC_V_kurtosis": 2.6986863662155587,
+          "CC_T_kurtosis": 2.139864812504287,
+          "CC_CCCT": 23.361955631569572,
+          "CC_entropy": 2.4976741900982904,
+          "dV_energy": 0.8912729546354982,
+          "dV_Q": 0.22583009132241955,
+          "dV_t_mean": 1.6936985174741832,
+          "dV_V_mean": 3.946691269437941,
+          "dV_T_mean": 28.25372781792388,
+          "dV_V_std": 0.02901301155681183,
+          "dV_T_std": 0.124265161351894,
+          "dV_V_skewness": 0.13962894716546553,
+          "dV_T_skewness": -0.013698319456805098,
+          "dV_V_kurtosis": 1.8170538583528235,
+          "dV_T_kurtosis": 1.9000009448905604,
+          "dV_dV_devide_dt": 0.02952119260709898,
+          "dV_entropy": 2.765558802463799,
+          "CV_energy": 1.4106463399870477,
+          "CV_Q": 0.3358825276834745,
+          "CV_t_mean": 14.48088773304181,
+          "CV_C_mean": 0.7090017725460543,
+          "CV_T_mean": 24.09997086192013,
+          "CV_C_std": 0.809224943950083,
+          "CV_T_std": 2.144340910257223,
+          "CV_C_skewness": 1.9287292947823507,
+          "CV_T_skewness": 0.737317687541273,
+          "CV_C_kurtosis": 6.23159655277444,
+          "CV_T_kurtosis": 2.1634683019067893,
+          "CV_CVCT": 28.96177546608362,
+          "CV_entropy": 1.8674158594379302,
+          "dI_energy": 0.04907275657209821,
+          "dI_Q": 0.011684227273623919,
+          "dI_t_mean": 0.3695186058615185,
+          "dI_C_mean": 0.9485610754845715,
+          "dI_T_mean": 26.44995304952251,
+          "dI_C_std": 0.02894355618234721,
+          "dI_T_std": 0.10425435087632007,
+          "dI_C_skewness": 0.06020360167036076,
+          "dI_T_skewness": 3.448563497476426e-14,
+          "dI_C_kurtosis": 1.8074496087524892,
+          "dI_T_kurtosis": 1.7999636627907085,
+          "dI_dI_devide_dt": -0.13531118381295165,
+          "dI_entropy": 2.770586909162649,
+          "Charge_energy": 7.458683251434016,
+          "Charge_Q": 1.899238169731598,
+          "Charge_t_mean": 26.069000000000003,
+          "Charge_V_mean": 4.04977872807967,
+          "Charge_C_mean": 2.1726529318133236,
+          "Charge_T_mean": 25.799123481433515,
+          "Charge_C_std": 1.7327204605880115,
+          "Charge_V_std": 0.2015654651895582,
+          "Charge_T_std": 2.385398557828308,
+          "Charge_C_skewness": -0.010365619048436824,
+          "Charge_V_skewness": -0.9482844825286034,
+          "Charge_T_skewness": -0.10416473535329815,
+          "Charge_C_kurtosis": 1.162403649538468,
+          "Charge_V_kurtosis": 2.643448367301775,
+          "Charge_T_kurtosis": 1.6269751086088144
+        }
+      },
+      {
+        "batch": 4,
+        "profiles": 8,
+        "cycles": 5670,
+        "feature_medians": {
+          "CC_energy": 5.731663023917315,
+          "CC_Q": 1.477160661690688,
+          "CC_t_mean": 11.079454705277886,
+          "CC_V_mean": 3.8795400471962225,
+          "CC_T_mean": 26.054439996802465,
+          "CC_V_std": 0.15167655172863165,
+          "CC_T_std": 1.141213897385177,
+          "CC_V_skewness": 0.35003262247951966,
+          "CC_T_skewness": -0.18645627714604115,
+          "CC_V_kurtosis": 2.3281629645331687,
+          "CC_T_kurtosis": 2.014764474367631,
+          "CC_CCCT": 22.158909410555772,
+          "CC_entropy": 2.618752365827838,
+          "dV_energy": 0.9064576442001799,
+          "dV_Q": 0.22968554110870906,
+          "dV_t_mean": 1.722564981508967,
+          "dV_V_mean": 3.9465414282777256,
+          "dV_T_mean": 26.284235064961408,
+          "dV_V_std": 0.02900921042720097,
+          "dV_T_std": 0.12420328645913858,
+          "dV_V_skewness": 0.14599516722575961,
+          "dV_T_skewness": -0.013807372282962986,
+          "dV_V_kurtosis": 1.8190020881692126,
+          "dV_T_kurtosis": 1.8992220076784827,
+          "dV_dV_devide_dt": 0.029026481197507156,
+          "dV_entropy": 2.7648353351361017,
+          "CV_energy": 1.4419454390735653,
+          "CV_Q": 0.3433209348152748,
+          "CV_t_mean": 14.588116644213628,
+          "CV_C_mean": 0.7153707976414378,
+          "CV_T_mean": 23.038021682738027,
+          "CV_C_std": 0.8169236987923714,
+          "CV_T_std": 1.8146284563789807,
+          "CV_C_skewness": 1.8995819994377974,
+          "CV_T_skewness": 0.7290582470357687,
+          "CV_C_kurtosis": 6.079120020781252,
+          "CV_T_kurtosis": 2.1396095854632726,
+          "CV_CVCT": 29.176233288427262,
+          "CV_entropy": 1.871820049564185,
+          "dI_energy": 0.048762660637857835,
+          "dI_Q": 0.011610157294728054,
+          "dI_t_mean": 0.3670017960975791,
+          "dI_C_mean": 0.9489482059510876,
+          "dI_T_mean": 24.660535917135334,
+          "dI_C_std": 0.02896026091783311,
+          "dI_T_std": 0.08745540125503157,
+          "dI_C_skewness": 0.04303423488510462,
+          "dI_T_skewness": 5.7976651613561e-14,
+          "dI_C_kurtosis": 1.8046486767883854,
+          "dI_T_kurtosis": 1.8075586825598187,
+          "dI_dI_devide_dt": -0.13623911526581053,
+          "dI_entropy": 2.7715037767171404,
+          "Charge_energy": 7.21553247656102,
+          "Charge_Q": 1.830072741728557,
+          "Charge_t_mean": 25.4965,
+          "Charge_V_mean": 4.061777859955525,
+          "Charge_C_mean": 2.127944471323046,
+          "Charge_T_mean": 24.20887287172267,
+          "Charge_C_std": 1.734140645367706,
+          "Charge_V_std": 0.18758173191544633,
+          "Charge_T_std": 1.9580807939412899,
+          "Charge_C_skewness": 0.03512160413319379,
+          "Charge_V_skewness": -0.91882428369185,
+          "Charge_T_skewness": -0.05665971249959596,
+          "Charge_C_kurtosis": 1.149823464852271,
+          "Charge_V_kurtosis": 2.3036652599151894,
+          "Charge_T_kurtosis": 1.6042926829556923
+        }
+      },
+      {
+        "batch": 5,
+        "profiles": 8,
+        "cycles": 1975,
+        "feature_medians": {
+          "CC_energy": 5.720690955051536,
+          "CC_Q": 1.4593282671739138,
+          "CC_t_mean": 7.32707208123831,
+          "CC_V_mean": 3.9213310837311477,
+          "CC_T_mean": 27.09331423429073,
+          "CC_V_std": 0.13662462727588556,
+          "CC_T_std": 2.476231008293961,
+          "CC_V_skewness": 0.22302331174282514,
+          "CC_T_skewness": -0.29917523618223446,
+          "CC_V_kurtosis": 2.3788228073373916,
+          "CC_T_kurtosis": 1.8227028749892498,
+          "CC_CCCT": 14.654144162476621,
+          "CC_entropy": 2.5682963023231484,
+          "dV_energy": 1.2523828873510345,
+          "dV_Q": 0.3174266914296366,
+          "dV_t_mean": 1.6152205316448982,
+          "dV_V_mean": 3.9458063232621394,
+          "dV_T_mean": 28.148913003652222,
+          "dV_V_std": 0.028763710090079674,
+          "dV_T_std": 0.49734228531274877,
+          "dV_V_skewness": 0.17883374441553887,
+          "dV_T_skewness": -0.07607226026973983,
+          "dV_V_kurtosis": 1.8477005598610814,
+          "dV_T_kurtosis": 1.819446274998484,
+          "dV_dV_devide_dt": 0.030955525279932738,
+          "dV_entropy": 2.7615580811171574,
+          "CV_energy": 1.5977642391612261,
+          "CV_Q": 0.3803828219788298,
+          "CV_t_mean": 13.43410349507363,
+          "CV_C_mean": 0.8671919483964544,
+          "CV_T_mean": 24.144629696948282,
+          "CV_C_std": 1.1611823192000756,
+          "CV_T_std": 3.193892849469621,
+          "CV_C_skewness": 2.2515032564572555,
+          "CV_T_skewness": 0.7024751013314768,
+          "CV_C_kurtosis": 7.643559451070861,
+          "CV_T_kurtosis": 2.109599536019128,
+          "CV_CVCT": 26.86820699014726,
+          "CV_entropy": 1.6821120243190277,
+          "dI_energy": 0.041204956632907436,
+          "dI_Q": 0.009811171158842669,
+          "dI_t_mean": 0.3106509818498635,
+          "dI_C_mean": 0.9482527018215166,
+          "dI_T_mean": 26.891867555646954,
+          "dI_C_std": 0.028927673613821606,
+          "dI_T_std": 0.12072623797559028,
+          "dI_C_skewness": 0.07139042870459683,
+          "dI_T_skewness": 0.0,
+          "dI_C_kurtosis": 1.8107084800489475,
+          "dI_T_kurtosis": 1.8002675731503808,
+          "dI_dI_devide_dt": -0.15579728426915998,
+          "dI_entropy": 2.7700255197666683,
+          "Charge_energy": 7.237551546893115,
+          "Charge_Q": 1.830408934590328,
+          "Charge_t_mean": 20.727500000000003,
+          "Charge_V_mean": 4.100010355298115,
+          "Charge_C_mean": 2.6314852234119077,
+          "Charge_T_mean": 25.142491661863495,
+          "Charge_C_std": 2.60857116006168,
+          "Charge_V_std": 0.15718974192762017,
+          "Charge_T_std": 3.2849561197701167,
+          "Charge_C_skewness": 0.34970999890427995,
+          "Charge_V_skewness": -1.2539806579547421,
+          "Charge_T_skewness": 0.19269319113274475,
+          "Charge_C_kurtosis": 1.2809105067332494,
+          "Charge_V_kurtosis": 3.1423900264392257,
+          "Charge_T_kurtosis": 1.6426709790335954
+        }
+      },
+      {
+        "batch": 6,
+        "profiles": 8,
+        "cycles": 8344,
+        "feature_medians": {
+          "CC_energy": 2.236582733246913,
+          "CC_Q": 0.5541077378978725,
+          "CC_t_mean": 4.251422817835012,
+          "CC_V_mean": 4.03861237526811,
+          "CC_T_mean": 25.31841282985886,
+          "CC_V_std": 0.08880585952340245,
+          "CC_T_std": 0.37748070830131314,
+          "CC_V_skewness": 0.15702756797612946,
+          "CC_T_skewness": -0.3327688517421963,
+          "CC_V_kurtosis": 1.7906809199962324,
+          "CC_T_kurtosis": 1.9560146347274507,
+          "CC_CCCT": 8.502866612450866,
+          "CC_entropy": 2.7573893095461557,
+          "dV_energy": 0.8755394294884493,
+          "dV_Q": 0.2218269111331205,
+          "dV_t_mean": 1.732832891280289,
+          "dV_V_mean": 3.946742956673971,
+          "dV_T_mean": 24.916123577670472,
+          "dV_V_std": 0.028950937483554186,
+          "dV_T_std": 0.20236360251058472,
+          "dV_V_skewness": 0.14221254705245656,
+          "dV_T_skewness": -0.12010611267872162,
+          "dV_V_kurtosis": 1.8171898910927067,
+          "dV_T_kurtosis": 1.841286553101988,
+          "dV_dV_devide_dt": 0.02878163804730169,
+          "dV_entropy": 2.764435814672753,
+          "CV_energy": 1.3580513704253128,
+          "CV_Q": 0.32334901435234253,
+          "CV_t_mean": 13.30359807527477,
+          "CV_C_mean": 0.7378413062104706,
+          "CV_T_mean": 22.418370017050034,
+          "CV_C_std": 0.8439928061915821,
+          "CV_T_std": 1.6991830941924209,
+          "CV_C_skewness": 1.7898432986732926,
+          "CV_T_skewness": 0.6151814209599098,
+          "CV_C_kurtosis": 5.535696975024591,
+          "CV_T_kurtosis": 1.9741815213212877,
+          "CV_CVCT": 26.60719615054954,
+          "CV_entropy": 1.9082430396472496,
+          "dI_energy": 0.043328687226882295,
+          "dI_Q": 0.010316115070993859,
+          "dI_t_mean": 0.3261426515154287,
+          "dI_C_mean": 0.948900900247968,
+          "dI_T_mean": 23.98555817339868,
+          "dI_C_std": 0.028964968900094534,
+          "dI_T_std": 0.06739187351703865,
+          "dI_C_skewness": 0.04627326188209312,
+          "dI_T_skewness": 0.0,
+          "dI_C_kurtosis": 1.802701233211391,
+          "dI_T_kurtosis": 1.825659779363295,
+          "dI_dI_devide_dt": -0.15330714880096127,
+          "dI_entropy": 2.7715037767171404,
+          "Charge_energy": 3.579116184581677,
+          "Charge_Q": 0.873499053790509,
+          "Charge_t_mean": 17.9125,
+          "Charge_V_mean": 4.160663336069158,
+          "Charge_C_mean": 1.4915724076001498,
+          "Charge_T_mean": 23.092670518771826,
+          "Charge_C_std": 1.5622182794517014,
+          "Charge_V_std": 0.08264630748064855,
+          "Charge_T_std": 1.8675369586727828,
+          "Charge_C_skewness": 0.7276379032222605,
+          "Charge_V_skewness": -1.9610641033101235,
+          "Charge_T_skewness": 0.036431214846490756,
+          "Charge_C_kurtosis": 1.771526624392709,
+          "Charge_V_kurtosis": 5.377310326993117,
+          "Charge_T_kurtosis": 1.3912086414379778
+        }
+      }
+    ],
+    "interpretation": "Descriptive. Batch is confounded with protocol and cell cohort; no causal protocol effect is inferred."
+  },
+  "plots": [
+    {
+      "path": "reports/member4/aging_figures/Charge_C_mean.png",
+      "features": [
+        "Charge_C_mean",
+        "Charge_energy",
+        "Charge_C_skewness"
+      ],
+      "description": "Per-cell feature trajectory versus cycle ordinal and stored capacity label; colors distinguish batches.",
+      "normalization": "None; no unverified initial-capacity normalization was applied."
+    },
+    {
+      "path": "reports/member4/aging_figures/Charge_energy.png",
+      "features": [
+        "Charge_C_mean",
+        "Charge_energy",
+        "Charge_C_skewness"
+      ],
+      "description": "Per-cell feature trajectory versus cycle ordinal and stored capacity label; colors distinguish batches.",
+      "normalization": "None; no unverified initial-capacity normalization was applied."
+    },
+    {
+      "path": "reports/member4/aging_figures/Charge_C_skewness.png",
+      "features": [
+        "Charge_C_mean",
+        "Charge_energy",
+        "Charge_C_skewness"
+      ],
+      "description": "Per-cell feature trajectory versus cycle ordinal and stored capacity label; colors distinguish batches.",
+      "normalization": "None; no unverified initial-capacity normalization was applied."
+    }
+  ],
+  "method_limitations": [
+    "Candidate segments and feature equations remain source-unverified.",
+    "Cycle ordering is the prepared MAT array ordinal; this analysis does not claim correspondence to Excel workbook rows.",
+    "Within-profile Spearman correlations avoid pooled between-cell correlation confounding but do not establish causality.",
+    "Batch differences may reflect protocol, cohort, or other confounded variables.",
+    "Capacity is not normalized to verified initial capacity; no SOH values are inferred.",
+    "Potentially informative features are screening candidates, not validated predictors."
+  ]
+}

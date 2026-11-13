@@ -9,12 +9,14 @@ from digital_twin.degradation_estimator import DegradationEstimator
 from pathlib import Path
 from digital_twin.sequential_replay import replay_battery
 from digital_twin.agentic_controller import run_agentic_maintenance_loop
+from backend.formula_explorer_api import router as formula_explorer_router
 
 app = FastAPI(
     title="VoltTwin API",
     description="API for EV battery SOH simulation and maintenance scenarios.",
     version="0.1.0",
 )
+app.include_router(formula_explorer_router)
 
 class SOHFeatureInput(BaseModel):
     features: list[float] = Field(

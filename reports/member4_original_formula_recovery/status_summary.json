@@ -1,0 +1,12 @@
+{
+  "feature_count": 67,
+  "entropy_feature_count": 4,
+  "status_counts": {
+    "Source verified": 0,
+    "Partially verified": 0,
+    "Candidate/unverified": 63,
+    "Original formula unavailable": 4
+  },
+  "source_verified_features": [],
+  "original_equations_recovered": 0
+}

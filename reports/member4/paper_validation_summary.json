@@ -1,0 +1,255 @@
+{
+  "title": "Member 4 Paper-Based Scientific Validation Phase 2",
+  "paper": {
+    "title": "Physics-informed neural network for lithium-ion battery degradation stable modeling and prognosis",
+    "doi": "10.1038/s41467-024-48779-z",
+    "article_url": "https://doi.org/10.1038/s41467-024-48779-z",
+    "supplement_url": "https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-024-48779-z/MediaObjects/41467_2024_48779_MOESM1_ESM.pdf",
+    "evidence_inspected": [
+      "Publisher-hosted full article, including Feature extraction, SOH estimation, Discussion, and Methods",
+      "Main-text Figure 3 visual labels for feature IDs 1-16",
+      "Publisher Supplementary Information, 15 pages; Supplementary Note 2 printed page 6 equations"
+    ],
+    "limitations": [
+      "Paper defines its own 16-feature method and does not claim to generate the SOHbenchmark 67-feature workbook schema.",
+      "Supplementary prose lists duration before accumulated charge while Figure 3 labels feature 5 as CC Q and feature 6 as CC charge time; numbering follows the figure and the mismatch is disclosed.",
+      "Current interval is printed as 0.5 A to 0.1 A; coverage counting uses ordered inclusive bounds [0.1, 0.5] A, without implying endpoint inclusion in the source."
+    ]
+  },
+  "paper_claim_classification": {
+    "allowed_statuses": [
+      "SUPPORTED BY PAPER",
+      "NOT SPECIFIED",
+      "NEEDS IMPLEMENTATION",
+      "NOT APPLICABLE"
+    ],
+    "counts": {
+      "SUPPORTED BY PAPER": 16,
+      "NOT SPECIFIED": 1,
+      "NEEDS IMPLEMENTATION": 1,
+      "NOT APPLICABLE": 1
+    },
+    "items": [
+      {
+        "claim": "The paper proposes 16 numbered charging features.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Main text Feature extraction and Figure 3."
+      },
+      {
+        "claim": "XJTU voltage window is [V_end-0.2, V_end], with a 4.2 V cutoff.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Main text Feature extraction and Data generation."
+      },
+      {
+        "claim": "Current values between 0.5 A and 0.1 A are selected during CV.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Main text Feature extraction; Supplementary Note 2."
+      },
+      {
+        "claim": "Arithmetic mean is defined for selected curve values.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Supplementary Note 2, equation (1)."
+      },
+      {
+        "claim": "Sample standard deviation uses denominator n-1.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Supplementary Note 2, equation (2)."
+      },
+      {
+        "claim": "The paper prints its skewness and kurtosis central-moment formulas.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Supplementary Note 2, equations (3)-(4)."
+      },
+      {
+        "claim": "Selected-window duration is t_end-t_start.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Supplementary Note 2, equation (5)."
+      },
+      {
+        "claim": "Accumulated charge is the integral of I dt over a selected interval.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Supplementary Note 2, equation (6)."
+      },
+      {
+        "claim": "The selected voltage slope is the endpoint voltage change divided by duration.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Supplementary Note 2, equation (7)."
+      },
+      {
+        "claim": "The generic curve entropy expression is -sum(p_i log(p_i)).",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Supplementary Note 2, equation (8); probability construction remains unspecified."
+      },
+      {
+        "claim": "A current-slope feature is included in the 16 inputs.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Main text and Figure 3, feature 15; exact equation is not specified."
+      },
+      {
+        "claim": "Paper min-max normalizes its 16 features to [-1, 1].",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Main text SOH estimation."
+      },
+      {
+        "claim": "Paper SOH is cycle capacity divided by nominal capacity.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Methods equation (5); XJTU nominal capacity stated as 2 Ah."
+      },
+      {
+        "claim": "Paper XJTU experiment has 55 LISHEN NCM cells and six protocols.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Main text Data generation and Supplementary Note 1."
+      },
+      {
+        "claim": "Paper model evaluation includes 387 batteries, 310705 samples, approximately 6:2:2 battery splits, and 10 repetitions.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Abstract and main Results."
+      },
+      {
+        "claim": "The paper reports 0.87% MAPE in its abstract.",
+        "status": "SUPPORTED BY PAPER",
+        "evidence": "Paper abstract; this is not a VoltTwin result."
+      },
+      {
+        "claim": "Paper specifies missing-data handling, endpoint inclusion, exact time units, current slope equation, entropy estimator, and scaler fit scope.",
+        "status": "NOT SPECIFIED",
+        "evidence": "Not fully specified in the inspected article or supplement."
+      },
+      {
+        "claim": "An exact paper feature extraction mode exists in VoltTwin.",
+        "status": "NEEDS IMPLEMENTATION",
+        "evidence": "Current Member 4 implementation contains the 67 candidate methods only; no Paper-16 implementation was added because it cannot validate the original 67."
+      },
+      {
+        "claim": "The 16 paper features are the source definitions of the SOHbenchmark XJTU 67 workbook columns.",
+        "status": "NOT APPLICABLE",
+        "evidence": "No mapping exists in the paper, supplement, or author 16-column input schema; the schemas are distinct."
+      }
+    ]
+  },
+  "feature_mapping": {
+    "paper_feature_count": 16,
+    "feature_ids_follow": "Main-text Figure 3 visible feature labels.",
+    "exact_equivalences_to_volttwin_67": 0,
+    "partial_mathematical_similarities": 16,
+    "original_67_features_verified_by_this_paper": 0,
+    "mapping_file": "paper_feature_mapping.csv",
+    "notes": [
+      "Candidate means and moments use 257-point uniform-time interpolation and population ddof=0 standard deviation; paper statistics are defined on selected curve values and specify n-1 standard deviation.",
+      "Paper voltage and current windows differ from the candidate CC, CV, dV, and dI windows.",
+      "The candidate 16-bin histogram entropy is not established by the paper's generic entropy equation.",
+      "Paper time units and charge integration implementation are not specified; current-slope equation is not given."
+    ]
+  },
+  "local_prepared_data_window_coverage": {
+    "coverage_script": "scripts/member4_xjtu/paper_window_coverage.py",
+    "results_csv": "paper_validation_results.csv",
+    "scope": "Inclusive raw value-band coverage only; no feature values were computed or compared.",
+    "profiles": 55,
+    "prepared_cycles": 27535,
+    "samples_per_prepared_cycle": 128,
+    "voltage_window": {
+      "band": "[4.0, 4.2] V",
+      "cycles_with_at_least_one_sample": 27535,
+      "cycles_with_at_least_two_samples": 27485,
+      "cycles_with_fewer_than_two_samples": 50,
+      "feature_values_computed": false
+    },
+    "current_value_band": {
+      "band_used_for_coverage": "[0.1, 0.5] A",
+      "cycles_with_at_least_one_sample": 27535,
+      "cycles_with_at_least_two_samples": 27535,
+      "cv_phase_filter_applied": false,
+      "reason_cv_filter_not_applied": "No authoritative CV phase boundary is available in the prepared local representation.",
+      "feature_values_computed": false
+    },
+    "lineage_limitations": [
+      "Local SOHbenchmark traces contain 128 prepared samples per cycle; exact lineage from the original acquisition stream is undocumented.",
+      "Matching the paper's 55 profile count does not prove that the local prepared records are cycle-identical to the paper's feature-generation inputs.",
+      "No authoritative cycle key links the prepared MAT traces to the 67-feature workbook rows."
+    ]
+  },
+  "feature_value_validation": {
+    "performed": false,
+    "reason": "No exact feature/window/statistic equivalence and no identity-mapped paper feature reference values exist for the 67 candidates.",
+    "mae": null,
+    "relative_error": null,
+    "unit_discrepancies": null,
+    "result": "No feature-value comparison is scientifically justified. The results CSV is only sample-window coverage."
+  },
+  "paper_dataset_and_method": {
+    "xjtu_battery_count": 55,
+    "chemistry": "Lithium nickel-cobalt-manganese oxide (NCM), LISHEN",
+    "nominal_capacity_ah": 2.0,
+    "nominal_voltage_v": 3.6,
+    "temperature": "Room temperature",
+    "protocol_batches": 6,
+    "datasets": [
+      {
+        "name": "XJTU",
+        "reported_cells": 55,
+        "chemistry": "LISHEN NCM",
+        "details": "2 Ah, 3.6 V nominal; room temperature; 4.2/2.5 V charge/discharge cutoffs; six charge/discharge protocols."
+      },
+      {
+        "name": "TJU",
+        "reported_cells": null,
+        "chemistry": "NCA, NCM, and NCM+NCA",
+        "details": "Nominal capacities 3.5 Ah for NCA and NCM, 2.5 Ah for NCM+NCA; stated cutoffs 2.65-4.2 V for NCA and 2.5-4.2 V for NCM variants; 25, 35, and 45 degC temperature sets and 0.25 C-4 C rates."
+      },
+      {
+        "name": "HUST",
+        "reported_cells": 77,
+        "chemistry": "A123 LFP/graphite",
+        "details": "1.1 Ah and 3.3 V nominal; 30 degC; identical charge protocol with multi-stage discharge protocols."
+      },
+      {
+        "name": "MIT",
+        "reported_cells": null,
+        "chemistry": "LFP chemistry, described as the same chemistry as HUST",
+        "details": "Fast charge with one- or two-step policies, 4 C discharge, and 30 degC."
+      }
+    ],
+    "all_paper_datasets_batteries": 387,
+    "all_paper_datasets_samples": 310705,
+    "paper_soh_definition": "Cycle capacity Q^k divided by nominal capacity Q^0.",
+    "paper_feature_normalization": "Min-max scaling to [-1, 1]; scaler fit scope not specified.",
+    "paper_abstract_mape_percent": 0.87,
+    "mape_is_volttwin_result": false
+  },
+  "tests_and_checks": [
+    {
+      "command": ".\\.venv\\Scripts\\python.exe -m scripts.member4_xjtu.paper_window_coverage",
+      "result": "Passed; wrote 12 batch/window coverage rows after inspecting all 27535 prepared cycles.",
+      "scope": "Coverage audit only; no candidate feature values compared."
+    },
+    {
+      "command": "Synthetic inclusive-boundary check for _sample_counts",
+      "result": "Passed; values exactly at 4.0/4.2 V and 0.1/0.5 A were counted."
+    },
+    {
+      "command": "load_batch(1, nonexistent_data_root)",
+      "result": "Passed; raised FileNotFoundError explicitly."
+    },
+    {
+      "command": "Pylance file syntax and textDocument/diagnostic for paper_window_coverage.py",
+      "result": "Passed; no syntax errors and no diagnostics."
+    },
+    {
+      "command": "Audit structure checks",
+      "result": "Passed; 16 ordered feature rows, 12 coverage rows, JSON status counts consistent with its claim list, and internal Markdown links resolve."
+    },
+    {
+      "command": "git diff --check",
+      "result": "Passed for tracked changes; newly created files were checked separately for trailing whitespace."
+    }
+  ],
+  "created_files": [
+    "reports/member4/paper_methodology_comparison.md",
+    "reports/member4/paper_feature_mapping.csv",
+    "reports/member4/paper_validation_results.csv",
+    "reports/member4/paper_validation_summary.json",
+    "scripts/member4_xjtu/paper_window_coverage.py"
+  ],
+  "recommended_next_task": "Obtain the SOHbenchmark workbook-generation source plus a unique cycle-to-row key and the original-to-128-point preprocessing lineage; then independently reproduce one mapped original CC_Q workbook value. Keep the 2024 paper's 16-feature method separate."
+}

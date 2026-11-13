@@ -1,0 +1,3518 @@
+{
+  "analysis": "Descriptive audit of the current candidate extractor on local prepared XJTU charge MAT data.",
+  "data_root": "C:\\Users\\acer\\Desktop\\VoltTwin\\reference\\SOHbenchmark\\data\\XJTU",
+  "original_benchmark_reproduction": false,
+  "prediction_experiment_run": false,
+  "mathematical_validation_summary": {
+    "candidate_operations_checked_on_synthetic_signals": 63,
+    "entropy_proxy_implementations_checked": 4,
+    "candidate_outputs_checked_total": 67,
+    "candidate_outputs_not_checked": 0,
+    "original_benchmark_formulas_verified": 0,
+    "interpretation": "Synthetic arithmetic checks validate the implemented candidate operations only; the entropy originals, source formulas, and authoritative segment definitions remain unverified."
+  },
+  "confirmed_implementation_correction": {
+    "file": "scripts/member4_xjtu/segments.py",
+    "defect": "CC interval construction computed interpolated threshold crossings but clamped starts to the first selected sample and ends to the last selected sample, potentially shortening or discarding positive-duration intervals.",
+    "correction": "Use the latest applicable interpolated crossing for entry and the earliest applicable interpolated crossing for exit.",
+    "feature_equations_changed": false,
+    "regression_expectations": {
+      "current_threshold_crossing_start_min": 0.5,
+      "voltage_cutoff_crossing_end_min": 0.99
+    }
+  },
+  "software_validation_evidence": {
+    "synthetic_math_tests": {
+      "command": ".\\.venv\\Scripts\\python.exe -m pytest -q tests\\member4_xjtu\\test_independent_mathematical_validation.py",
+      "result": "15 passed"
+    },
+    "focused_member4_tests": {
+      "command": ".\\.venv\\Scripts\\python.exe -m pytest -q tests\\member4_xjtu",
+      "result": "38 passed"
+    },
+    "formula_explorer_api_tests": {
+      "command": ".\\.venv\\Scripts\\python.exe -m pytest -q tests\\test_formula_explorer_api.py",
+      "result": "13 passed"
+    },
+    "full_repository_tests": {
+      "command": ".\\.venv\\Scripts\\python.exe -m pytest -q",
+      "result": "119 passed"
+    },
+    "frontend_build": {
+      "command": "Set-Location frontend; npm run build",
+      "result": "passed with a non-blocking Vite large-chunk warning"
+    },
+    "frontend_lint": {
+      "command": "Set-Location frontend; npm run lint",
+      "result": "passed"
+    },
+    "git_diff_check": "passed"
+  },
+  "target_for_descriptive_associations": {
+    "field": "CycleTrace.capacity_label",
+    "interpretation": "Measured capacity label used as an aging/SOH proxy only; the inspected local loader does not explicitly declare its unit or normalization lineage.",
+    "predictor": false
+  },
+  "visualization_note": "No feature-versus-SOH plot was generated because the available field is an unnormalized capacity label with unresolved unit/lineage; descriptive correlations are reported against that field explicitly as a proxy instead.",
+  "dataset_integrity": {
+    "profiles": 55,
+    "prepared_cycles": 27535,
+    "workbook_rows": 26937,
+    "prepared_cycle_minus_workbook_row_count": 598,
+    "sample_count_distribution": {
+      "128": 27535
+    },
+    "nonfinite_input_values": 0,
+    "nonpositive_time_intervals": 0,
+    "cycles_with_nonuniform_time_grids": 0,
+    "missing_workbook_cells_including_labels": 0
+  },
+  "leakage_audit": {
+    "extractor_reads_capacity_label": false,
+    "capacity_label_used_to_calculate_features": false,
+    "capacity_integral_features_are_direct_target_leakage": false,
+    "capacity_integral_note": "Charge integrals use measured current and elapsed time and may be physically associated with capacity; this is not direct reuse of the capacity_label field.",
+    "prediction_inputs_used": false
+  },
+  "batch_cohort_note": "Differences in feature distributions across batch labels are descriptive. They cannot be attributed to charging protocol alone because batch, cell composition, and other factors may be confounded.",
+  "batches": [
+    {
+      "batch": 1,
+      "profile_count": 8,
+      "prepared_cycle_count": 3211,
+      "workbook_row_count": 3211,
+      "workbook_missing_cells": 0,
+      "nonfinite_input_values": 0,
+      "nonpositive_time_intervals": 0,
+      "cycles_with_nonuniform_time_grids": 0,
+      "candidate_unavailable_counts_by_feature": {},
+      "feature_medians": {
+        "CC_energy": 6.147240637026297,
+        "CC_Q": 1.5910200453956962,
+        "CC_t_mean": 11.933787776126925,
+        "CC_V_mean": 3.865764175537347,
+        "CC_T_mean": 28.089672269399593,
+        "CC_V_std": 0.15394661711428342,
+        "CC_T_std": 1.2072265322481877,
+        "CC_V_skewness": 0.2894347946267593,
+        "CC_T_skewness": -0.3781825438285066,
+        "CC_V_kurtosis": 2.517103883583936,
+        "CC_T_kurtosis": 1.8940746478843613,
+        "CC_CCCT": 23.86757555225385,
+        "CC_entropy": 2.5196298918145357,
+        "dV_energy": 0.8900224130013092,
+        "dV_Q": 0.2255052318771132,
+        "dV_t_mean": 1.691244464324391,
+        "dV_V_mean": 3.94651133379218,
+        "dV_T_mean": 28.88990390821085,
+        "dV_V_std": 0.02904090566083204,
+        "dV_T_std": 0.1403459242219931,
+        "dV_V_skewness": 0.14733428630426593,
+        "dV_T_skewness": -0.05276428847511672,
+        "dV_V_kurtosis": 1.8157032770840014,
+        "dV_T_kurtosis": 1.8862242404996128,
+        "dV_dV_devide_dt": 0.02956402876976971,
+        "dV_entropy": 2.764630448346662,
+        "CV_energy": 1.338822171489246,
+        "CV_Q": 0.31876970389558656,
+        "CV_t_mean": 12.993347660244837,
+        "CV_C_mean": 0.7151680596480787,
+        "CV_T_mean": 26.24699946851923,
+        "CV_C_std": 0.810376913112459,
+        "CV_T_std": 1.966232482533213,
+        "CV_C_skewness": 1.913358511877949,
+        "CV_T_skewness": 0.6914526247833903,
+        "CV_C_kurtosis": 6.146792466360102,
+        "CV_T_kurtosis": 2.0878246856257174,
+        "CV_CVCT": 25.986695320489677,
+        "CV_entropy": 1.881614729261759,
+        "dI_energy": 0.04616166037051238,
+        "dI_Q": 0.010991394916546594,
+        "dI_t_mean": 0.3477107277116235,
+        "dI_C_mean": 0.9481860877157589,
+        "dI_T_mean": 27.538504796981858,
+        "dI_C_std": 0.028939902176127595,
+        "dI_T_std": 0.09057907168395289,
+        "dI_C_skewness": 0.07633063865698524,
+        "dI_T_skewness": 3.801192423958055e-14,
+        "dI_C_kurtosis": 1.8075842882987367,
+        "dI_T_kurtosis": 1.8002363121937413,
+        "dI_dI_devide_dt": -0.14379769163023323,
+        "dI_entropy": 2.7697802556280537,
+        "Charge_energy": 7.499621369950102,
+        "Charge_Q": 1.9125268645347586,
+        "Charge_t_mean": 25.0905,
+        "Charge_V_mean": 4.038795669058313,
+        "Charge_C_mean": 2.298908229516884,
+        "Charge_T_mean": 27.15121050761254,
+        "Charge_C_std": 1.7341482512049977,
+        "Charge_V_std": 0.19908374868476134,
+        "Charge_T_std": 1.986733303695715,
+        "Charge_C_skewness": -0.1487850480660387,
+        "Charge_V_skewness": -0.7715402753510577,
+        "Charge_T_skewness": -0.17863505834138574,
+        "Charge_C_kurtosis": 1.1627248693356573,
+        "Charge_V_kurtosis": 2.1842106822080156,
+        "Charge_T_kurtosis": 1.641515806702842
+      }
+    },
+    {
+      "batch": 2,
+      "profile_count": 15,
+      "prepared_cycle_count": 3727,
+      "workbook_row_count": 3727,
+      "workbook_missing_cells": 0,
+      "nonfinite_input_values": 0,
+      "nonpositive_time_intervals": 0,
+      "cycles_with_nonuniform_time_grids": 0,
+      "candidate_unavailable_counts_by_feature": {},
+      "feature_medians": {
+        "CC_energy": 5.887366593585745,
+        "CC_Q": 1.5053088598516462,
+        "CC_t_mean": 7.527315171729468,
+        "CC_V_mean": 3.9111981744026827,
+        "CC_T_mean": 31.01131973798789,
+        "CC_V_std": 0.14144402377704998,
+        "CC_T_std": 2.8452304897022413,
+        "CC_V_skewness": 0.07673254556491861,
+        "CC_T_skewness": -0.38334300778883273,
+        "CC_V_kurtosis": 2.8630362792671367,
+        "CC_T_kurtosis": 1.8831458002241301,
+        "CC_CCCT": 15.054630343458935,
+        "CC_entropy": 2.4473503845211737,
+        "dV_energy": 1.222503037857135,
+        "dV_Q": 0.3098698585742265,
+        "dV_t_mean": 1.5493219687613153,
+        "dV_V_mean": 3.9453254351289764,
+        "dV_T_mean": 32.47963320497092,
+        "dV_V_std": 0.02882221450166318,
+        "dV_T_std": 0.4868729257156708,
+        "dV_V_skewness": 0.19917776096032755,
+        "dV_T_skewness": -0.08267429864836609,
+        "dV_V_kurtosis": 1.8473530587294553,
+        "dV_T_kurtosis": 1.819881777028564,
+        "dV_dV_devide_dt": 0.032272181643415984,
+        "dV_entropy": 2.7590171754172497,
+        "CV_energy": 1.6058335425917738,
+        "CV_Q": 0.3823600287222016,
+        "CV_t_mean": 13.002408391538221,
+        "CV_C_mean": 0.8914810627787493,
+        "CV_T_mean": 28.010672267528726,
+        "CV_C_std": 1.1753497747695936,
+        "CV_T_std": 3.6276257610006892,
+        "CV_C_skewness": 2.222448212619754,
+        "CV_T_skewness": 0.7023764262740999,
+        "CV_C_kurtosis": 7.559327657081785,
+        "CV_T_kurtosis": 2.1025050571642856,
+        "CV_CVCT": 26.004816783076443,
+        "CV_entropy": 1.6891734930822304,
+        "dI_energy": 0.041620080344793475,
+        "dI_Q": 0.009910014844705337,
+        "dI_t_mean": 0.31350744989011053,
+        "dI_C_mean": 0.9487796759094567,
+        "dI_T_mean": 30.234149932059587,
+        "dI_C_std": 0.028959671266855606,
+        "dI_T_std": 0.1488276705851708,
+        "dI_C_skewness": 0.049392173274713215,
+        "dI_T_skewness": 6.155594637670335e-14,
+        "dI_C_kurtosis": 1.8044260416881017,
+        "dI_T_kurtosis": 1.8046618210366123,
+        "dI_dI_devide_dt": -0.1594858432152914,
+        "dI_entropy": 2.771031409970557,
+        "Charge_energy": 7.523159258275389,
+        "Charge_Q": 1.8952104177725788,
+        "Charge_t_mean": 20.596000000000004,
+        "Charge_V_mean": 4.0934586109938405,
+        "Charge_C_mean": 2.7624801348981904,
+        "Charge_T_mean": 29.11817272466544,
+        "Charge_C_std": 2.6328942936674777,
+        "Charge_V_std": 0.1646736822556486,
+        "Charge_T_std": 3.6642531505680767,
+        "Charge_C_skewness": 0.30899047157093273,
+        "Charge_V_skewness": -1.2844162378307376,
+        "Charge_T_skewness": 0.1826660063069497,
+        "Charge_C_kurtosis": 1.214883110746315,
+        "Charge_V_kurtosis": 3.4066048540809066,
+        "Charge_T_kurtosis": 1.6115749911516724
+      }
+    },
+    {
+      "batch": 3,
+      "profile_count": 8,
+      "prepared_cycle_count": 4608,
+      "workbook_row_count": 4608,
+      "workbook_missing_cells": 0,
+      "nonfinite_input_values": 0,
+      "nonpositive_time_intervals": 0,
+      "cycles_with_nonuniform_time_grids": 0,
+      "candidate_unavailable_counts_by_feature": {},
+      "feature_medians": {
+        "CC_energy": 6.022464054557703,
+        "CC_Q": 1.5574056298896692,
+        "CC_t_mean": 11.680977815784786,
+        "CC_V_mean": 3.862338929217871,
+        "CC_T_mean": 28.472376101970866,
+        "CC_V_std": 0.16341356750974106,
+        "CC_T_std": 1.3161699427783247,
+        "CC_V_skewness": 0.08590898435539956,
+        "CC_T_skewness": 0.30611627259959595,
+        "CC_V_kurtosis": 2.6986863662155587,
+        "CC_T_kurtosis": 2.139864812504287,
+        "CC_CCCT": 23.361955631569572,
+        "CC_entropy": 2.4976741900982904,
+        "dV_energy": 0.8912729546354982,
+        "dV_Q": 0.22583009132241955,
+        "dV_t_mean": 1.6936985174741832,
+        "dV_V_mean": 3.946691269437941,
+        "dV_T_mean": 28.25372781792388,
+        "dV_V_std": 0.02901301155681183,
+        "dV_T_std": 0.124265161351894,
+        "dV_V_skewness": 0.13962894716546553,
+        "dV_T_skewness": -0.013698319456805098,
+        "dV_V_kurtosis": 1.8170538583528235,
+        "dV_T_kurtosis": 1.9000009448905604,
+        "dV_dV_devide_dt": 0.02952119260709898,
+        "dV_entropy": 2.765558802463799,
+        "CV_energy": 1.4106463399870477,
+        "CV_Q": 0.3358825276834745,
+        "CV_t_mean": 14.48088773304181,
+        "CV_C_mean": 0.7090017725460543,
+        "CV_T_mean": 24.09997086192013,
+        "CV_C_std": 0.809224943950083,
+        "CV_T_std": 2.144340910257223,
+        "CV_C_skewness": 1.9287292947823507,
+        "CV_T_skewness": 0.737317687541273,
+        "CV_C_kurtosis": 6.23159655277444,
+        "CV_T_kurtosis": 2.1634683019067893,
+        "CV_CVCT": 28.96177546608362,
+        "CV_entropy": 1.8674158594379302,
+        "dI_energy": 0.04907275657209821,
+        "dI_Q": 0.011684227273623919,
+        "dI_t_mean": 0.3695186058615185,
+        "dI_C_mean": 0.9485610754845715,
+        "dI_T_mean": 26.44995304952251,
+        "dI_C_std": 0.02894355618234721,
+        "dI_T_std": 0.10425435087632007,
+        "dI_C_skewness": 0.06020360167036076,
+        "dI_T_skewness": 3.448563497476426e-14,
+        "dI_C_kurtosis": 1.8074496087524892,
+        "dI_T_kurtosis": 1.7999636627907085,
+        "dI_dI_devide_dt": -0.13531118381295165,
+        "dI_entropy": 2.770586909162649,
+        "Charge_energy": 7.458683251434016,
+        "Charge_Q": 1.899238169731598,
+        "Charge_t_mean": 26.069000000000003,
+        "Charge_V_mean": 4.04977872807967,
+        "Charge_C_mean": 2.1726529318133236,
+        "Charge_T_mean": 25.799123481433515,
+        "Charge_C_std": 1.7327204605880115,
+        "Charge_V_std": 0.2015654651895582,
+        "Charge_T_std": 2.385398557828308,
+        "Charge_C_skewness": -0.010365619048436824,
+        "Charge_V_skewness": -0.9482844825286034,
+        "Charge_T_skewness": -0.10416473535329815,
+        "Charge_C_kurtosis": 1.162403649538468,
+        "Charge_V_kurtosis": 2.643448367301775,
+        "Charge_T_kurtosis": 1.6269751086088144
+      }
+    },
+    {
+      "batch": 4,
+      "profile_count": 8,
+      "prepared_cycle_count": 5670,
+      "workbook_row_count": 5670,
+      "workbook_missing_cells": 0,
+      "nonfinite_input_values": 0,
+      "nonpositive_time_intervals": 0,
+      "cycles_with_nonuniform_time_grids": 0,
+      "candidate_unavailable_counts_by_feature": {},
+      "feature_medians": {
+        "CC_energy": 5.731663023917315,
+        "CC_Q": 1.477160661690688,
+        "CC_t_mean": 11.079454705277886,
+        "CC_V_mean": 3.8795400471962225,
+        "CC_T_mean": 26.054439996802465,
+        "CC_V_std": 0.15167655172863165,
+        "CC_T_std": 1.141213897385177,
+        "CC_V_skewness": 0.35003262247951966,
+        "CC_T_skewness": -0.18645627714604115,
+        "CC_V_kurtosis": 2.3281629645331687,
+        "CC_T_kurtosis": 2.014764474367631,
+        "CC_CCCT": 22.158909410555772,
+        "CC_entropy": 2.618752365827838,
+        "dV_energy": 0.9064576442001799,
+        "dV_Q": 0.22968554110870906,
+        "dV_t_mean": 1.722564981508967,
+        "dV_V_mean": 3.9465414282777256,
+        "dV_T_mean": 26.284235064961408,
+        "dV_V_std": 0.02900921042720097,
+        "dV_T_std": 0.12420328645913858,
+        "dV_V_skewness": 0.14599516722575961,
+        "dV_T_skewness": -0.013807372282962986,
+        "dV_V_kurtosis": 1.8190020881692126,
+        "dV_T_kurtosis": 1.8992220076784827,
+        "dV_dV_devide_dt": 0.029026481197507156,
+        "dV_entropy": 2.7648353351361017,
+        "CV_energy": 1.4419454390735653,
+        "CV_Q": 0.3433209348152748,
+        "CV_t_mean": 14.588116644213628,
+        "CV_C_mean": 0.7153707976414378,
+        "CV_T_mean": 23.038021682738027,
+        "CV_C_std": 0.8169236987923714,
+        "CV_T_std": 1.8146284563789807,
+        "CV_C_skewness": 1.8995819994377974,
+        "CV_T_skewness": 0.7290582470357687,
+        "CV_C_kurtosis": 6.079120020781252,
+        "CV_T_kurtosis": 2.1396095854632726,
+        "CV_CVCT": 29.176233288427262,
+        "CV_entropy": 1.871820049564185,
+        "dI_energy": 0.048762660637857835,
+        "dI_Q": 0.011610157294728054,
+        "dI_t_mean": 0.3670017960975791,
+        "dI_C_mean": 0.9489482059510876,
+        "dI_T_mean": 24.660535917135334,
+        "dI_C_std": 0.02896026091783311,
+        "dI_T_std": 0.08745540125503157,
+        "dI_C_skewness": 0.04303423488510462,
+        "dI_T_skewness": 5.7976651613561e-14,
+        "dI_C_kurtosis": 1.8046486767883854,
+        "dI_T_kurtosis": 1.8075586825598187,
+        "dI_dI_devide_dt": -0.13623911526581053,
+        "dI_entropy": 2.7715037767171404,
+        "Charge_energy": 7.21553247656102,
+        "Charge_Q": 1.830072741728557,
+        "Charge_t_mean": 25.4965,
+        "Charge_V_mean": 4.061777859955525,
+        "Charge_C_mean": 2.127944471323046,
+        "Charge_T_mean": 24.20887287172267,
+        "Charge_C_std": 1.734140645367706,
+        "Charge_V_std": 0.18758173191544633,
+        "Charge_T_std": 1.9580807939412899,
+        "Charge_C_skewness": 0.03512160413319379,
+        "Charge_V_skewness": -0.91882428369185,
+        "Charge_T_skewness": -0.05665971249959596,
+        "Charge_C_kurtosis": 1.149823464852271,
+        "Charge_V_kurtosis": 2.3036652599151894,
+        "Charge_T_kurtosis": 1.6042926829556923
+      }
+    },
+    {
+      "batch": 5,
+      "profile_count": 8,
+      "prepared_cycle_count": 1975,
+      "workbook_row_count": 1975,
+      "workbook_missing_cells": 0,
+      "nonfinite_input_values": 0,
+      "nonpositive_time_intervals": 0,
+      "cycles_with_nonuniform_time_grids": 0,
+      "candidate_unavailable_counts_by_feature": {
+        "dI_energy": 75,
+        "dI_Q": 75,
+        "dI_t_mean": 75,
+        "dI_C_mean": 75,
+        "dI_T_mean": 75,
+        "dI_C_std": 75,
+        "dI_T_std": 75,
+        "dI_C_skewness": 75,
+        "dI_T_skewness": 75,
+        "dI_C_kurtosis": 75,
+        "dI_T_kurtosis": 75,
+        "dI_dI_devide_dt": 75,
+        "dI_entropy": 75
+      },
+      "feature_medians": {
+        "CC_energy": 5.720690955051536,
+        "CC_Q": 1.4593282671739138,
+        "CC_t_mean": 7.32707208123831,
+        "CC_V_mean": 3.9213310837311477,
+        "CC_T_mean": 27.09331423429073,
+        "CC_V_std": 0.13662462727588556,
+        "CC_T_std": 2.476231008293961,
+        "CC_V_skewness": 0.22302331174282514,
+        "CC_T_skewness": -0.29917523618223446,
+        "CC_V_kurtosis": 2.3788228073373916,
+        "CC_T_kurtosis": 1.8227028749892498,
+        "CC_CCCT": 14.654144162476621,
+        "CC_entropy": 2.5682963023231484,
+        "dV_energy": 1.2523828873510345,
+        "dV_Q": 0.3174266914296366,
+        "dV_t_mean": 1.6152205316448982,
+        "dV_V_mean": 3.9458063232621394,
+        "dV_T_mean": 28.148913003652222,
+        "dV_V_std": 0.028763710090079674,
+        "dV_T_std": 0.49734228531274877,
+        "dV_V_skewness": 0.17883374441553887,
+        "dV_T_skewness": -0.07607226026973983,
+        "dV_V_kurtosis": 1.8477005598610814,
+        "dV_T_kurtosis": 1.819446274998484,
+        "dV_dV_devide_dt": 0.030955525279932738,
+        "dV_entropy": 2.7615580811171574,
+        "CV_energy": 1.5977642391612261,
+        "CV_Q": 0.3803828219788298,
+        "CV_t_mean": 13.43410349507363,
+        "CV_C_mean": 0.8671919483964544,
+        "CV_T_mean": 24.144629696948282,
+        "CV_C_std": 1.1611823192000756,
+        "CV_T_std": 3.193892849469621,
+        "CV_C_skewness": 2.2515032564572555,
+        "CV_T_skewness": 0.7024751013314768,
+        "CV_C_kurtosis": 7.643559451070861,
+        "CV_T_kurtosis": 2.109599536019128,
+        "CV_CVCT": 26.86820699014726,
+        "CV_entropy": 1.6821120243190277,
+        "dI_energy": 0.041204956632907436,
+        "dI_Q": 0.009811171158842669,
+        "dI_t_mean": 0.3106509818498635,
+        "dI_C_mean": 0.9482527018215166,
+        "dI_T_mean": 26.891867555646954,
+        "dI_C_std": 0.028927673613821606,
+        "dI_T_std": 0.12072623797559028,
+        "dI_C_skewness": 0.07139042870459683,
+        "dI_T_skewness": 0.0,
+        "dI_C_kurtosis": 1.8107084800489475,
+        "dI_T_kurtosis": 1.8002675731503808,
+        "dI_dI_devide_dt": -0.15579728426915998,
+        "dI_entropy": 2.7700255197666683,
+        "Charge_energy": 7.237551546893115,
+        "Charge_Q": 1.830408934590328,
+        "Charge_t_mean": 20.727500000000003,
+        "Charge_V_mean": 4.100010355298115,
+        "Charge_C_mean": 2.6314852234119077,
+        "Charge_T_mean": 25.142491661863495,
+        "Charge_C_std": 2.60857116006168,
+        "Charge_V_std": 0.15718974192762017,
+        "Charge_T_std": 3.2849561197701167,
+        "Charge_C_skewness": 0.34970999890427995,
+        "Charge_V_skewness": -1.2539806579547421,
+        "Charge_T_skewness": 0.19269319113274475,
+        "Charge_C_kurtosis": 1.2809105067332494,
+        "Charge_V_kurtosis": 3.1423900264392257,
+        "Charge_T_kurtosis": 1.6426709790335954
+      }
+    },
+    {
+      "batch": 6,
+      "profile_count": 8,
+      "prepared_cycle_count": 8344,
+      "workbook_row_count": 7746,
+      "workbook_missing_cells": 0,
+      "nonfinite_input_values": 0,
+      "nonpositive_time_intervals": 0,
+      "cycles_with_nonuniform_time_grids": 0,
+      "candidate_unavailable_counts_by_feature": {
+        "CC_energy": 109,
+        "CC_Q": 109,
+        "CC_t_mean": 109,
+        "CC_V_mean": 109,
+        "CC_T_mean": 109,
+        "CC_V_std": 109,
+        "CC_T_std": 109,
+        "CC_V_skewness": 109,
+        "CC_T_skewness": 109,
+        "CC_V_kurtosis": 109,
+        "CC_T_kurtosis": 109,
+        "CC_CCCT": 111,
+        "CC_entropy": 109,
+        "dV_energy": 433,
+        "dV_Q": 433,
+        "dV_t_mean": 433,
+        "dV_V_mean": 433,
+        "dV_T_mean": 433,
+        "dV_V_std": 433,
+        "dV_T_std": 433,
+        "dV_V_skewness": 433,
+        "dV_T_skewness": 433,
+        "dV_V_kurtosis": 433,
+        "dV_T_kurtosis": 433,
+        "dV_dV_devide_dt": 433,
+        "dV_entropy": 433
+      },
+      "feature_medians": {
+        "CC_energy": 2.236582733246913,
+        "CC_Q": 0.5541077378978725,
+        "CC_t_mean": 4.251422817835012,
+        "CC_V_mean": 4.03861237526811,
+        "CC_T_mean": 25.31841282985886,
+        "CC_V_std": 0.08880585952340245,
+        "CC_T_std": 0.37748070830131314,
+        "CC_V_skewness": 0.15702756797612946,
+        "CC_T_skewness": -0.3327688517421963,
+        "CC_V_kurtosis": 1.7906809199962324,
+        "CC_T_kurtosis": 1.9560146347274507,
+        "CC_CCCT": 8.502866612450866,
+        "CC_entropy": 2.7573893095461557,
+        "dV_energy": 0.8755394294884493,
+        "dV_Q": 0.2218269111331205,
+        "dV_t_mean": 1.732832891280289,
+        "dV_V_mean": 3.946742956673971,
+        "dV_T_mean": 24.916123577670472,
+        "dV_V_std": 0.028950937483554186,
+        "dV_T_std": 0.20236360251058472,
+        "dV_V_skewness": 0.14221254705245656,
+        "dV_T_skewness": -0.12010611267872162,
+        "dV_V_kurtosis": 1.8171898910927067,
+        "dV_T_kurtosis": 1.841286553101988,
+        "dV_dV_devide_dt": 0.02878163804730169,
+        "dV_entropy": 2.764435814672753,
+        "CV_energy": 1.3580513704253128,
+        "CV_Q": 0.32334901435234253,
+        "CV_t_mean": 13.30359807527477,
+        "CV_C_mean": 0.7378413062104706,
+        "CV_T_mean": 22.418370017050034,
+        "CV_C_std": 0.8439928061915821,
+        "CV_T_std": 1.6991830941924209,
+        "CV_C_skewness": 1.7898432986732926,
+        "CV_T_skewness": 0.6151814209599098,
+        "CV_C_kurtosis": 5.535696975024591,
+        "CV_T_kurtosis": 1.9741815213212877,
+        "CV_CVCT": 26.60719615054954,
+        "CV_entropy": 1.9082430396472496,
+        "dI_energy": 0.043328687226882295,
+        "dI_Q": 0.010316115070993859,
+        "dI_t_mean": 0.3261426515154287,
+        "dI_C_mean": 0.948900900247968,
+        "dI_T_mean": 23.98555817339868,
+        "dI_C_std": 0.028964968900094534,
+        "dI_T_std": 0.06739187351703865,
+        "dI_C_skewness": 0.04627326188209312,
+        "dI_T_skewness": 0.0,
+        "dI_C_kurtosis": 1.802701233211391,
+        "dI_T_kurtosis": 1.825659779363295,
+        "dI_dI_devide_dt": -0.15330714880096127,
+        "dI_entropy": 2.7715037767171404,
+        "Charge_energy": 3.579116184581677,
+        "Charge_Q": 0.873499053790509,
+        "Charge_t_mean": 17.9125,
+        "Charge_V_mean": 4.160663336069158,
+        "Charge_C_mean": 1.4915724076001498,
+        "Charge_T_mean": 23.092670518771826,
+        "Charge_C_std": 1.5622182794517014,
+        "Charge_V_std": 0.08264630748064855,
+        "Charge_T_std": 1.8675369586727828,
+        "Charge_C_skewness": 0.7276379032222605,
+        "Charge_V_skewness": -1.9610641033101235,
+        "Charge_T_skewness": 0.036431214846490756,
+        "Charge_C_kurtosis": 1.771526624392709,
+        "Charge_V_kurtosis": 5.377310326993117,
+        "Charge_T_kurtosis": 1.3912086414379778
+      }
+    }
+  ],
+  "features": [
+    {
+      "name": "CC_energy",
+      "group": "CC",
+      "signal": "voltage and current",
+      "segment": "constant-current-like charge candidate",
+      "candidate_formula": "Trapezoidal integral of V(t)*I(t), with minutes converted to hours.",
+      "unit": "Wh",
+      "evidence_class": "standard_physical_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Current sign, integration convention, and interval boundaries are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27426,
+        "unavailable_cycles": 109,
+        "finite_fraction": 0.9960414018521881
+      },
+      "candidate_value_distribution": {
+        "count": 27426,
+        "minimum": 0.015627206670184867,
+        "q25": 2.3405488824837644,
+        "median": 5.550877857269745,
+        "q75": 6.068914868360603,
+        "maximum": 6.729412323476903
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.43616873963165226,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.9497010202029641,
+        "within_profile_spearman_rho_minimum": -0.3022440895406336,
+        "within_profile_spearman_rho_maximum": 0.993279043762859
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 6.147240637026297,
+        "2": 5.887366593585745,
+        "3": 6.022464054557703,
+        "4": 5.731663023917315,
+        "5": 5.720690955051536,
+        "6": 2.236582733246913
+      },
+      "batch_median_spread": 3.910657903779384,
+      "batch_median_spread_over_pooled_iqr": 1.048893246691197
+    },
+    {
+      "name": "CC_Q",
+      "group": "CC",
+      "signal": "current and time",
+      "segment": "constant-current-like charge candidate",
+      "candidate_formula": "Trapezoidal integral of I(t), with minutes converted to hours.",
+      "unit": "Ah",
+      "evidence_class": "standard_physical_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Current sign, integration convention, and interval boundaries are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27426,
+        "unavailable_cycles": 109,
+        "finite_fraction": 0.9960414018521881
+      },
+      "candidate_value_distribution": {
+        "count": 27426,
+        "minimum": 0.0037504408836531505,
+        "q25": 0.5799389045518675,
+        "median": 1.4255820877618628,
+        "q75": 1.565357573336709,
+        "maximum": 1.7698969550087196
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.4347709778204524,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.9591855570565573,
+        "within_profile_spearman_rho_minimum": -0.308563967091023,
+        "within_profile_spearman_rho_maximum": 0.99431020265802
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.5910200453956962,
+        "2": 1.5053088598516462,
+        "3": 1.5574056298896692,
+        "4": 1.477160661690688,
+        "5": 1.4593282671739138,
+        "6": 0.5541077378978725
+      },
+      "batch_median_spread": 1.0369123074978237,
+      "batch_median_spread_over_pooled_iqr": 1.0522555948493253
+    },
+    {
+      "name": "CC_t_mean",
+      "group": "CC",
+      "signal": "elapsed time",
+      "segment": "constant-current-like charge candidate",
+      "candidate_formula": "Arithmetic mean of elapsed time on a 257-point uniform-time interpolation grid.",
+      "unit": "min",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Grid and time origin are candidate conventions.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27426,
+        "unavailable_cycles": 109,
+        "finite_fraction": 0.9960414018521881
+      },
+      "candidate_value_distribution": {
+        "count": 27426,
+        "minimum": 0.04512395314543261,
+        "q25": 4.516078802878718,
+        "median": 8.271013147141339,
+        "q75": 11.509214121913535,
+        "maximum": 53.10068527937972
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.3040680519042447,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.9591228648801858,
+        "within_profile_spearman_rho_minimum": -0.3170733921582396,
+        "within_profile_spearman_rho_maximum": 0.9943095512626344
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 11.933787776126925,
+        "2": 7.527315171729468,
+        "3": 11.680977815784786,
+        "4": 11.079454705277886,
+        "5": 7.32707208123831,
+        "6": 4.251422817835012
+      },
+      "batch_median_spread": 7.682364958291913,
+      "batch_median_spread_over_pooled_iqr": 1.0985580298126167
+    },
+    {
+      "name": "CC_V_mean",
+      "group": "CC",
+      "signal": "voltage",
+      "segment": "constant-current-like charge candidate",
+      "candidate_formula": "Arithmetic mean of voltage on a 257-point uniform-time interpolation grid.",
+      "unit": "V",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27426,
+        "unavailable_cycles": 109,
+        "finite_fraction": 0.9960414018521881
+      },
+      "candidate_value_distribution": {
+        "count": 27426,
+        "minimum": 3.801576588271034,
+        "q25": 3.870472062909286,
+        "median": 3.9029704413037045,
+        "q75": 4.0348547996230195,
+        "maximum": 4.1929
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.2937912772458073,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.869432533187566,
+        "within_profile_spearman_rho_minimum": -0.9810381805932196,
+        "within_profile_spearman_rho_maximum": 0.5093492456289429
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 3.865764175537347,
+        "2": 3.9111981744026827,
+        "3": 3.862338929217871,
+        "4": 3.8795400471962225,
+        "5": 3.9213310837311477,
+        "6": 4.03861237526811
+      },
+      "batch_median_spread": 0.17627344605023865,
+      "batch_median_spread_over_pooled_iqr": 1.0723355114668307
+    },
+    {
+      "name": "CC_T_mean",
+      "group": "CC",
+      "signal": "temperature",
+      "segment": "constant-current-like charge candidate",
+      "candidate_formula": "Arithmetic mean of temperature on a 257-point uniform-time interpolation grid.",
+      "unit": "degC",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27426,
+        "unavailable_cycles": 109,
+        "finite_fraction": 0.9960414018521881
+      },
+      "candidate_value_distribution": {
+        "count": 27426,
+        "minimum": 17.8,
+        "q25": 25.134761460789402,
+        "median": 26.93127534974192,
+        "q75": 29.159320710233423,
+        "maximum": 36.343931768346565
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.4278478614976678,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.4695516500140466,
+        "within_profile_spearman_rho_minimum": -0.5451849149468718,
+        "within_profile_spearman_rho_maximum": 0.762379665935728
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 28.089672269399593,
+        "2": 31.01131973798789,
+        "3": 28.472376101970866,
+        "4": 26.054439996802465,
+        "5": 27.09331423429073,
+        "6": 25.31841282985886
+      },
+      "batch_median_spread": 5.692906908129029,
+      "batch_median_spread_over_pooled_iqr": 1.4145417063782784
+    },
+    {
+      "name": "CC_V_std",
+      "group": "CC",
+      "signal": "voltage",
+      "segment": "constant-current-like charge candidate",
+      "candidate_formula": "Population standard deviation (ddof=0) of voltage on that grid.",
+      "unit": "V",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27426,
+        "unavailable_cycles": 109,
+        "finite_fraction": 0.9960414018521881
+      },
+      "candidate_value_distribution": {
+        "count": 27426,
+        "minimum": 0.0035355670514077386,
+        "q25": 0.08953903999414056,
+        "median": 0.1440003633330482,
+        "q75": 0.15589444266875555,
+        "maximum": 0.19314627814353263
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.21116555921016247,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.4563178607259336,
+        "within_profile_spearman_rho_minimum": -0.7037081689967309,
+        "within_profile_spearman_rho_maximum": 0.8991896462891124
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.15394661711428342,
+        "2": 0.14144402377704998,
+        "3": 0.16341356750974106,
+        "4": 0.15167655172863165,
+        "5": 0.13662462727588556,
+        "6": 0.08880585952340245
+      },
+      "batch_median_spread": 0.07460770798633862,
+      "batch_median_spread_over_pooled_iqr": 1.1243652359731764
+    },
+    {
+      "name": "CC_T_std",
+      "group": "CC",
+      "signal": "temperature",
+      "segment": "constant-current-like charge candidate",
+      "candidate_formula": "Population standard deviation (ddof=0) of temperature on that grid.",
+      "unit": "degC",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27426,
+        "unavailable_cycles": 109,
+        "finite_fraction": 0.9960414018521881
+      },
+      "candidate_value_distribution": {
+        "count": 27426,
+        "minimum": 0.0,
+        "q25": 0.4787437774267349,
+        "median": 1.069774091462379,
+        "q75": 1.6447157148812082,
+        "maximum": 4.576245287232158
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.1190763886793019,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.28994254476487985,
+        "within_profile_spearman_rho_minimum": -0.8619286420337017,
+        "within_profile_spearman_rho_maximum": 0.03343713424856384
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.2072265322481877,
+        "2": 2.8452304897022413,
+        "3": 1.3161699427783247,
+        "4": 1.141213897385177,
+        "5": 2.476231008293961,
+        "6": 0.37748070830131314
+      },
+      "batch_median_spread": 2.4677497814009284,
+      "batch_median_spread_over_pooled_iqr": 2.1164744211498525
+    },
+    {
+      "name": "CC_V_skewness",
+      "group": "CC",
+      "signal": "voltage",
+      "segment": "constant-current-like charge candidate",
+      "candidate_formula": "Biased third standardized central moment of voltage.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27426,
+        "unavailable_cycles": 109,
+        "finite_fraction": 0.9960414018521881
+      },
+      "candidate_value_distribution": {
+        "count": 27426,
+        "minimum": -1.8961572590837596,
+        "q25": 0.10164559708129747,
+        "median": 0.19635234745463542,
+        "q75": 0.30449452089398926,
+        "maximum": 0.693908017297514
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.18479032178793633,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.6197430046124535,
+        "within_profile_spearman_rho_minimum": -0.5274914069877564,
+        "within_profile_spearman_rho_maximum": 0.9024925452200124
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.2894347946267593,
+        "2": 0.07673254556491861,
+        "3": 0.08590898435539956,
+        "4": 0.35003262247951966,
+        "5": 0.22302331174282514,
+        "6": 0.15702756797612946
+      },
+      "batch_median_spread": 0.27330007691460106,
+      "batch_median_spread_over_pooled_iqr": 1.3473084883948558
+    },
+    {
+      "name": "CC_T_skewness",
+      "group": "CC",
+      "signal": "temperature",
+      "segment": "constant-current-like charge candidate",
+      "candidate_formula": "Biased third standardized central moment of temperature.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27426,
+        "unavailable_cycles": 109,
+        "finite_fraction": 0.9960414018521881
+      },
+      "candidate_value_distribution": {
+        "count": 27426,
+        "minimum": -7.7676218229278735,
+        "q25": -0.4397053599876682,
+        "median": -0.3303971196374058,
+        "q75": -0.026798547002339888,
+        "maximum": 13.536511504053966
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.1752828411745409,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.3913706834464198,
+        "within_profile_spearman_rho_minimum": -0.7983758367706858,
+        "within_profile_spearman_rho_maximum": -0.05620656711101752
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": -0.3781825438285066,
+        "2": -0.38334300778883273,
+        "3": 0.30611627259959595,
+        "4": -0.18645627714604115,
+        "5": -0.29917523618223446,
+        "6": -0.3327688517421963
+      },
+      "batch_median_spread": 0.6894592803884287,
+      "batch_median_spread_over_pooled_iqr": 1.6697696882345392
+    },
+    {
+      "name": "CC_V_kurtosis",
+      "group": "CC",
+      "signal": "voltage",
+      "segment": "constant-current-like charge candidate",
+      "candidate_formula": "Pearson fourth standardized central moment of voltage.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27426,
+        "unavailable_cycles": 109,
+        "finite_fraction": 0.9960414018521881
+      },
+      "candidate_value_distribution": {
+        "count": 27426,
+        "minimum": 1.7308907413122763,
+        "q25": 1.8128941734425574,
+        "median": 2.4021858140306716,
+        "q75": 2.64221639187592,
+        "maximum": 5.87185271262246
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.00018953715022305002,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.16191766268260294,
+        "within_profile_spearman_rho_minimum": -0.8408454037752112,
+        "within_profile_spearman_rho_maximum": 0.5489798760127437
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 2.517103883583936,
+        "2": 2.8630362792671367,
+        "3": 2.6986863662155587,
+        "4": 2.3281629645331687,
+        "5": 2.3788228073373916,
+        "6": 1.7906809199962324
+      },
+      "batch_median_spread": 1.0723553592709043,
+      "batch_median_spread_over_pooled_iqr": 1.293050319207226
+    },
+    {
+      "name": "CC_T_kurtosis",
+      "group": "CC",
+      "signal": "temperature",
+      "segment": "constant-current-like charge candidate",
+      "candidate_formula": "Pearson fourth standardized central moment of temperature.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27426,
+        "unavailable_cycles": 109,
+        "finite_fraction": 0.9960414018521881
+      },
+      "candidate_value_distribution": {
+        "count": 27426,
+        "minimum": 0.0,
+        "q25": 1.8359611702486003,
+        "median": 1.9342528514322046,
+        "q75": 2.1244882297615435,
+        "maximum": 193.83165576320488
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.16096763375643938,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.25940826453992577,
+        "within_profile_spearman_rho_minimum": -0.40927907816921566,
+        "within_profile_spearman_rho_maximum": 0.8686482683309743
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.8940746478843613,
+        "2": 1.8831458002241301,
+        "3": 2.139864812504287,
+        "4": 2.014764474367631,
+        "5": 1.8227028749892498,
+        "6": 1.9560146347274507
+      },
+      "batch_median_spread": 0.3171619375150374,
+      "batch_median_spread_over_pooled_iqr": 1.0992450345920142
+    },
+    {
+      "name": "CC_CCCT",
+      "group": "CC",
+      "signal": "time",
+      "segment": "constant-current-like charge candidate",
+      "candidate_formula": "Candidate interval end minus start.",
+      "unit": "min",
+      "evidence_class": "name_supported_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Exact phase selector and treatment of gaps are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27424,
+        "unavailable_cycles": 111,
+        "finite_fraction": 0.9959687670237879
+      },
+      "candidate_value_distribution": {
+        "count": 27424,
+        "minimum": 0.09024790629086524,
+        "q25": 9.033695173695298,
+        "median": 16.546765429407632,
+        "q75": 23.01891599742803,
+        "maximum": 106.20137055875942
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.303943266740927,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.9591228648801858,
+        "within_profile_spearman_rho_minimum": -0.3170733921582396,
+        "within_profile_spearman_rho_maximum": 0.9943095512626344
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 23.86757555225385,
+        "2": 15.054630343458935,
+        "3": 23.361955631569572,
+        "4": 22.158909410555772,
+        "5": 14.654144162476621,
+        "6": 8.502866612450866
+      },
+      "batch_median_spread": 15.364708939802984,
+      "batch_median_spread_over_pooled_iqr": 1.098638994225195
+    },
+    {
+      "name": "CC_entropy",
+      "group": "CC",
+      "signal": "voltage proxy",
+      "segment": "constant-current-like charge candidate",
+      "candidate_formula": "Diagnostic proxy: Shannon entropy in nats of a 16-bin equal-width histogram.",
+      "unit": "nats",
+      "evidence_class": "unknown_original_definition",
+      "formula_status": "Original formula unknown; histogram proxy is diagnostic only.",
+      "assumptions": "Original entropy signal, estimator, binning, and logarithm base were not located.",
+      "mathematical_validation": "Histogram proxy calculation tested; original entropy feature definition unavailable.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27426,
+        "unavailable_cycles": 109,
+        "finite_fraction": 0.9960414018521881
+      },
+      "candidate_value_distribution": {
+        "count": 27426,
+        "minimum": 1.6835524922371283,
+        "q25": 2.5021398957173995,
+        "median": 2.578351762051436,
+        "q75": 2.75048678028514,
+        "maximum": 2.77247717366369
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.03661325353849059,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.105897570958182,
+        "within_profile_spearman_rho_minimum": -0.4163084742400805,
+        "within_profile_spearman_rho_maximum": 0.8238606332427862
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 2.5196298918145357,
+        "2": 2.4473503845211737,
+        "3": 2.4976741900982904,
+        "4": 2.618752365827838,
+        "5": 2.5682963023231484,
+        "6": 2.7573893095461557
+      },
+      "batch_median_spread": 0.310038925024982,
+      "batch_median_spread_over_pooled_iqr": 1.248410768528944
+    },
+    {
+      "name": "dV_energy",
+      "group": "dV",
+      "signal": "voltage and current",
+      "segment": "candidate rising 3.9-4.0 V window within CC",
+      "candidate_formula": "Trapezoidal integral of V(t)*I(t), with minutes converted to hours.",
+      "unit": "Wh",
+      "evidence_class": "standard_physical_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Current sign, integration convention, and interval boundaries are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27102,
+        "unavailable_cycles": 433,
+        "finite_fraction": 0.9842745596513528
+      },
+      "candidate_value_distribution": {
+        "count": 27102,
+        "minimum": 8.543941602031543e-05,
+        "q25": 0.8616182024416243,
+        "median": 0.9155233866716039,
+        "q75": 0.9874597093544358,
+        "maximum": 1.8967239976329204
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.458949235244375,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.6473243781601334,
+        "within_profile_spearman_rho_minimum": -0.9411770668074297,
+        "within_profile_spearman_rho_maximum": 0.6782011234131207
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.8900224130013092,
+        "2": 1.222503037857135,
+        "3": 0.8912729546354982,
+        "4": 0.9064576442001799,
+        "5": 1.2523828873510345,
+        "6": 0.8755394294884493
+      },
+      "batch_median_spread": 0.3768434578625852,
+      "batch_median_spread_over_pooled_iqr": 2.9945879313387347
+    },
+    {
+      "name": "dV_Q",
+      "group": "dV",
+      "signal": "current and time",
+      "segment": "candidate rising 3.9-4.0 V window within CC",
+      "candidate_formula": "Trapezoidal integral of I(t), with minutes converted to hours.",
+      "unit": "Ah",
+      "evidence_class": "standard_physical_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Current sign, integration convention, and interval boundaries are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27102,
+        "unavailable_cycles": 433,
+        "finite_fraction": 0.9842745596513528
+      },
+      "candidate_value_distribution": {
+        "count": 27102,
+        "minimum": 2.136012100659144e-05,
+        "q25": 0.21830623744108157,
+        "median": 0.23199157435519424,
+        "q75": 0.25024348257091145,
+        "maximum": 0.4807844541950747
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.45885654264477943,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.6473935087573894,
+        "within_profile_spearman_rho_minimum": -0.9411050392164904,
+        "within_profile_spearman_rho_maximum": 0.6818125922604643
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.2255052318771132,
+        "2": 0.3098698585742265,
+        "3": 0.22583009132241955,
+        "4": 0.22968554110870906,
+        "5": 0.3174266914296366,
+        "6": 0.2218269111331205
+      },
+      "batch_median_spread": 0.09559978029651608,
+      "batch_median_spread_over_pooled_iqr": 2.993363388353883
+    },
+    {
+      "name": "dV_t_mean",
+      "group": "dV",
+      "signal": "elapsed time",
+      "segment": "candidate rising 3.9-4.0 V window within CC",
+      "candidate_formula": "Arithmetic mean of elapsed time on a 257-point uniform-time interpolation grid.",
+      "unit": "min",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Grid and time origin are candidate conventions.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27102,
+        "unavailable_cycles": 433,
+        "finite_fraction": 0.9842745596513528
+      },
+      "candidate_value_distribution": {
+        "count": 27102,
+        "minimum": 0.0001602049126722526,
+        "q25": 1.6158060477286293,
+        "median": 1.6815988733477791,
+        "q75": 1.7966849042340791,
+        "maximum": 5.747210068734269
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.473191052783377,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.6473755619584434,
+        "within_profile_spearman_rho_minimum": -0.9411050392164904,
+        "within_profile_spearman_rho_maximum": 0.6818125922604643
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.691244464324391,
+        "2": 1.5493219687613153,
+        "3": 1.6936985174741832,
+        "4": 1.722564981508967,
+        "5": 1.6152205316448982,
+        "6": 1.732832891280289
+      },
+      "batch_median_spread": 0.18351092251897372,
+      "batch_median_spread_over_pooled_iqr": 1.0145515405414156
+    },
+    {
+      "name": "dV_V_mean",
+      "group": "dV",
+      "signal": "voltage",
+      "segment": "candidate rising 3.9-4.0 V window within CC",
+      "candidate_formula": "Arithmetic mean of voltage on a 257-point uniform-time interpolation grid.",
+      "unit": "V",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27102,
+        "unavailable_cycles": 433,
+        "finite_fraction": 0.9842745596513528
+      },
+      "candidate_value_distribution": {
+        "count": 27102,
+        "minimum": 3.9433386190729887,
+        "q25": 3.946043308836019,
+        "median": 3.946471760558314,
+        "q75": 3.946932971575693,
+        "maximum": 3.9999499999999997
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.30137343122428256,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.40066527495305465,
+        "within_profile_spearman_rho_minimum": -0.9213578317388031,
+        "within_profile_spearman_rho_maximum": 0.8781731054998417
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 3.94651133379218,
+        "2": 3.9453254351289764,
+        "3": 3.946691269437941,
+        "4": 3.9465414282777256,
+        "5": 3.9458063232621394,
+        "6": 3.946742956673971
+      },
+      "batch_median_spread": 0.0014175215449947487,
+      "batch_median_spread_over_pooled_iqr": 1.5933246181737408
+    },
+    {
+      "name": "dV_T_mean",
+      "group": "dV",
+      "signal": "temperature",
+      "segment": "candidate rising 3.9-4.0 V window within CC",
+      "candidate_formula": "Arithmetic mean of temperature on a 257-point uniform-time interpolation grid.",
+      "unit": "degC",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27102,
+        "unavailable_cycles": 433,
+        "finite_fraction": 0.9842745596513528
+      },
+      "candidate_value_distribution": {
+        "count": 27102,
+        "minimum": 18.5,
+        "q25": 25.27529180584416,
+        "median": 27.200171683605745,
+        "q75": 29.83972808738236,
+        "maximum": 39.096777044818786
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.4266772928103478,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.5632337137323122,
+        "within_profile_spearman_rho_minimum": 0.07464109114176205,
+        "within_profile_spearman_rho_maximum": 0.7800628172949763
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 28.88990390821085,
+        "2": 32.47963320497092,
+        "3": 28.25372781792388,
+        "4": 26.284235064961408,
+        "5": 28.148913003652222,
+        "6": 24.916123577670472
+      },
+      "batch_median_spread": 7.563509627300451,
+      "batch_median_spread_over_pooled_iqr": 1.6570522975405793
+    },
+    {
+      "name": "dV_V_std",
+      "group": "dV",
+      "signal": "voltage",
+      "segment": "candidate rising 3.9-4.0 V window within CC",
+      "candidate_formula": "Population standard deviation (ddof=0) of voltage on that grid.",
+      "unit": "V",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27102,
+        "unavailable_cycles": 433,
+        "finite_fraction": 0.9842745596513528
+      },
+      "candidate_value_distribution": {
+        "count": 27102,
+        "minimum": 2.898005779849405e-05,
+        "q25": 0.02888647632155805,
+        "median": 0.028970467123525342,
+        "q75": 0.02903178607471152,
+        "maximum": 0.030218133085832467
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.5279438187443315,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.7120538295667475,
+        "within_profile_spearman_rho_minimum": 0.28612938721305253,
+        "within_profile_spearman_rho_maximum": 0.8865900610302228
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.02904090566083204,
+        "2": 0.02882221450166318,
+        "3": 0.02901301155681183,
+        "4": 0.02900921042720097,
+        "5": 0.028763710090079674,
+        "6": 0.028950937483554186
+      },
+      "batch_median_spread": 0.0002771955707523664,
+      "batch_median_spread_over_pooled_iqr": 1.9076184821510533
+    },
+    {
+      "name": "dV_T_std",
+      "group": "dV",
+      "signal": "temperature",
+      "segment": "candidate rising 3.9-4.0 V window within CC",
+      "candidate_formula": "Population standard deviation (ddof=0) of temperature on that grid.",
+      "unit": "degC",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27102,
+        "unavailable_cycles": 433,
+        "finite_fraction": 0.9842745596513528
+      },
+      "candidate_value_distribution": {
+        "count": 27102,
+        "minimum": 0.0,
+        "q25": 0.10797129065718931,
+        "median": 0.17145050348703195,
+        "q75": 0.3255529352632306,
+        "maximum": 1.2474008474287983
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.3232029699459409,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.5039347372415102,
+        "within_profile_spearman_rho_minimum": -0.9451534792528619,
+        "within_profile_spearman_rho_maximum": -0.27447954460333895
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.1403459242219931,
+        "2": 0.4868729257156708,
+        "3": 0.124265161351894,
+        "4": 0.12420328645913858,
+        "5": 0.49734228531274877,
+        "6": 0.20236360251058472
+      },
+      "batch_median_spread": 0.3731389988536102,
+      "batch_median_spread_over_pooled_iqr": 1.7149378548416843
+    },
+    {
+      "name": "dV_V_skewness",
+      "group": "dV",
+      "signal": "voltage",
+      "segment": "candidate rising 3.9-4.0 V window within CC",
+      "candidate_formula": "Biased third standardized central moment of voltage.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27102,
+        "unavailable_cycles": 433,
+        "finite_fraction": 0.9842745596513528
+      },
+      "candidate_value_distribution": {
+        "count": 27102,
+        "minimum": -0.46778948041614715,
+        "q25": 0.12965544004975926,
+        "median": 0.1509549685833999,
+        "q75": 0.16903687887190394,
+        "maximum": 0.3084024375048166
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.30678142324105273,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.41454532399899985,
+        "within_profile_spearman_rho_minimum": -0.8782318241410154,
+        "within_profile_spearman_rho_maximum": 0.9237177524277068
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.14733428630426593,
+        "2": 0.19917776096032755,
+        "3": 0.13962894716546553,
+        "4": 0.14599516722575961,
+        "5": 0.17883374441553887,
+        "6": 0.14221254705245656
+      },
+      "batch_median_spread": 0.059548813794862016,
+      "batch_median_spread_over_pooled_iqr": 1.5121035588312983
+    },
+    {
+      "name": "dV_T_skewness",
+      "group": "dV",
+      "signal": "temperature",
+      "segment": "candidate rising 3.9-4.0 V window within CC",
+      "candidate_formula": "Biased third standardized central moment of temperature.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27102,
+        "unavailable_cycles": 433,
+        "finite_fraction": 0.9842745596513528
+      },
+      "candidate_value_distribution": {
+        "count": 27102,
+        "minimum": -15.937500036918847,
+        "q25": -0.22913104604195622,
+        "median": -0.07287736343554369,
+        "q75": 0.09817441047872968,
+        "maximum": 15.861810495477037
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.07596524625013448,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.0645612591028608,
+        "within_profile_spearman_rho_minimum": -0.2123829990427611,
+        "within_profile_spearman_rho_maximum": 0.24234241070976
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": -0.05276428847511672,
+        "2": -0.08267429864836609,
+        "3": -0.013698319456805098,
+        "4": -0.013807372282962986,
+        "5": -0.07607226026973983,
+        "6": -0.12010611267872162
+      },
+      "batch_median_spread": 0.10640779322191653,
+      "batch_median_spread_over_pooled_iqr": 0.32510241153034825
+    },
+    {
+      "name": "dV_V_kurtosis",
+      "group": "dV",
+      "signal": "voltage",
+      "segment": "candidate rising 3.9-4.0 V window within CC",
+      "candidate_formula": "Pearson fourth standardized central moment of voltage.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27102,
+        "unavailable_cycles": 433,
+        "finite_fraction": 0.9842745596513528
+      },
+      "candidate_value_distribution": {
+        "count": 27102,
+        "minimum": 1.7190454812301814,
+        "q25": 1.810910393272159,
+        "median": 1.8208496970069807,
+        "q75": 1.8322826336819908,
+        "maximum": 2.1151959253433845
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.4798618311767883,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.5385865071376116,
+        "within_profile_spearman_rho_minimum": -0.8581255678131671,
+        "within_profile_spearman_rho_maximum": 0.9241275681160662
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.8157032770840014,
+        "2": 1.8473530587294553,
+        "3": 1.8170538583528235,
+        "4": 1.8190020881692126,
+        "5": 1.8477005598610814,
+        "6": 1.8171898910927067
+      },
+      "batch_median_spread": 0.03199728277708003,
+      "batch_median_spread_over_pooled_iqr": 1.4971421883482312
+    },
+    {
+      "name": "dV_T_kurtosis",
+      "group": "dV",
+      "signal": "temperature",
+      "segment": "candidate rising 3.9-4.0 V window within CC",
+      "candidate_formula": "Pearson fourth standardized central moment of temperature.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27102,
+        "unavailable_cycles": 433,
+        "finite_fraction": 0.9842745596513528
+      },
+      "candidate_value_distribution": {
+        "count": 27102,
+        "minimum": 0.0,
+        "q25": 1.7147380700591708,
+        "median": 1.8510952068897777,
+        "q75": 2.054105000302552,
+        "maximum": 255.00390703452484
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.06409097837931008,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.04845782350755576,
+        "within_profile_spearman_rho_minimum": -0.2220467105538108,
+        "within_profile_spearman_rho_maximum": 0.16654529695755835
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.8862242404996128,
+        "2": 1.819881777028564,
+        "3": 1.9000009448905604,
+        "4": 1.8992220076784827,
+        "5": 1.819446274998484,
+        "6": 1.841286553101988
+      },
+      "batch_median_spread": 0.08055466989207627,
+      "batch_median_spread_over_pooled_iqr": 0.2373674707618255
+    },
+    {
+      "name": "dV_dV_devide_dt",
+      "group": "dV",
+      "signal": "voltage and time",
+      "segment": "candidate rising 3.9-4.0 V window within CC",
+      "candidate_formula": "Endpoint signal difference divided by candidate interval duration.",
+      "unit": "V/min",
+      "evidence_class": "name_supported_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Derivative estimator and candidate window boundaries are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27102,
+        "unavailable_cycles": 433,
+        "finite_fraction": 0.9842745596513528
+      },
+      "candidate_value_distribution": {
+        "count": 27102,
+        "minimum": 0.008699873399792352,
+        "q25": 0.027809361425590595,
+        "median": 0.02971617108070685,
+        "q75": 0.030925958286734393,
+        "maximum": 0.653595766924833
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.4721734885791974,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.6473755619584434,
+        "within_profile_spearman_rho_minimum": -0.6818125922604643,
+        "within_profile_spearman_rho_maximum": 0.9411050392164904
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.02956402876976971,
+        "2": 0.032272181643415984,
+        "3": 0.02952119260709898,
+        "4": 0.029026481197507156,
+        "5": 0.030955525279932738,
+        "6": 0.02878163804730169
+      },
+      "batch_median_spread": 0.0034905435961142955,
+      "batch_median_spread_over_pooled_iqr": 1.1199855969928874
+    },
+    {
+      "name": "dV_entropy",
+      "group": "dV",
+      "signal": "voltage proxy",
+      "segment": "candidate rising 3.9-4.0 V window within CC",
+      "candidate_formula": "Diagnostic proxy: Shannon entropy in nats of a 16-bin equal-width histogram.",
+      "unit": "nats",
+      "evidence_class": "unknown_original_definition",
+      "formula_status": "Original formula unknown; histogram proxy is diagnostic only.",
+      "assumptions": "Original entropy signal, estimator, binning, and logarithm base were not located.",
+      "mathematical_validation": "Histogram proxy calculation tested; original entropy feature definition unavailable.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27102,
+        "unavailable_cycles": 433,
+        "finite_fraction": 0.9842745596513528
+      },
+      "candidate_value_distribution": {
+        "count": 27102,
+        "minimum": 2.7076846493560027,
+        "q25": 2.762272552841782,
+        "median": 2.7643323900341574,
+        "q75": 2.766061747565743,
+        "maximum": 2.77247717366369
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.29158028814344483,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.4033575860961237,
+        "within_profile_spearman_rho_minimum": -0.9132008727249896,
+        "within_profile_spearman_rho_maximum": 0.8660178654355819
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 2.764630448346662,
+        "2": 2.7590171754172497,
+        "3": 2.765558802463799,
+        "4": 2.7648353351361017,
+        "5": 2.7615580811171574,
+        "6": 2.764435814672753
+      },
+      "batch_median_spread": 0.006541627046549259,
+      "batch_median_spread_over_pooled_iqr": 1.7263897801775279
+    },
+    {
+      "name": "CV_energy",
+      "group": "CV",
+      "signal": "voltage and current",
+      "segment": "constant-voltage-like charge candidate",
+      "candidate_formula": "Trapezoidal integral of V(t)*I(t), with minutes converted to hours.",
+      "unit": "Wh",
+      "evidence_class": "standard_physical_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Current sign, integration convention, and interval boundaries are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 0.39850390508705524,
+        "q25": 1.2805484842843713,
+        "median": 1.438962120374946,
+        "q75": 1.5556062817054372,
+        "maximum": 2.7505650327621693
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.6900474784899502,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.8815056332701507,
+        "within_profile_spearman_rho_minimum": -0.9681346275495464,
+        "within_profile_spearman_rho_maximum": -0.4541165990675108
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.338822171489246,
+        "2": 1.6058335425917738,
+        "3": 1.4106463399870477,
+        "4": 1.4419454390735653,
+        "5": 1.5977642391612261,
+        "6": 1.3580513704253128
+      },
+      "batch_median_spread": 0.2670113711025277,
+      "batch_median_spread_over_pooled_iqr": 0.970746416229675
+    },
+    {
+      "name": "CV_Q",
+      "group": "CV",
+      "signal": "current and time",
+      "segment": "constant-voltage-like charge candidate",
+      "candidate_formula": "Trapezoidal integral of I(t), with minutes converted to hours.",
+      "unit": "Ah",
+      "evidence_class": "standard_physical_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Current sign, integration convention, and interval boundaries are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 0.09488140829105607,
+        "q25": 0.30489665404240845,
+        "median": 0.34262196439094506,
+        "q75": 0.3703863769791058,
+        "maximum": 0.6551891026657651
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.6900204092451444,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.8815292148709453,
+        "within_profile_spearman_rho_minimum": -0.968125487633611,
+        "within_profile_spearman_rho_maximum": -0.4541165990675108
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.31876970389558656,
+        "2": 0.3823600287222016,
+        "3": 0.3358825276834745,
+        "4": 0.3433209348152748,
+        "5": 0.3803828219788298,
+        "6": 0.32334901435234253
+      },
+      "batch_median_spread": 0.06359032482661503,
+      "batch_median_spread_over_pooled_iqr": 0.9709970049511693
+    },
+    {
+      "name": "CV_t_mean",
+      "group": "CV",
+      "signal": "elapsed time",
+      "segment": "constant-voltage-like charge candidate",
+      "candidate_formula": "Arithmetic mean of elapsed time on a 257-point uniform-time interpolation grid.",
+      "unit": "min",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Grid and time origin are candidate conventions.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 5.526232647959998,
+        "q25": 12.345663943890145,
+        "median": 13.561091573830515,
+        "q75": 15.251577366666897,
+        "maximum": 27.34246645620708
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.8273789167950485,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.9404787145771875,
+        "within_profile_spearman_rho_minimum": -0.9827226005105024,
+        "within_profile_spearman_rho_maximum": -0.7408107483524453
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 12.993347660244837,
+        "2": 13.002408391538221,
+        "3": 14.48088773304181,
+        "4": 14.588116644213628,
+        "5": 13.43410349507363,
+        "6": 13.30359807527477
+      },
+      "batch_median_spread": 1.594768983968791,
+      "batch_median_spread_over_pooled_iqr": 0.5488012724222547
+    },
+    {
+      "name": "CV_C_mean",
+      "group": "CV",
+      "signal": "current",
+      "segment": "constant-voltage-like charge candidate",
+      "candidate_formula": "Arithmetic mean of current on a 257-point uniform-time interpolation grid.",
+      "unit": "A",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 0.20275687697480702,
+        "q25": 0.6959910660718595,
+        "median": 0.7334349644447679,
+        "q75": 0.7691376591375468,
+        "maximum": 1.7665505228166338
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.2797957017937007,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.5207961089147163,
+        "within_profile_spearman_rho_minimum": -0.3680895650448314,
+        "within_profile_spearman_rho_maximum": 0.8489033599169427
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.7151680596480787,
+        "2": 0.8914810627787493,
+        "3": 0.7090017725460543,
+        "4": 0.7153707976414378,
+        "5": 0.8671919483964544,
+        "6": 0.7378413062104706
+      },
+      "batch_median_spread": 0.18247929023269494,
+      "batch_median_spread_over_pooled_iqr": 2.4947066238454085
+    },
+    {
+      "name": "CV_T_mean",
+      "group": "CV",
+      "signal": "temperature",
+      "segment": "constant-voltage-like charge candidate",
+      "candidate_formula": "Arithmetic mean of temperature on a 257-point uniform-time interpolation grid.",
+      "unit": "degC",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 17.64295978233235,
+        "q25": 22.344810664616503,
+        "median": 23.698101127395173,
+        "q75": 26.705451576472683,
+        "maximum": 36.10314608031853
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.5176484257974788,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.5600241373250028,
+        "within_profile_spearman_rho_minimum": -0.515914365794553,
+        "within_profile_spearman_rho_maximum": 0.7958253758884793
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 26.24699946851923,
+        "2": 28.010672267528726,
+        "3": 24.09997086192013,
+        "4": 23.038021682738027,
+        "5": 24.144629696948282,
+        "6": 22.418370017050034
+      },
+      "batch_median_spread": 5.592302250478692,
+      "batch_median_spread_over_pooled_iqr": 1.282449613146026
+    },
+    {
+      "name": "CV_C_std",
+      "group": "CV",
+      "signal": "current",
+      "segment": "constant-voltage-like charge candidate",
+      "candidate_formula": "Population standard deviation (ddof=0) of current on that grid.",
+      "unit": "A",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 0.19313888976004473,
+        "q25": 0.8028802557284186,
+        "median": 0.83193088232909,
+        "q75": 0.8717801897063147,
+        "maximum": 1.5573247089424183
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.12004295895266658,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.2968390304875678,
+        "within_profile_spearman_rho_minimum": -0.3439006699466719,
+        "within_profile_spearman_rho_maximum": 0.7471349298897363
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.810376913112459,
+        "2": 1.1753497747695936,
+        "3": 0.809224943950083,
+        "4": 0.8169236987923714,
+        "5": 1.1611823192000756,
+        "6": 0.8439928061915821
+      },
+      "batch_median_spread": 0.3661248308195105,
+      "batch_median_spread_over_pooled_iqr": 5.313863304092103
+    },
+    {
+      "name": "CV_T_std",
+      "group": "CV",
+      "signal": "temperature",
+      "segment": "constant-voltage-like charge candidate",
+      "candidate_formula": "Population standard deviation (ddof=0) of temperature on that grid.",
+      "unit": "degC",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 0.048656085701240664,
+        "q25": 1.6844568202959391,
+        "median": 1.9966028286280244,
+        "q75": 2.432760738403953,
+        "maximum": 7.020396423729825
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.3128267856548941,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.795607763368906,
+        "within_profile_spearman_rho_minimum": -0.9605665386636019,
+        "within_profile_spearman_rho_maximum": -0.0432670845464392
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.966232482533213,
+        "2": 3.6276257610006892,
+        "3": 2.144340910257223,
+        "4": 1.8146284563789807,
+        "5": 3.193892849469621,
+        "6": 1.6991830941924209
+      },
+      "batch_median_spread": 1.9284426668082684,
+      "batch_median_spread_over_pooled_iqr": 2.577084818270198
+    },
+    {
+      "name": "CV_C_skewness",
+      "group": "CV",
+      "signal": "current",
+      "segment": "constant-voltage-like charge candidate",
+      "candidate_formula": "Biased third standardized central moment of current.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 0.3955710931539976,
+        "q25": 1.7899205584356102,
+        "median": 1.9049819992665475,
+        "q75": 2.074793172598542,
+        "maximum": 3.0444411757205736
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.4166842862549108,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.44219648552392604,
+        "within_profile_spearman_rho_minimum": -0.8496019604675983,
+        "within_profile_spearman_rho_maximum": 0.4947228002182988
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.913358511877949,
+        "2": 2.222448212619754,
+        "3": 1.9287292947823507,
+        "4": 1.8995819994377974,
+        "5": 2.2515032564572555,
+        "6": 1.7898432986732926
+      },
+      "batch_median_spread": 0.46165995778396285,
+      "batch_median_spread_over_pooled_iqr": 1.6205838498744511
+    },
+    {
+      "name": "CV_T_skewness",
+      "group": "CV",
+      "signal": "temperature",
+      "segment": "constant-voltage-like charge candidate",
+      "candidate_formula": "Biased third standardized central moment of temperature.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": -0.8971311017488952,
+        "q25": 0.60059498650441,
+        "median": 0.6837499057275606,
+        "q75": 0.7867932500928054,
+        "maximum": 4.429912626060723
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.5165202191303327,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.7028383962740902,
+        "within_profile_spearman_rho_minimum": -0.9154849504740132,
+        "within_profile_spearman_rho_maximum": -0.042439684277457035
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.6914526247833903,
+        "2": 0.7023764262740999,
+        "3": 0.737317687541273,
+        "4": 0.7290582470357687,
+        "5": 0.7024751013314768,
+        "6": 0.6151814209599098
+      },
+      "batch_median_spread": 0.12213626658136323,
+      "batch_median_spread_over_pooled_iqr": 0.6559473983675497
+    },
+    {
+      "name": "CV_C_kurtosis",
+      "group": "CV",
+      "signal": "current",
+      "segment": "constant-voltage-like charge candidate",
+      "candidate_formula": "Pearson fourth standardized central moment of current.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 1.445819130102301,
+        "q25": 5.573436473313375,
+        "median": 6.10656276776248,
+        "q75": 6.873321347958522,
+        "maximum": 12.198327465119956
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.4037696954927401,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.4403249345006057,
+        "within_profile_spearman_rho_minimum": -0.8481117573014267,
+        "within_profile_spearman_rho_maximum": 0.514401439277609
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 6.146792466360102,
+        "2": 7.559327657081785,
+        "3": 6.23159655277444,
+        "4": 6.079120020781252,
+        "5": 7.643559451070861,
+        "6": 5.535696975024591
+      },
+      "batch_median_spread": 2.1078624760462707,
+      "batch_median_spread_over_pooled_iqr": 1.6215762773774038
+    },
+    {
+      "name": "CV_T_kurtosis",
+      "group": "CV",
+      "signal": "temperature",
+      "segment": "constant-voltage-like charge candidate",
+      "candidate_formula": "Pearson fourth standardized central moment of temperature.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 1.260102439371404,
+        "q25": 1.9617983928071387,
+        "median": 2.072596118683856,
+        "q75": 2.232451734187145,
+        "maximum": 21.53140816032364
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.5137530100549057,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.7407317709530234,
+        "within_profile_spearman_rho_minimum": -0.9003982202657503,
+        "within_profile_spearman_rho_maximum": 0.09516632541347188
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 2.0878246856257174,
+        "2": 2.1025050571642856,
+        "3": 2.1634683019067893,
+        "4": 2.1396095854632726,
+        "5": 2.109599536019128,
+        "6": 1.9741815213212877
+      },
+      "batch_median_spread": 0.18928678058550163,
+      "batch_median_spread_over_pooled_iqr": 0.699369827175851
+    },
+    {
+      "name": "CV_CVCT",
+      "group": "CV",
+      "signal": "time",
+      "segment": "constant-voltage-like charge candidate",
+      "candidate_formula": "Candidate interval end minus start.",
+      "unit": "min",
+      "evidence_class": "name_supported_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Exact phase selector and treatment of gaps are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 11.052465295919996,
+        "q25": 24.691327887780293,
+        "median": 27.122183147661033,
+        "q75": 30.503154733333794,
+        "maximum": 54.684932912414155
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.8273789167950485,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.9404787145771875,
+        "within_profile_spearman_rho_minimum": -0.9827226005105024,
+        "within_profile_spearman_rho_maximum": -0.7408107483524453
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 25.986695320489677,
+        "2": 26.004816783076443,
+        "3": 28.96177546608362,
+        "4": 29.176233288427262,
+        "5": 26.86820699014726,
+        "6": 26.60719615054954
+      },
+      "batch_median_spread": 3.1895379679375857,
+      "batch_median_spread_over_pooled_iqr": 0.5488012724222556
+    },
+    {
+      "name": "CV_entropy",
+      "group": "CV",
+      "signal": "current proxy",
+      "segment": "constant-voltage-like charge candidate",
+      "candidate_formula": "Diagnostic proxy: Shannon entropy in nats of a 16-bin equal-width histogram.",
+      "unit": "nats",
+      "evidence_class": "unknown_original_definition",
+      "formula_status": "Original formula unknown; histogram proxy is diagnostic only.",
+      "assumptions": "Original entropy signal, estimator, binning, and logarithm base were not located.",
+      "mathematical_validation": "Histogram proxy calculation tested; original entropy feature definition unavailable.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 1.0813082406475483,
+        "q25": 1.7806118274238818,
+        "median": 1.8685834895099196,
+        "q75": 1.9208281325148047,
+        "maximum": 2.2416095426256692
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.4602497003077775,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.6010529527130977,
+        "within_profile_spearman_rho_minimum": -0.34502001690533574,
+        "within_profile_spearman_rho_maximum": 0.8832019214213429
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.881614729261759,
+        "2": 1.6891734930822304,
+        "3": 1.8674158594379302,
+        "4": 1.871820049564185,
+        "5": 1.6821120243190277,
+        "6": 1.9082430396472496
+      },
+      "batch_median_spread": 0.22613101532822188,
+      "batch_median_spread_over_pooled_iqr": 1.6127298118545335
+    },
+    {
+      "name": "dI_energy",
+      "group": "dI",
+      "signal": "voltage and current",
+      "segment": "candidate falling 1.0-0.9 A window within CV",
+      "candidate_formula": "Trapezoidal integral of V(t)*I(t), with minutes converted to hours.",
+      "unit": "Wh",
+      "evidence_class": "standard_physical_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Current sign, integration convention, and interval boundaries are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27460,
+        "unavailable_cycles": 75,
+        "finite_fraction": 0.9972761939349918
+      },
+      "candidate_value_distribution": {
+        "count": 27460,
+        "minimum": 4.5037719677516395e-05,
+        "q25": 0.0411870153273949,
+        "median": 0.0456904214067166,
+        "q75": 0.05095840524525471,
+        "maximum": 0.15843705651247844
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.36302323537591524,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.48790786834079247,
+        "within_profile_spearman_rho_minimum": -0.818999808511199,
+        "within_profile_spearman_rho_maximum": 0.36690650556951293
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.04616166037051238,
+        "2": 0.041620080344793475,
+        "3": 0.04907275657209821,
+        "4": 0.048762660637857835,
+        "5": 0.041204956632907436,
+        "6": 0.043328687226882295
+      },
+      "batch_median_spread": 0.007867799939190775,
+      "batch_median_spread_over_pooled_iqr": 0.8051873894429578
+    },
+    {
+      "name": "dI_Q",
+      "group": "dI",
+      "signal": "current and time",
+      "segment": "candidate falling 1.0-0.9 A window within CV",
+      "candidate_formula": "Trapezoidal integral of I(t), with minutes converted to hours.",
+      "unit": "Ah",
+      "evidence_class": "standard_physical_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Current sign, integration convention, and interval boundaries are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27460,
+        "unavailable_cycles": 75,
+        "finite_fraction": 0.9972761939349918
+      },
+      "candidate_value_distribution": {
+        "count": 27460,
+        "minimum": 1.0722495088156947e-05,
+        "q25": 0.009807113970526337,
+        "median": 0.010878806644473531,
+        "q75": 0.012133182661572834,
+        "maximum": 0.037725703446592054
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.36298763120049443,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.4878890807408815,
+        "within_profile_spearman_rho_minimum": -0.8189987330564822,
+        "within_profile_spearman_rho_maximum": 0.36690650556951293
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.010991394916546594,
+        "2": 0.009910014844705337,
+        "3": 0.011684227273623919,
+        "4": 0.011610157294728054,
+        "5": 0.009811171158842669,
+        "6": 0.010316115070993859
+      },
+      "batch_median_spread": 0.0018730561147812502,
+      "batch_median_spread_over_pooled_iqr": 0.8052454005296652
+    },
+    {
+      "name": "dI_t_mean",
+      "group": "dI",
+      "signal": "elapsed time",
+      "segment": "candidate falling 1.0-0.9 A window within CV",
+      "candidate_formula": "Arithmetic mean of elapsed time on a 257-point uniform-time interpolation grid.",
+      "unit": "min",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Grid and time origin are candidate conventions.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27460,
+        "unavailable_cycles": 75,
+        "finite_fraction": 0.9972761939349918
+      },
+      "candidate_value_distribution": {
+        "count": 27460,
+        "minimum": 0.0003573982022188894,
+        "q25": 0.3101309085052131,
+        "median": 0.34396929380828833,
+        "q75": 0.38376814020801,
+        "maximum": 1.1870078301035092
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.3631524941917194,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.4872081617999741,
+        "within_profile_spearman_rho_minimum": -0.8189609758760196,
+        "within_profile_spearman_rho_maximum": 0.3704707069020386
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.3477107277116235,
+        "2": 0.31350744989011053,
+        "3": 0.3695186058615185,
+        "4": 0.3670017960975791,
+        "5": 0.3106509818498635,
+        "6": 0.3261426515154287
+      },
+      "batch_median_spread": 0.05886762401165502,
+      "batch_median_spread_over_pooled_iqr": 0.7994274451984742
+    },
+    {
+      "name": "dI_C_mean",
+      "group": "dI",
+      "signal": "current",
+      "segment": "candidate falling 1.0-0.9 A window within CV",
+      "candidate_formula": "Arithmetic mean of current on a 257-point uniform-time interpolation grid.",
+      "unit": "A",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27460,
+        "unavailable_cycles": 75,
+        "finite_fraction": 0.9972761939349918
+      },
+      "candidate_value_distribution": {
+        "count": 27460,
+        "minimum": 0.9000460848643917,
+        "q25": 0.9480833358502258,
+        "median": 0.9488107496947968,
+        "q75": 0.949093132598355,
+        "maximum": 0.9592979255146712
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.09324496517021577,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.0024362362977415055,
+        "within_profile_spearman_rho_minimum": -0.5367619229500511,
+        "within_profile_spearman_rho_maximum": 0.6395027507556532
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.9481860877157589,
+        "2": 0.9487796759094567,
+        "3": 0.9485610754845715,
+        "4": 0.9489482059510876,
+        "5": 0.9482527018215166,
+        "6": 0.948900900247968
+      },
+      "batch_median_spread": 0.0007621182353287903,
+      "batch_median_spread_over_pooled_iqr": 0.7547243905673714
+    },
+    {
+      "name": "dI_T_mean",
+      "group": "dI",
+      "signal": "temperature",
+      "segment": "candidate falling 1.0-0.9 A window within CV",
+      "candidate_formula": "Arithmetic mean of temperature on a 257-point uniform-time interpolation grid.",
+      "unit": "degC",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27460,
+        "unavailable_cycles": 75,
+        "finite_fraction": 0.9972761939349918
+      },
+      "candidate_value_distribution": {
+        "count": 27460,
+        "minimum": 17.941170494644656,
+        "q25": 24.0402086616428,
+        "median": 25.89430246211909,
+        "q75": 28.431349918111692,
+        "maximum": 43.68056684410131
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.42554046311818877,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.5065386089059165,
+        "within_profile_spearman_rho_minimum": -0.3929826977022455,
+        "within_profile_spearman_rho_maximum": 0.7833762795077722
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 27.538504796981858,
+        "2": 30.234149932059587,
+        "3": 26.44995304952251,
+        "4": 24.660535917135334,
+        "5": 26.891867555646954,
+        "6": 23.98555817339868
+      },
+      "batch_median_spread": 6.248591758660908,
+      "batch_median_spread_over_pooled_iqr": 1.4229994877654364
+    },
+    {
+      "name": "dI_C_std",
+      "group": "dI",
+      "signal": "current",
+      "segment": "candidate falling 1.0-0.9 A window within CV",
+      "candidate_formula": "Population standard deviation (ddof=0) of current on that grid.",
+      "unit": "A",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27460,
+        "unavailable_cycles": 75,
+        "finite_fraction": 0.9972761939349918
+      },
+      "candidate_value_distribution": {
+        "count": 27460,
+        "minimum": 2.6710840673622306e-05,
+        "q25": 0.028889916315443263,
+        "median": 0.028955610677649523,
+        "q75": 0.029013503698673077,
+        "maximum": 0.056591542770072195
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.0278471448478675,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.055744924487508965,
+        "within_profile_spearman_rho_minimum": -0.40984338659351444,
+        "within_profile_spearman_rho_maximum": 0.21442617549856377
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.028939902176127595,
+        "2": 0.028959671266855606,
+        "3": 0.02894355618234721,
+        "4": 0.02896026091783311,
+        "5": 0.028927673613821606,
+        "6": 0.028964968900094534
+      },
+      "batch_median_spread": 3.729528627292866e-05,
+      "batch_median_spread_over_pooled_iqr": 0.3017726024959776
+    },
+    {
+      "name": "dI_T_std",
+      "group": "dI",
+      "signal": "temperature",
+      "segment": "candidate falling 1.0-0.9 A window within CV",
+      "candidate_formula": "Population standard deviation (ddof=0) of temperature on that grid.",
+      "unit": "degC",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27460,
+        "unavailable_cycles": 75,
+        "finite_fraction": 0.9972761939349918
+      },
+      "candidate_value_distribution": {
+        "count": 27460,
+        "minimum": 0.0,
+        "q25": 0.0685987790520092,
+        "median": 0.09265710939699592,
+        "q75": 0.11620505082268957,
+        "maximum": 0.29035115720576027
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.21044928245880035,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.23361410444246378,
+        "within_profile_spearman_rho_minimum": -0.6099798634113343,
+        "within_profile_spearman_rho_maximum": 0.38764249993326244
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.09057907168395289,
+        "2": 0.1488276705851708,
+        "3": 0.10425435087632007,
+        "4": 0.08745540125503157,
+        "5": 0.12072623797559028,
+        "6": 0.06739187351703865
+      },
+      "batch_median_spread": 0.08143579706813214,
+      "batch_median_spread_over_pooled_iqr": 1.710610682987501
+    },
+    {
+      "name": "dI_C_skewness",
+      "group": "dI",
+      "signal": "current",
+      "segment": "candidate falling 1.0-0.9 A window within CV",
+      "candidate_formula": "Biased third standardized central moment of current.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27460,
+        "unavailable_cycles": 75,
+        "finite_fraction": 0.9972761939349918
+      },
+      "candidate_value_distribution": {
+        "count": 27460,
+        "minimum": -0.4638614559833212,
+        "q25": 0.03699628513194235,
+        "median": 0.049802008052977326,
+        "q75": 0.08133250398205326,
+        "maximum": 0.3684752934428506
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.08294320116674357,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.01719647527533365,
+        "within_profile_spearman_rho_minimum": -0.642353998396989,
+        "within_profile_spearman_rho_maximum": 0.6094845396621467
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.07633063865698524,
+        "2": 0.049392173274713215,
+        "3": 0.06020360167036076,
+        "4": 0.04303423488510462,
+        "5": 0.07139042870459683,
+        "6": 0.04627326188209312
+      },
+      "batch_median_spread": 0.03329640377188062,
+      "batch_median_spread_over_pooled_iqr": 0.7509978215428563
+    },
+    {
+      "name": "dI_T_skewness",
+      "group": "dI",
+      "signal": "temperature",
+      "segment": "candidate falling 1.0-0.9 A window within CV",
+      "candidate_formula": "Biased third standardized central moment of temperature.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27460,
+        "unavailable_cycles": 75,
+        "finite_fraction": 0.9972761939349918
+      },
+      "candidate_value_distribution": {
+        "count": 27460,
+        "minimum": -13.195515568403339,
+        "q25": -0.15385666344001195,
+        "median": 2.6252951450310267e-14,
+        "q75": 0.1939323672580661,
+        "maximum": 15.937500000252294
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.0024409742774751764,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.013758498460485335,
+        "within_profile_spearman_rho_minimum": -0.2267802554106699,
+        "within_profile_spearman_rho_maximum": 0.1120832717436459
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 3.801192423958055e-14,
+        "2": 6.155594637670335e-14,
+        "3": 3.448563497476426e-14,
+        "4": 5.7976651613561e-14,
+        "5": 0.0,
+        "6": 0.0
+      },
+      "batch_median_spread": 6.155594637670335e-14,
+      "batch_median_spread_over_pooled_iqr": 1.7699220200576475e-13
+    },
+    {
+      "name": "dI_C_kurtosis",
+      "group": "dI",
+      "signal": "current",
+      "segment": "candidate falling 1.0-0.9 A window within CV",
+      "candidate_formula": "Pearson fourth standardized central moment of current.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27460,
+        "unavailable_cycles": 75,
+        "finite_fraction": 0.9972761939349918
+      },
+      "candidate_value_distribution": {
+        "count": 27460,
+        "minimum": 1.7575486369175177,
+        "q25": 1.7986276550617097,
+        "median": 1.8041922790682265,
+        "q75": 1.813900269839412,
+        "maximum": 2.2161769070889425
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.03444948711359205,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.004760031652323107,
+        "within_profile_spearman_rho_minimum": -0.3553890851777378,
+        "within_profile_spearman_rho_maximum": 0.42985155883772647
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.8075842882987367,
+        "2": 1.8044260416881017,
+        "3": 1.8074496087524892,
+        "4": 1.8046486767883854,
+        "5": 1.8107084800489475,
+        "6": 1.802701233211391
+      },
+      "batch_median_spread": 0.008007246837556492,
+      "batch_median_spread_over_pooled_iqr": 0.5242878808969195
+    },
+    {
+      "name": "dI_T_kurtosis",
+      "group": "dI",
+      "signal": "temperature",
+      "segment": "candidate falling 1.0-0.9 A window within CV",
+      "candidate_formula": "Pearson fourth standardized central moment of temperature.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27460,
+        "unavailable_cycles": 75,
+        "finite_fraction": 0.9972761939349918
+      },
+      "candidate_value_distribution": {
+        "count": 27460,
+        "minimum": 0.0,
+        "q25": 1.7598022334026555,
+        "median": 1.805217764079241,
+        "q75": 1.9798251492216572,
+        "maximum": 255.003906255361
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.021315862641176207,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.015945439162975257,
+        "within_profile_spearman_rho_minimum": -0.11993985418670519,
+        "within_profile_spearman_rho_maximum": 0.1556675915795475
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.8002363121937413,
+        "2": 1.8046618210366123,
+        "3": 1.7999636627907085,
+        "4": 1.8075586825598187,
+        "5": 1.8002675731503808,
+        "6": 1.825659779363295
+      },
+      "batch_median_spread": 0.025696116572586414,
+      "batch_median_spread_over_pooled_iqr": 0.11678836487070697
+    },
+    {
+      "name": "dI_dI_devide_dt",
+      "group": "dI",
+      "signal": "current and time",
+      "segment": "candidate falling 1.0-0.9 A window within CV",
+      "candidate_formula": "Endpoint signal difference divided by candidate interval duration.",
+      "unit": "A/min",
+      "evidence_class": "name_supported_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Derivative estimator and candidate window boundaries are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27460,
+        "unavailable_cycles": 75,
+        "finite_fraction": 0.9972761939349918
+      },
+      "candidate_value_distribution": {
+        "count": 27460,
+        "minimum": -0.31236846275579666,
+        "q25": -0.16107399006324016,
+        "median": -0.1453136779150681,
+        "q75": -0.13030247433587439,
+        "maximum": -0.0421227212929504
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.3658755514077055,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.5009314823107927,
+        "within_profile_spearman_rho_minimum": -0.8189609758760196,
+        "within_profile_spearman_rho_maximum": 0.3704707069020386
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": -0.14379769163023323,
+        "2": -0.1594858432152914,
+        "3": -0.13531118381295165,
+        "4": -0.13623911526581053,
+        "5": -0.15579728426915998,
+        "6": -0.15330714880096127
+      },
+      "batch_median_spread": 0.02417465940233976,
+      "batch_median_spread_over_pooled_iqr": 0.7856180896815788
+    },
+    {
+      "name": "dI_entropy",
+      "group": "dI",
+      "signal": "current proxy",
+      "segment": "candidate falling 1.0-0.9 A window within CV",
+      "candidate_formula": "Diagnostic proxy: Shannon entropy in nats of a 16-bin equal-width histogram.",
+      "unit": "nats",
+      "evidence_class": "unknown_original_definition",
+      "formula_status": "Original formula unknown; histogram proxy is diagnostic only.",
+      "assumptions": "Original entropy signal, estimator, binning, and logarithm base were not located.",
+      "mathematical_validation": "Histogram proxy calculation tested; original entropy feature definition unavailable.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27460,
+        "unavailable_cycles": 75,
+        "finite_fraction": 0.9972761939349918
+      },
+      "candidate_value_distribution": {
+        "count": 27460,
+        "minimum": 2.712728209986897,
+        "q25": 2.7695388212933936,
+        "median": 2.7712604274805033,
+        "q75": 2.7717471259537776,
+        "maximum": 2.77247717366369
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.09626586781514193,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.010932669726583053,
+        "within_profile_spearman_rho_minimum": -0.6532096737422118,
+        "within_profile_spearman_rho_maximum": 0.6374493888945046
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 2.7697802556280537,
+        "2": 2.771031409970557,
+        "3": 2.770586909162649,
+        "4": 2.7715037767171404,
+        "5": 2.7700255197666683,
+        "6": 2.7715037767171404
+      },
+      "batch_median_spread": 0.001723521089086688,
+      "batch_median_spread_over_pooled_iqr": 0.7804725136009864
+    },
+    {
+      "name": "Charge_energy",
+      "group": "Charge",
+      "signal": "voltage and current",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Trapezoidal integral of V(t)*I(t), with minutes converted to hours.",
+      "unit": "Wh",
+      "evidence_class": "standard_physical_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Current sign, integration convention, and interval boundaries are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 0.4635490788993622,
+        "q25": 3.811668948688684,
+        "median": 7.118810322041669,
+        "q75": 7.503483943461667,
+        "maximum": 7.979382352916186
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.39176292155519554,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.9627797091995658,
+        "within_profile_spearman_rho_minimum": -0.508146896936131,
+        "within_profile_spearman_rho_maximum": 0.996849807152906
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 7.499621369950102,
+        "2": 7.523159258275389,
+        "3": 7.458683251434016,
+        "4": 7.21553247656102,
+        "5": 7.237551546893115,
+        "6": 3.579116184581677
+      },
+      "batch_median_spread": 3.944043073693712,
+      "batch_median_spread_over_pooled_iqr": 1.0683208880395805
+    },
+    {
+      "name": "Charge_Q",
+      "group": "Charge",
+      "signal": "current and time",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Trapezoidal integral of I(t), with minutes converted to hours.",
+      "unit": "Ah",
+      "evidence_class": "standard_physical_candidate",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Current sign, integration convention, and interval boundaries are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 0.11036972591036846,
+        "q25": 0.9301698723453489,
+        "median": 1.8000786653726162,
+        "q75": 1.9043734395570513,
+        "maximum": 2.028984877572981
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.40808355060480966,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.9608457283304309,
+        "within_profile_spearman_rho_minimum": -0.5063054321530461,
+        "within_profile_spearman_rho_maximum": 0.996864137851386
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.9125268645347586,
+        "2": 1.8952104177725788,
+        "3": 1.899238169731598,
+        "4": 1.830072741728557,
+        "5": 1.830408934590328,
+        "6": 0.873499053790509
+      },
+      "batch_median_spread": 1.0390278107442497,
+      "batch_median_spread_over_pooled_iqr": 1.0665407577166677
+    },
+    {
+      "name": "Charge_t_mean",
+      "group": "Charge",
+      "signal": "elapsed time",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Arithmetic mean of elapsed time on a 257-point uniform-time interpolation grid.",
+      "unit": "min",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Grid and time origin are candidate conventions.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 5.8335,
+        "q25": 19.40625,
+        "median": 23.938000000000002,
+        "q75": 25.6585,
+        "maximum": 75.23899999999999
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.28331248326726144,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.8234167030290745,
+        "within_profile_spearman_rho_minimum": -0.9582264610879919,
+        "within_profile_spearman_rho_maximum": -0.3110394165263525
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 25.0905,
+        "2": 20.596000000000004,
+        "3": 26.069000000000003,
+        "4": 25.4965,
+        "5": 20.727500000000003,
+        "6": 17.9125
+      },
+      "batch_median_spread": 8.156500000000001,
+      "batch_median_spread_over_pooled_iqr": 1.3045703546723182
+    },
+    {
+      "name": "Charge_V_mean",
+      "group": "Charge",
+      "signal": "voltage",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Arithmetic mean of voltage on a 257-point uniform-time interpolation grid.",
+      "unit": "V",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 3.9100926545892025,
+        "q25": 4.054123235393552,
+        "median": 4.089226278836815,
+        "q75": 4.156879822038183,
+        "maximum": 4.200050773401779
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.40446909270207654,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.9528995752087017,
+        "within_profile_spearman_rho_minimum": -0.9930654433336233,
+        "within_profile_spearman_rho_maximum": -0.46391721314582474
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 4.038795669058313,
+        "2": 4.0934586109938405,
+        "3": 4.04977872807967,
+        "4": 4.061777859955525,
+        "5": 4.100010355298115,
+        "6": 4.160663336069158
+      },
+      "batch_median_spread": 0.12186766701084473,
+      "batch_median_spread_over_pooled_iqr": 1.18598399372983
+    },
+    {
+      "name": "Charge_C_mean",
+      "group": "Charge",
+      "signal": "current",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Arithmetic mean of current on a 257-point uniform-time interpolation grid.",
+      "unit": "A",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 0.39879041570542156,
+        "q25": 1.5543572204301683,
+        "median": 2.0877839513136296,
+        "q75": 2.374803512846624,
+        "maximum": 3.197263304782226
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.33256356950779353,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.9642761677188009,
+        "within_profile_spearman_rho_minimum": 0.5036284677408841,
+        "within_profile_spearman_rho_maximum": 0.9916605057431811
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 2.298908229516884,
+        "2": 2.7624801348981904,
+        "3": 2.1726529318133236,
+        "4": 2.127944471323046,
+        "5": 2.6314852234119077,
+        "6": 1.4915724076001498
+      },
+      "batch_median_spread": 1.2709077272980407,
+      "batch_median_spread_over_pooled_iqr": 1.5490443908946725
+    },
+    {
+      "name": "Charge_T_mean",
+      "group": "Charge",
+      "signal": "temperature",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Arithmetic mean of temperature on a 257-point uniform-time interpolation grid.",
+      "unit": "degC",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 17.645337916840887,
+        "q25": 23.25359280316342,
+        "median": 24.89678394606247,
+        "q75": 27.646793430414963,
+        "maximum": 34.563465747846585
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.5120777186976262,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.5834680026694616,
+        "within_profile_spearman_rho_minimum": -0.329546854427555,
+        "within_profile_spearman_rho_maximum": 0.7973456396616263
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 27.15121050761254,
+        "2": 29.11817272466544,
+        "3": 25.799123481433515,
+        "4": 24.20887287172267,
+        "5": 25.142491661863495,
+        "6": 23.092670518771826
+      },
+      "batch_median_spread": 6.025502205893613,
+      "batch_median_spread_over_pooled_iqr": 1.371551794952571
+    },
+    {
+      "name": "Charge_C_std",
+      "group": "Charge",
+      "signal": "current",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Population standard deviation (ddof=0) of current on that grid.",
+      "unit": "A",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 0.35904934445798464,
+        "q25": 1.5848010591796016,
+        "median": 1.7306529747778812,
+        "q75": 1.7455427563358776,
+        "maximum": 2.6802438492676144
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.07669190956218637,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.5561842844789551,
+        "within_profile_spearman_rho_minimum": -0.2476865906559513,
+        "within_profile_spearman_rho_maximum": 0.9576602037465588
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.7341482512049977,
+        "2": 2.6328942936674777,
+        "3": 1.7327204605880115,
+        "4": 1.734140645367706,
+        "5": 2.60857116006168,
+        "6": 1.5622182794517014
+      },
+      "batch_median_spread": 1.0706760142157763,
+      "batch_median_spread_over_pooled_iqr": 6.660848013660359
+    },
+    {
+      "name": "Charge_V_std",
+      "group": "Charge",
+      "signal": "voltage",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Population standard deviation (ddof=0) of voltage on that grid.",
+      "unit": "V",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 0.0009045557564395973,
+        "q25": 0.08471711882506425,
+        "median": 0.1693588365441916,
+        "q75": 0.19493853869324923,
+        "maximum": 0.23576862351109207
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.3674851728482482,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.8805714299816365,
+        "within_profile_spearman_rho_minimum": 0.3784156380240499,
+        "within_profile_spearman_rho_maximum": 0.9882670636838836
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 0.19908374868476134,
+        "2": 0.1646736822556486,
+        "3": 0.2015654651895582,
+        "4": 0.18758173191544633,
+        "5": 0.15718974192762017,
+        "6": 0.08264630748064855
+      },
+      "batch_median_spread": 0.11891915770890965,
+      "batch_median_spread_over_pooled_iqr": 1.0789115024205493
+    },
+    {
+      "name": "Charge_T_std",
+      "group": "Charge",
+      "signal": "temperature",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Population standard deviation (ddof=0) of temperature on that grid.",
+      "unit": "degC",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 0.04792299503608952,
+        "q25": 1.796252836171607,
+        "median": 2.1467767181574455,
+        "q75": 2.8148676014325327,
+        "maximum": 8.07126941042185
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.302811714176467,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.6133051711469041,
+        "within_profile_spearman_rho_minimum": -0.9651137624723062,
+        "within_profile_spearman_rho_maximum": -0.06974530962563306
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.986733303695715,
+        "2": 3.6642531505680767,
+        "3": 2.385398557828308,
+        "4": 1.9580807939412899,
+        "5": 3.2849561197701167,
+        "6": 1.8675369586727828
+      },
+      "batch_median_spread": 1.7967161918952939,
+      "batch_median_spread_over_pooled_iqr": 1.7638819435677942
+    },
+    {
+      "name": "Charge_C_skewness",
+      "group": "Charge",
+      "signal": "current",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Biased third standardized central moment of current.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": -1.2553602072475492,
+        "q25": -0.015105443189258617,
+        "median": 0.22823847378856274,
+        "q75": 0.6399911646743182,
+        "maximum": 3.522171485703855
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.47776532836011804,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.9627573230391315,
+        "within_profile_spearman_rho_minimum": -0.9916385113655168,
+        "within_profile_spearman_rho_maximum": -0.47475715002908625
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": -0.1487850480660387,
+        "2": 0.30899047157093273,
+        "3": -0.010365619048436824,
+        "4": 0.03512160413319379,
+        "5": 0.34970999890427995,
+        "6": 0.7276379032222605
+      },
+      "batch_median_spread": 0.8764229512882993,
+      "batch_median_spread_over_pooled_iqr": 1.3378529834653234
+    },
+    {
+      "name": "Charge_V_skewness",
+      "group": "Charge",
+      "signal": "voltage",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Biased third standardized central moment of voltage.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": -12.796270584288099,
+        "q25": -1.8487926326452433,
+        "median": -1.2047172530829378,
+        "q75": -0.8887893535617822,
+        "maximum": 0.04086519990473956
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.4543905117241752,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": 0.9289662353832046,
+        "within_profile_spearman_rho_minimum": 0.4940886936224325,
+        "within_profile_spearman_rho_maximum": 0.9877758694336451
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": -0.7715402753510577,
+        "2": -1.2844162378307376,
+        "3": -0.9482844825286034,
+        "4": -0.91882428369185,
+        "5": -1.2539806579547421,
+        "6": -1.9610641033101235
+      },
+      "batch_median_spread": 1.1895238279590656,
+      "batch_median_spread_over_pooled_iqr": 1.2390830884397952
+    },
+    {
+      "name": "Charge_T_skewness",
+      "group": "Charge",
+      "signal": "temperature",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Biased third standardized central moment of temperature.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": -1.3727533966836467,
+        "q25": -0.17921062636084623,
+        "median": 0.022236936455141347,
+        "q75": 0.1538080403798216,
+        "maximum": 1.2177010715558532
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.40761907744427966,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.5461998024603717,
+        "within_profile_spearman_rho_minimum": -0.9670236838741558,
+        "within_profile_spearman_rho_maximum": -0.3176424903914767
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": -0.17863505834138574,
+        "2": 0.1826660063069497,
+        "3": -0.10416473535329815,
+        "4": -0.05665971249959596,
+        "5": 0.19269319113274475,
+        "6": 0.036431214846490756
+      },
+      "batch_median_spread": 0.37132824947413046,
+      "batch_median_spread_over_pooled_iqr": 1.1150373434270444
+    },
+    {
+      "name": "Charge_C_kurtosis",
+      "group": "Charge",
+      "signal": "current",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Pearson fourth standardized central moment of current.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 1.083286977837552,
+        "q25": 1.15241715935697,
+        "median": 1.2050379402281155,
+        "q75": 1.6452642851624806,
+        "maximum": 21.872259676969627
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.2718682409445094,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.5422971242231281,
+        "within_profile_spearman_rho_minimum": -0.996840783553111,
+        "within_profile_spearman_rho_maximum": 0.2720252544672092
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.1627248693356573,
+        "2": 1.214883110746315,
+        "3": 1.162403649538468,
+        "4": 1.149823464852271,
+        "5": 1.2809105067332494,
+        "6": 1.771526624392709
+      },
+      "batch_median_spread": 0.6217031595404381,
+      "batch_median_spread_over_pooled_iqr": 1.2614523388450831
+    },
+    {
+      "name": "Charge_V_kurtosis",
+      "group": "Charge",
+      "signal": "voltage",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Pearson fourth standardized central moment of voltage.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 1.393106754279761,
+        "q25": 2.3420012991776615,
+        "median": 3.1072890739211982,
+        "q75": 5.033353763141234,
+        "maximum": 173.23528557103643
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": -0.4386606689747473,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.8782968774921133,
+        "within_profile_spearman_rho_minimum": -0.9823559806572844,
+        "within_profile_spearman_rho_maximum": -0.47640347219589857
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 2.1842106822080156,
+        "2": 3.4066048540809066,
+        "3": 2.643448367301775,
+        "4": 2.3036652599151894,
+        "5": 3.1423900264392257,
+        "6": 5.377310326993117
+      },
+      "batch_median_spread": 3.193099644785101,
+      "batch_median_spread_over_pooled_iqr": 1.1864293835682163
+    },
+    {
+      "name": "Charge_T_kurtosis",
+      "group": "Charge",
+      "signal": "temperature",
+      "segment": "complete stored charge trace",
+      "candidate_formula": "Pearson fourth standardized central moment of temperature.",
+      "unit": "dimensionless",
+      "evidence_class": "candidate_approximation",
+      "formula_status": "Original formula implementation not located; candidate approximation only.",
+      "assumptions": "Workbook formula and exact segment convention remain unverified. Statistical weighting and sample/bias/excess conventions are not source-confirmed.",
+      "mathematical_validation": "Candidate equation tested on synthetic signals; original formula and segment provenance unverified.",
+      "original_benchmark_status": "unverified",
+      "availability": {
+        "finite_cycles": 27535,
+        "unavailable_cycles": 0,
+        "finite_fraction": 1.0
+      },
+      "candidate_value_distribution": {
+        "count": 27535,
+        "minimum": 1.2218278923196229,
+        "q25": 1.456799739795219,
+        "median": 1.5897724570148515,
+        "q75": 1.6784458228050614,
+        "maximum": 4.101258642670196
+      },
+      "capacity_label_association": {
+        "pooled_spearman_rho_descriptive_only": 0.15147791042938105,
+        "valid_profile_correlations": 55,
+        "within_profile_spearman_rho_median": -0.11499113869246501,
+        "within_profile_spearman_rho_minimum": -0.9347532735676118,
+        "within_profile_spearman_rho_maximum": 0.9025865620426358
+      },
+      "batch_median_capacity_protocol_cohort_values": {
+        "1": 1.641515806702842,
+        "2": 1.6115749911516724,
+        "3": 1.6269751086088144,
+        "4": 1.6042926829556923,
+        "5": 1.6426709790335954,
+        "6": 1.3912086414379778
+      },
+      "batch_median_spread": 0.25146233759561754,
+      "batch_median_spread_over_pooled_iqr": 1.134521910700543
+    }
+  ],
+  "descriptive_association_summary": {
+    "highest_absolute_median_within_profile_spearman": [
+      "Charge_C_mean",
+      "Charge_energy",
+      "Charge_C_skewness",
+      "Charge_Q",
+      "CC_Q",
+      "CC_t_mean",
+      "CC_CCCT",
+      "Charge_V_mean",
+      "CC_energy",
+      "CV_t_mean"
+    ],
+    "largest_batch_median_spread_relative_to_pooled_iqr": [
+      "Charge_C_std",
+      "CV_C_std",
+      "dV_energy",
+      "dV_Q",
+      "CV_T_std",
+      "CV_C_mean",
+      "CC_T_std",
+      "dV_V_std",
+      "Charge_T_std",
+      "dV_entropy"
+    ],
+    "causal_or_predictive_interpretation": false
+  },
+  "method_limitations": [
+    "The prepared MAT cycle indices are not an authoritative mapping to the workbook feature rows.",
+    "Feature values are candidate calculations under current segmentation assumptions.",
+    "Pooled and within-profile Spearman coefficients describe association only; no causal claim or p-value-based inference is made.",
+    "Within-profile ordering is used only for descriptive association, not as evidence of authoritative cycle identity.",
+    "No cycle-wise random split, predictive model, or cell-wise/batch-wise predictive validation was performed."
+  ]
+}

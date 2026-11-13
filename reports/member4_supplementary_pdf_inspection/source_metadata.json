@@ -1,0 +1,52 @@
+{
+  "attached_files": [
+    {
+      "filename": "s41467-024-48779-z (1).pdf",
+      "local_path": "C:\\Users\\acer\\Downloads\\s41467-024-48779-z (1).pdf",
+      "bytes": 8732355,
+      "sha256": "3594214f6710adbdbf823402aff98ff69238d1ae959d57b57215dcd4bce08e8a",
+      "metadata_title": "Physics-informed neural network for lithium-ion battery degradation stable modeling and prognosis",
+      "pymupdf_page_count": 0,
+      "pymupdf_is_repaired": true,
+      "pdf_eof_marker_present": false,
+      "inspection_result": "Not page-renderable by PyMuPDF (zero pages) or pypdf (unexpected end of stream); do not use as page evidence."
+    },
+    {
+      "filename": "s41467-024-48779-z.pdf",
+      "local_path": "C:\\Users\\acer\\Downloads\\s41467-024-48779-z.pdf",
+      "bytes": 1064643,
+      "sha256": "152734a683ae0a9ec919e635e5cde300b4ceb4ba12e3f28fa8e8b9932a6f266a",
+      "metadata_title": "Physics-informed neural network for lithium-ion battery degradation stable modeling and prognosis",
+      "pymupdf_page_count": 0,
+      "pymupdf_is_repaired": true,
+      "pdf_eof_marker_present": false,
+      "inspection_result": "Not page-renderable by PyMuPDF (zero pages) or pypdf (unexpected end of stream); do not use as page evidence."
+    }
+  ],
+  "inspected_authoritative_supplement": {
+    "title": "Supplementary Information for Physics-informed neural network for lithium-ion battery degradation stable modeling and prognosis",
+    "url": "https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-024-48779-z/MediaObjects/41467_2024_48779_MOESM1_ESM.pdf",
+    "retrieved_to": "system temporary directory; not copied into repository",
+    "bytes": 2974460,
+    "page_count": 15,
+    "sha256": "f6f0ee6ea624c959487ea680fefc97142cdd88135976201b6e498f780dbe0753",
+    "metadata_title": "Physics-informed neural network for lithium-ion battery degradation stable modeling and prognosis",
+    "inspection": "Text scanned page by page; pages 3, 5, 6, and 7 rendered at 2x and visually inspected. Page 6 equations inspected in rendered form."
+  },
+  "paper": {
+    "doi": "https://doi.org/10.1038/s41467-024-48779-z",
+    "article": "Wang et al., Nature Communications 15, 4332 (2024)"
+  },
+  "author_code_linked_from_supplement_page_7": {
+    "repository": "https://github.com/wang-fujin/PINN4SOH/tree/cc3cc5053caf38f04e0665f7f88cb109144d035e",
+    "data_file": "https://github.com/wang-fujin/PINN4SOH/blob/cc3cc5053caf38f04e0665f7f88cb109144d035e/data/XJTU%20data/RW_battery-7.csv",
+    "loader": "https://github.com/wang-fujin/PINN4SOH/blob/cc3cc5053caf38f04e0665f7f88cb109144d035e/dataloader/dataloader.py",
+    "observed_schema": "16 paper-specific input feature columns plus capacity; repository README describes data folder as preprocessed; loader consumes CSVs and no formula generator was located in the inspected repository files."
+  },
+  "mapping_counts": {
+    "No feature-level correspondence located": 31,
+    "Related methodology only": 36
+  },
+  "features_mapped": 67,
+  "direct_67_feature_matches": 0
+}

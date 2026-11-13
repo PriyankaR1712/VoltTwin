@@ -1,0 +1,14 @@
+{
+  "profiles": 55,
+  "raw_cycles": 27535,
+  "workbook_rows": 26937,
+  "helper_matched_pairs": 26320,
+  "unmatched_workbook_rows": 617,
+  "ambiguous_workbook_rows": 489,
+  "unmatched_raw_cycles": 1215,
+  "equal_count_profiles": 47,
+  "same_index_capacity_matches_within_1e-6": 13464,
+  "same_index_capacity_comparison_profiles": 47,
+  "positional_unverified_pairs": 19191,
+  "capacity_match_diagnostic_pairs": 7129
+}

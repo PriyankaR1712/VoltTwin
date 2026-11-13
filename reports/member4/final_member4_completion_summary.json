@@ -1,0 +1,296 @@
+{
+  "title": "Member 4 Final Completion Summary",
+  "review_date": "2026-11-10",
+  "repository": "VoltTwin",
+  "branch": "feature/features-ui",
+  "verdict": {
+    "implementation": "COMPLETE",
+    "scientific_validation": "PARTIALLY_VALIDATED",
+    "original_benchmark_validation": "BLOCKED",
+    "browser_e2e": "VERIFIED: 26 passed, 0 failed in installed Google Chrome through Playwright 1.65.0",
+    "handoff": "READY WITH DOCUMENTED LIMITATIONS",
+    "coding_task_remaining": false,
+    "scope": "Engineering completion includes the 67-feature candidate extractor, Formula Explorer, aging analysis, and grouped capacity-prediction evaluation. Candidate math has synthetic checks, but no original benchmark formulas or cycle identities are verified."
+  },
+  "implementation": {
+    "candidate_features": 67,
+    "feature_groups": {
+      "CC": 13,
+      "dV": 13,
+      "CV": 13,
+      "dI": 13,
+      "Charge": 15
+    },
+    "formula_explorer_backend_registered": true,
+    "formula_explorer_frontend_integrated": true,
+    "candidate_and_original_values_distinguished": true,
+    "feature_aging_analysis_implemented": true,
+    "leakage_safe_grouped_capacity_prediction_implemented": true,
+    "confirmed_mandatory_implementation_tasks_remaining": 0
+  },
+  "software_validation": {
+    "focused_member4_test_command": ".\\.venv\\Scripts\\python.exe -m pytest -q tests\\member4_xjtu",
+    "focused_member4_test_result": "49 passed",
+    "formula_explorer_api_test_command": ".\\.venv\\Scripts\\python.exe -m pytest -q tests\\test_formula_explorer_api.py",
+    "formula_explorer_api_test_result": "13 passed",
+    "formula_recovery_audit_test_command": ".\\.venv\\Scripts\\python.exe -m pytest -q tests\\member4_xjtu\\test_original_formula_recovery_audit.py",
+    "formula_recovery_audit_test_result": "2 passed",
+    "formula_verification_phase2_test_command": ".\\.venv\\Scripts\\python.exe -m pytest -q tests\\member4_xjtu\\test_formula_verification_phase2.py",
+    "formula_verification_phase2_test_result": "2 passed",
+    "full_test_command": ".\\.venv\\Scripts\\python.exe -m pytest -q",
+    "full_test_result": "132 passed",
+    "aging_analysis_command": ".\\.venv\\Scripts\\python.exe -m scripts.member4_xjtu.aging_analysis",
+    "aging_analysis_result": "Recorded completed run; 27,535 prepared cycles, 67 features, 3 plots. Not rerun during closure.",
+    "aging_prediction_command": ".\\.venv\\Scripts\\python.exe -m scripts.member4_xjtu.aging_prediction",
+    "aging_prediction_result": "Recorded completed run; 55 profiles and 27,535 finite target cycles. Not rerun during closure.",
+    "frontend_build_command": "Set-Location frontend; npm run build",
+    "frontend_build_result": "passed",
+    "frontend_build_warning": "Vite reported a minified chunk larger than 500 kB; build succeeded.",
+    "frontend_lint_command": "Set-Location frontend; npm run lint",
+    "frontend_lint_result": "passed",
+    "report_integrity_result": {
+      "csv_files_parsed": 33,
+      "json_files_parsed": 14,
+      "csv_data_rows": 107277,
+      "csv_rows_match_header_width": true
+    },
+    "git_diff_check": "passed",
+    "browser_automation_rerun": true,
+    "browser_e2e": {
+      "browser": "Google Chrome",
+      "framework": "Playwright",
+      "framework_version": "1.65.0",
+      "mode": "headless",
+      "viewport": "1440x1100",
+      "command": "node frontend/browser_e2e.mjs",
+      "passed": 26,
+      "failed": 0,
+      "page_errors": 0,
+      "critical_http_5xx": 0,
+      "unexpected_application_console_errors": 0,
+      "screenshots": 6,
+      "report": "reports/browser_testing_report.md",
+      "summary": "reports/browser_testing_summary.json",
+      "limitations": [
+        "Single-page dashboard uses anchored sections rather than separate routes.",
+        "Intentional invalid-cycle 404 was browser-observed; UI error state was tested with equivalent intercepted response.",
+        "External Google Fonts request was blocked by the restricted environment; fallback fonts rendered."
+      ]
+    },
+    "live_api_checks": {
+      "health": {"status": 200, "body_status": "healthy"},
+      "formula_catalog": {"status": 200, "feature_count": 67, "source_verified_count": 0},
+      "batch_1_profiles": {"status": 200, "profile_count": 8},
+      "candidate_calculation": {"status": 200, "batch": 1, "profile": "Sheet1", "cycle": 1, "feature": "Charge_energy", "raw_sample_count": 128, "original_benchmark_value": false},
+      "invalid_feature_status": 422,
+      "invalid_batch_status": 422,
+      "missing_cycle_status": 404
+    },
+    "environment_note": "scikit-learn import failed because Windows Application Control blocked its compiled _ball_tree extension; Ridge was implemented using NumPy closed-form regularized least squares."
+  },
+  "scientific_verification": {
+    "original_feature_generator_found": 0,
+    "original_feature_formulas": {
+      "total": 67,
+      "source_verified": 0,
+      "partially_verified": 0,
+      "candidate_unverified": 63,
+      "original_formula_unavailable": 4
+    },
+    "expression_evidence_classification": {
+      "A_direct_authoritative_match": 0,
+      "B_related_operation_only": 14,
+      "C_engineering_candidate": 49,
+      "D_proxy_or_approximation": 4,
+      "E_no_implemented_expression": 0,
+      "note": "The 14 class-B entries do not verify exact workbook formulas or context."
+    },
+    "paper_feature_comparison": {
+      "paper_features": 16,
+      "exact_equivalences": 0,
+      "original_67_features_verified_by_paper": 0
+    },
+    "cycle_identity": {
+      "profiles": 55,
+      "prepared_cycles": 27535,
+      "workbook_rows": 26937,
+      "authoritative_pairs": 0,
+      "positional_unverified_candidates": 19191,
+      "capacity_unverified_candidates": 7129,
+      "all_helper_matched_unverified_candidates": 26320,
+      "ambiguous_workbook_rows": 489,
+      "unmatched_workbook_rows_without_capacity_candidate": 128,
+      "unmatched_workbook_rows_total": 617,
+      "raw_cycles_unused_by_capacity_diagnostic": 1215
+    },
+    "cc_q_independently_reproduced": false,
+    "candidate_comparison_metrics_are_ground_truth": false,
+    "original_formula_recovery": {
+      "original_formulas_recovered": 0,
+      "status_counts": {
+        "SOURCE_VERIFIED": 0,
+        "PARTIALLY_VERIFIED": 0,
+        "CANDIDATE_UNVERIFIED": 63,
+        "ORIGINAL_FORMULA_UNKNOWN": 4
+      },
+      "authoritative_sources_inspected": [
+        "SOHbenchmark author repository at inspected commit 62230dd9a857f5c05ac641227b52ec2ffbeb9e15",
+        "SOHbenchmark XJTU workbook addition commit 611bb5948fe4a7914486ded7be238db24faabb23",
+        "Author XJTU preprocessing library XJTUBatteryClass.py",
+        "Official XJTU dataset site and Zenodo record 10963339",
+        "SOHbenchmark paper appendix PDF supplied in reference/SOHbenchmark",
+        "Nature Communications 2024 paper, treated as a distinct feature method"
+      ],
+      "local_workbook_audit": {
+        "workbooks": 6,
+        "features_per_workbook": 67,
+        "label_column": "label",
+        "all_headers_match_registry": true,
+        "spreadsheet_formula_cells": 0,
+        "comments": 0,
+        "defined_names": 0
+      },
+      "formula_explorer_updated": false,
+      "reason": "No exact original formula was supported by an authoritative source; existing candidate equations and provenance warning were retained.",
+      "audit_files": [
+        "reports/member4/original_formula_recovery_audit.md",
+        "reports/member4/original_formula_recovery.csv",
+        "reports/member4/original_formula_recovery_summary.json"
+      ]
+    },
+    "formula_verification_phase2": {
+      "original_formulas_recovered": 0,
+      "phase2_evidence_status_counts": {
+        "SOURCE_VERIFIED": 0,
+        "PARTIALLY_VERIFIED": 0,
+        "RELATED_METHOD_ONLY": 32,
+        "CANDIDATE_UNVERIFIED": 31,
+        "ORIGINAL_FORMULA_UNKNOWN": 4
+      },
+      "original_formula_provenance_counts": {
+        "SOURCE_VERIFIED": 0,
+        "PARTIALLY_VERIFIED": 0,
+        "CANDIDATE_UNVERIFIED": 63,
+        "ORIGINAL_FORMULA_UNKNOWN": 4
+      },
+      "author_xjtu_notebook_selector_evidence": {
+        "cc_voltage_range": "[3.8, 4.0] V",
+        "cv_current_range": "[1.0, 0.5] A",
+        "scope": "Visualization/helper evidence only; no 67-column exporter or workbook mapping."
+      },
+      "formula_explorer_updated": false,
+      "candidate_formulas_modified": false,
+      "report_files": [
+        "reports/member4/formula_verification_phase2.md",
+        "reports/member4/formula_verification_phase2.csv",
+        "reports/member4/formula_verification_phase2_summary.json"
+      ]
+    },
+    "aging_analysis": {
+      "profiles": 55,
+      "prepared_cycles": 27535,
+      "features_analyzed": 67,
+      "features_with_any_unavailable_values": 39,
+      "unavailable_cycle_counts": {
+        "CC_features": 109,
+        "CC_CCCT": 111,
+        "dV_features": 433,
+        "dI_features": 75
+      },
+      "within_profile_capacity_label_associations": {
+        "Charge_C_mean": 0.964,
+        "Charge_energy": 0.963,
+        "Charge_C_skewness": -0.963,
+        "Charge_Q": 0.961,
+        "CC_Q": 0.959
+      },
+      "high_redundancy_pairs": 134,
+      "trajectory_plots": [
+        "reports/member4/aging_figures/Charge_C_mean.png",
+        "reports/member4/aging_figures/Charge_energy.png",
+        "reports/member4/aging_figures/Charge_C_skewness.png"
+      ],
+      "capacity_normalized_per_profile": false,
+      "interpretation": "Descriptive within-profile associations only; not causal or predictor validation. Target is an unnormalized capacity label, not SOH."
+    },
+    "leakage_safe_capacity_prediction": {
+      "target": "capacity_label",
+      "target_units": "Unresolved stored scale",
+      "soh_prediction_claimed": false,
+      "profiles": 55,
+      "cycles": 27535,
+      "predictors": 57,
+      "excluded_candidate_features": 10,
+      "folds": 5,
+      "training_profiles_per_fold": 44,
+      "test_profiles_per_fold": 11,
+      "no_profile_overlap_between_train_test": true,
+      "ridge_preprocessing_fit_on_training_fold_only": true,
+      "pooled_out_of_fold_metrics": {
+        "training_median_baseline": {
+          "mae": 0.0733097075,
+          "rmse": 0.0989519428,
+          "r2": -0.0456022750
+        },
+        "ridge": {
+          "mae": 0.0290549734,
+          "rmse": 0.0398805381,
+          "r2": 0.8301600363
+        }
+      },
+      "interpretation": "Exploratory grouped capacity prediction in unresolved target units, not SOH or original benchmark validation; fold cells share batches with training cells, limiting external generalization."
+    }
+  },
+  "remaining_optional_research": [
+    "Obtain the versioned author feature generator or formula specification for the 67 workbook columns.",
+    "Obtain an authoritative workbook-row-to-cycle crosswalk or sufficient source identifiers and documented preprocessing lineage.",
+    "After both are available, independently reproduce CC_Q on an identity-mapped cycle and add a source-backed regression test."
+  ],
+  "closure": {
+    "final_member4_status": "IMPLEMENTATION COMPLETE; SCIENTIFICALLY PARTIALLY VALIDATED; ORIGINAL BENCHMARK VALIDATION BLOCKED",
+    "handoff_status": "READY WITH DOCUMENTED LIMITATIONS",
+    "coding_task_genuinely_remaining": false,
+    "scientific_limitations_remaining": [
+      "Original benchmark formulas: 0/67 verified; four entropy definitions remain unknown.",
+      "Authoritative workbook-row-to-raw-cycle mapping remains unresolved.",
+      "Capacity prediction target units and per-cell SOH normalization lineage remain unresolved.",
+      "Prepared reference data are local/ignored and are required for data-backed routes in a clean checkout."
+    ],
+    "preserved_dirty_worktree": true,
+    "commit_or_push_performed": false
+  },
+  "files_created_or_updated": [
+    "scripts/member4_xjtu/analysis_data.py",
+    "scripts/member4_xjtu/aging_analysis.py",
+    "scripts/member4_xjtu/aging_prediction.py",
+    "tests/member4_xjtu/test_aging_prediction.py",
+    "reports/member4/feature_aging_analysis.md",
+    "reports/member4/feature_aging_summary.json",
+    "reports/member4/aging_figures/Charge_C_mean.png",
+    "reports/member4/aging_figures/Charge_energy.png",
+    "reports/member4/aging_figures/Charge_C_skewness.png",
+    "reports/member4/aging_prediction_results.csv",
+    "reports/member4/aging_prediction_summary.json",
+    "reports/member4/leakage_safe_prediction.md",
+    "reports/member4/original_formula_recovery_audit.md",
+    "reports/member4/original_formula_recovery.csv",
+    "reports/member4/original_formula_recovery_summary.json",
+    "scripts/member4_xjtu/formula_verification_phase2.py",
+    "reports/member4/formula_verification_phase2.md",
+    "reports/member4/formula_verification_phase2.csv",
+    "reports/member4/formula_verification_phase2_summary.json",
+    "frontend/browser_e2e.mjs",
+    "reports/browser_testing_report.md",
+    "reports/browser_testing_summary.json",
+    "reports/browser_screenshots/",
+    "reports/final_integration_audit.md",
+    "reports/final_integration_summary.json",
+    "reports/member4/final_member4_completion_report.md",
+    "reports/member4/final_member4_completion_summary.json",
+    "tests/member4_xjtu/test_original_formula_recovery_audit.py",
+    "tests/member4_xjtu/test_formula_verification_phase2.py"
+  ],
+  "existing_feature_formulas_modified": false,
+  "unrelated_teammate_files_modified": false,
+  "commit_or_push_performed": false
+}

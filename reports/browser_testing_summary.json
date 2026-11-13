@@ -1,0 +1,65 @@
+{
+  "project": "VoltTwin",
+  "date": "2026-11-10",
+  "browser": {
+    "name": "Google Chrome",
+    "executable": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    "framework": "Playwright",
+    "framework_version": "1.65.0",
+    "mode": "headless",
+    "viewport": "1440x1100"
+  },
+  "commands": {
+    "backend": ".venv\\Scripts\\python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000",
+    "frontend": "npm.cmd run dev -- --host 127.0.0.1 --port 5173",
+    "browser_test": "node frontend/browser_e2e.mjs"
+  },
+  "result": {
+    "passed": 26,
+    "failed": 0,
+    "page_errors": 0,
+    "critical_http_5xx": 0,
+    "unexpected_application_console_errors": 0,
+    "tests_executed": [
+      "homepage loads",
+      "Formula Explorer anchor navigation",
+      "all 67 features accessible",
+      "CC, dV, CV, dI, and Charge category filters",
+      "CC_energy search",
+      "feature details",
+      "candidate status and original-formula warning",
+      "original-formula-unknown entropy status",
+      "valid candidate calculation",
+      "raw plot rendering",
+      "batch/profile selection",
+      "browser-observed invalid-cycle 404",
+      "invalid-calculation UI error",
+      "brand navigation back to homepage"
+    ]
+  },
+  "screenshots": [
+    "reports/browser_screenshots/01_homepage.png",
+    "reports/browser_screenshots/02_formula_explorer_catalog.png",
+    "reports/browser_screenshots/03_feature_search_and_details.png",
+    "reports/browser_screenshots/04_valid_calculation_and_raw_plot.png",
+    "reports/browser_screenshots/05_batch_profile_selection.png",
+    "reports/browser_screenshots/06_invalid_calculation_error.png"
+  ],
+  "issues_discovered": [],
+  "test_assumption_corrections": [
+    "Native option elements were checked for attachment/count rather than visibility.",
+    "The UI status label is sentence-case 'Original formula unknown'."
+  ],
+  "known_environment_observations": [
+    "React StrictMode aborts superseded development catalog requests; replacement requests succeed.",
+    "External Google Fonts request is blocked by the restricted test environment; fallback fonts render.",
+    "Intentional invalid-calculation checks produce expected HTTP 404 responses."
+  ],
+  "product_code_changed_for_browser_defect": false,
+  "scientific_formulas_modified": false,
+  "browser_limitations": [
+    "Single-page dashboard has anchored sections rather than separate routes.",
+    "Out-of-range cycle is disabled by the UI; backend 404 was observed with browser fetch and UI error rendering with an equivalent intercepted response.",
+    "Clean checkouts require the ignored local XJTU reference data for data-backed flows."
+  ]
+}

@@ -1,0 +1,16 @@
+pdf_page,page_heading_or_content,observed_evidence,relevance_to_67_features
+1,Title page,Article title/authors and submission information. No 67-feature list or equations.,Context only
+2,Figure S.1,Laboratory cycling platform and cell parameters; room-temperature testing noted. No feature extraction equations.,Experimental setup
+3,"Supplementary Note 1, batches 1-5 and start of batch 6",Describes batch protocols; batches 1-5 charged in CC-CV mode with differing rates/discharge conditions. Not feature-window segmentation.,Protocol context
+4,Supplementary Note 1.6 continuation,GEO/satellite discharge-duration and DOD details; no feature equations.,Protocol context
+5,Figure S.4,Whole-life voltage/current/temperature/capacity curves for first battery in each XJTU batch. Caption says batch 3-6 capacity measured every few cycles and interpolated; plotted horizontal axis includes sample points/cycle.,Signal and capacity context
+6,Supplementary Note 2: Feature extraction,"XJTU/TJU voltage range [4.0,4.2] V; generic mean, sample SD, kurtosis, skewness, duration, integrated charge, endpoint voltage slope, curve entropy; current interval printed as [0.5,0.1] A. Equations (1)-(8).",Direct evidence for this paper method; not the 67-column workbook
+7,Table S.2 and code link,XJTU batch battery counts; states battery ID is MATLAB-file order for MIT data; links to PINN4SOH code. Does not establish XJTU workbook row-to-cycle mapping.,Related source and scope limitation
+8,Table S.3,"XJTU PINN/MLP/CNN estimation errors, averaged over 10 experiments.","Model results, not feature formulas"
+9,Table S.4,TJU model estimation errors.,"Model results, not feature formulas"
+10,Table S.5,HUST model estimation errors.,"Model results, not feature formulas"
+11,Table S.6,MIT model estimation errors.,"Model results, not feature formulas"
+12,Table S.7,XJTU small-sample experiment results.,"Model results, not feature formulas"
+13,Figure S.5,XJTU RMSE distributions for three models by batch.,"Model results, not feature formulas"
+14,Supplementary Note 3,PINN/MLP/CNN architecture and implementation settings.,"Model implementation, not feature extraction equations"
+15,References,"References for satellite battery capacity estimation, MIT cycle life dataset, and ResNet.",Bibliography

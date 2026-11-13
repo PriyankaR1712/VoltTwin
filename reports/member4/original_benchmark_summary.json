@@ -1,0 +1,46 @@
+{
+  "phase": "original_sohbenchmark_feature_reproduction",
+  "overall_status": "BLOCKED",
+  "original_feature_generation_source_found": false,
+  "authoritative_cycle_mapping_found": false,
+  "cc_q_independently_reproduced": false,
+  "verified_workbook_row_cycle_pairs": 0,
+  "dataset_counts": {
+    "profiles": 55,
+    "prepared_mat_cycles": 27535,
+    "workbook_rows": 26937
+  },
+  "cycle_identity_diagnostic_counts": {
+    "positional_unverified_candidates": 19191,
+    "unique_monotone_capacity_unverified_candidates": 7129,
+    "all_helper_matched_unverified_candidates": 26320,
+    "ambiguous_workbook_rows": 489,
+    "unmatched_workbook_rows_total": 617,
+    "unmatched_workbook_rows_without_capacity_candidate": 128,
+    "raw_cycles_unused_by_capacity_diagnostic": 1215
+  },
+  "cc_q": {
+    "original_formula_status": "UNVERIFIED",
+    "candidate_reproduction_status": "NOT_PERFORMED",
+    "absolute_error": null,
+    "relative_error": null,
+    "reason": "No source-backed original CC_Q definition or authoritative workbook-row-to-cycle identity is available."
+  },
+  "interpretation": {
+    "candidate_pairs_are_authoritative": false,
+    "capacity_matching_proves_identity": false,
+    "equal_counts_prove_positional_identity": false,
+    "scope": "Bounded to inspected local files, repository history, and recorded source searches; inaccessible or private sources may exist."
+  },
+  "generated_files": [
+    "reports/member4/original_benchmark_reproduction.md",
+    "reports/member4/cycle_identity_audit.csv",
+    "reports/member4/original_benchmark_summary.json"
+  ],
+  "not_created": [
+    {
+      "path": "reports/member4/feature_reproduction_results.csv",
+      "reason": "No source-backed reproduction was performed."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+column_order,author_repository_column,role,exact_67_workbook_feature_name_match,source_file
+1,voltage mean,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+2,voltage std,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+3,voltage kurtosis,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+4,voltage skewness,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+5,CC Q,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+6,CC charge time,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+7,voltage slope,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+8,voltage entropy,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+9,current mean,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+10,current std,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+11,current kurtosis,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+12,current skewness,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+13,CV Q,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+14,CV charge time,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+15,current slope,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+16,current entropy,paper-specific input feature,No,data/XJTU data/RW_battery-7.csv
+17,capacity,label/capacity,No,data/XJTU data/RW_battery-7.csv

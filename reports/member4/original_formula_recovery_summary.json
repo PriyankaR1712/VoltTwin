@@ -1,0 +1,133 @@
+{
+  "task": "Original XJTU SOHbenchmark formula recovery",
+  "audit_date": "2026-11-10",
+  "overall_status": "BLOCKED_NO_ORIGINAL_FORMULAS_RECOVERED",
+  "feature_count": 67,
+  "original_formulas_recovered": 0,
+  "status_counts": {
+    "SOURCE_VERIFIED": 0,
+    "PARTIALLY_VERIFIED": 0,
+    "CANDIDATE_UNVERIFIED": 63,
+    "ORIGINAL_FORMULA_UNKNOWN": 4
+  },
+  "formula_explorer": {
+    "updated": false,
+    "reason": "No authoritative original feature formulas were recovered.",
+    "candidate_calculations_preserved": true,
+    "existing_provenance_warning_preserved": true,
+    "feature_count_preserved": 67
+  },
+  "workbook_inspection": {
+    "workbooks": 6,
+    "feature_columns_per_workbook": 67,
+    "label_column": "label",
+    "sheet_counts_by_batch": {
+      "1": 8,
+      "2": 15,
+      "3": 8,
+      "4": 8,
+      "5": 8,
+      "6": 8
+    },
+    "all_sheets_have_identical_headers": true,
+    "headers_match_volttwin_registry": true,
+    "spreadsheet_formula_cells": 0,
+    "cell_comments": 0,
+    "defined_names": 0
+  },
+  "source_investigation": [
+    {
+      "id": "S1",
+      "name": "SOHbenchmark author repository",
+      "url": "https://github.com/wang-fujin/SOHbenchmark/tree/62230dd9a857f5c05ac641227b52ec2ffbeb9e15",
+      "local_locations": [
+        "reference/SOHbenchmark/README.md",
+        "reference/SOHbenchmark/dataloader/XJTU_loader.py"
+      ],
+      "finding": "The benchmark loader reads precomputed Excel feature sheets and label; inspected repository tree contains no original 67-feature generator."
+    },
+    {
+      "id": "S2",
+      "name": "SOHbenchmark feature workbook upload commit",
+      "url": "https://github.com/wang-fujin/SOHbenchmark/commit/611bb5948fe4a7914486ded7be238db24faabb23",
+      "finding": "Adds six precomputed XJTU feature workbooks; no feature-generation code or equations in the commit."
+    },
+    {
+      "id": "S3",
+      "name": "Author XJTU preprocessing library",
+      "url": "https://github.com/wang-fujin/Battery-dataset-preprocessing-code-library/blob/main/XJTUBatteryClass.py",
+      "finding": "Documents phase selection, CC/CV helpers and dQ/dV methods, but no mapping from those helpers to the 67 workbook features."
+    },
+    {
+      "id": "S4",
+      "name": "Official XJTU dataset documentation",
+      "url": "https://wang-fujin.github.io/",
+      "dataset_record": "https://zenodo.org/records/10963339",
+      "finding": "Documents dataset and protocols, not the SOHbenchmark workbook feature equations."
+    },
+    {
+      "id": "S5",
+      "name": "Wang et al. Nature Communications 2024 paper",
+      "url": "https://doi.org/10.1038/s41467-024-48779-z",
+      "finding": "Describes its own feature method; no equivalence to the SOHbenchmark 67-column schema found."
+    },
+    {
+      "id": "S6",
+      "name": "SOHbenchmark paper and supplied appendix",
+      "url": "https://doi.org/10.1016/j.est.2023.109884",
+      "local_location": "reference/SOHbenchmark/SOHbenchmark - Appendix.pdf",
+      "finding": "Available appendix material contains benchmark result tables; exact 67-column formulas were not found. Full main-article text was not accessible through the available endpoint."
+    },
+    {
+      "id": "S7",
+      "name": "VoltTwin candidate feature implementation",
+      "local_locations": [
+        "scripts/member4_xjtu/feature_definitions.py",
+        "scripts/member4_xjtu/extractor.py",
+        "backend/formula_explorer_api.py"
+      ],
+      "finding": "Supports candidate implementation documentation only, not original formula provenance."
+    },
+    {
+      "id": "S8",
+      "name": "Prior source inventory and exact-name searches",
+      "local_locations": [
+        "reports/member4_original_formula_recovery/source_evidence.csv",
+        "reports/member4_original_formula_recovery/search_log.csv"
+      ],
+      "finding": "No original generator recovered; code-search and literature indexes are incomplete discovery sources."
+    }
+  ],
+  "formula_group_counts": {
+    "CC": 13,
+    "dV": 13,
+    "CV": 13,
+    "dI": 13,
+    "Charge": 15
+  },
+  "tests": {
+    "provenance_status_coverage": "Existing Formula Explorer API tests assert 67 accessible feature names, source_verified_count=0, 63 candidate_unverified statuses, and 4 original_formula_unknown statuses.",
+    "formula_recovery_audit_test": {
+      "command": ".\\.venv\\Scripts\\python.exe -m pytest -q tests\\member4_xjtu\\test_original_formula_recovery_audit.py",
+      "result": "2 passed"
+    },
+    "formula_explorer_api_test": {
+      "command": ".\\.venv\\Scripts\\python.exe -m pytest -q tests\\test_formula_explorer_api.py",
+      "result": "13 passed"
+    },
+    "full_test_suite": {
+      "command": ".\\.venv\\Scripts\\python.exe -m pytest -q",
+      "result": "130 passed (prior audit run); latest closure run: 132 passed"
+    },
+    "frontend_build": "Passed; Vite reported a non-blocking chunk-size warning.",
+    "frontend_lint": "Passed.",
+    "git_diff_check": "Passed.",
+    "candidate_formulas_modified": false
+  },
+  "blockers": [
+    "A versioned author feature-generation script/notebook or a complete original formula specification for the 67 workbook columns is unavailable.",
+    "Exact signal windows, units, interpolation/sampling, integration, and statistical conventions are not tied to workbook columns.",
+    "An authoritative workbook-row-to-cycle crosswalk and preprocessing lineage are unavailable for independent value reproduction."
+  ],
+  "scope_note": "No formula was marked source verified based on names, numerical agreement, related selectors, or mathematical similarity. Inaccessible or private source material may exist."
+}

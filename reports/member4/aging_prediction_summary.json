@@ -1,0 +1,163 @@
+{
+  "task": "Grouped cross-validated prediction of stored capacity_label; this is capacity prediction, not SOH prediction.",
+  "data": {
+    "profiles": 55,
+    "cycles_with_finite_target": 27535,
+    "cycles_excluded_for_missing_or_nonfinite_target": 0,
+    "target_column": "capacity_label",
+    "target_units": "Unresolved from available local documentation.",
+    "initial_capacity_verified": false,
+    "soh_prediction_claimed": false,
+    "prepared_cycles": 27535,
+    "workbook_rows": 26937
+  },
+  "predictors": {
+    "count": 57,
+    "features": [
+      "CC_t_mean",
+      "CC_V_mean",
+      "CC_T_mean",
+      "CC_V_std",
+      "CC_T_std",
+      "CC_V_skewness",
+      "CC_T_skewness",
+      "CC_V_kurtosis",
+      "CC_T_kurtosis",
+      "CC_CCCT",
+      "CC_entropy",
+      "dV_t_mean",
+      "dV_V_mean",
+      "dV_T_mean",
+      "dV_V_std",
+      "dV_T_std",
+      "dV_V_skewness",
+      "dV_T_skewness",
+      "dV_V_kurtosis",
+      "dV_T_kurtosis",
+      "dV_dV_devide_dt",
+      "dV_entropy",
+      "CV_t_mean",
+      "CV_C_mean",
+      "CV_T_mean",
+      "CV_C_std",
+      "CV_T_std",
+      "CV_C_skewness",
+      "CV_T_skewness",
+      "CV_C_kurtosis",
+      "CV_T_kurtosis",
+      "CV_CVCT",
+      "CV_entropy",
+      "dI_t_mean",
+      "dI_C_mean",
+      "dI_T_mean",
+      "dI_C_std",
+      "dI_T_std",
+      "dI_C_skewness",
+      "dI_T_skewness",
+      "dI_C_kurtosis",
+      "dI_T_kurtosis",
+      "dI_dI_devide_dt",
+      "dI_entropy",
+      "Charge_t_mean",
+      "Charge_V_mean",
+      "Charge_C_mean",
+      "Charge_T_mean",
+      "Charge_C_std",
+      "Charge_V_std",
+      "Charge_T_std",
+      "Charge_C_skewness",
+      "Charge_V_skewness",
+      "Charge_T_skewness",
+      "Charge_C_kurtosis",
+      "Charge_V_kurtosis",
+      "Charge_T_kurtosis"
+    ],
+    "excluded_candidate_features": [
+      "CC_energy",
+      "CC_Q",
+      "dV_energy",
+      "dV_Q",
+      "CV_energy",
+      "CV_Q",
+      "dI_energy",
+      "dI_Q",
+      "Charge_energy",
+      "Charge_Q"
+    ],
+    "leakage_rules": [
+      "Capacity labels, SOH, cycle/profile/cell identifiers, batch, and metadata are not predictors.",
+      "Candidate charge-integral features ending in _Q or _energy are excluded because they are capacity/energy-adjacent.",
+      "Only registered candidate features are considered.",
+      "The remaining charge statistics and phase features are assumed available after observing the corresponding charge trace; no earlier prediction horizon is claimed."
+    ],
+    "candidate_formulas_source_verified": false
+  },
+  "evaluation": {
+    "method": "Five deterministic group-balanced folds by composite batch/profile cell_id; each profile is held out exactly once.",
+    "models": [
+      "training_median_baseline",
+      "ridge"
+    ],
+    "preprocessing": "For each fold, candidate-feature medians, means, and scales are calculated on training rows only. Ridge uses an unpenalized intercept and alpha=1.0, solved by the closed-form regularized least-squares equation.",
+    "n_splits": 5,
+    "folds": [
+      {
+        "fold": 1,
+        "training_profiles": 44,
+        "test_profiles": 11,
+        "training_cycles": 22022,
+        "test_cycles": 5513
+      },
+      {
+        "fold": 2,
+        "training_profiles": 44,
+        "test_profiles": 11,
+        "training_cycles": 22051,
+        "test_cycles": 5484
+      },
+      {
+        "fold": 3,
+        "training_profiles": 44,
+        "test_profiles": 11,
+        "training_cycles": 22007,
+        "test_cycles": 5528
+      },
+      {
+        "fold": 4,
+        "training_profiles": 44,
+        "test_profiles": 11,
+        "training_cycles": 22036,
+        "test_cycles": 5499
+      },
+      {
+        "fold": 5,
+        "training_profiles": 44,
+        "test_profiles": 11,
+        "training_cycles": 22024,
+        "test_cycles": 5511
+      }
+    ],
+    "aggregate_metrics_are": "Pooled out-of-fold predictions; each profile is held out as a group exactly once.",
+    "generalization_limit": "Only 55 independent profiles are available. Fold and per-profile results are descriptive and do not establish robust generalization across laboratories, protocols, or chemistries."
+  },
+  "metrics": {
+    "training_median_baseline": {
+      "mae": 0.07330970752766058,
+      "rmse": 0.09895194276388933,
+      "r2": -0.04560227501898284
+    },
+    "ridge": {
+      "mae": 0.029054973398632656,
+      "rmse": 0.039880538118475105,
+      "r2": 0.8301600362938655
+    }
+  },
+  "scientific_limitations": [
+    "The local capacity target unit and normalization lineage are not established.",
+    "No per-cell initial-capacity reference was found, so no SOH target is calculated.",
+    "Original benchmark formulas and authoritative workbook-row/cycle mapping remain unavailable.",
+    "Candidate features remain source-unverified; good predictive metrics would not validate their original formulas.",
+    "Charge integral features are omitted as leakage-adjacent variables; other charge-derived features can still encode protocol or capacity-related information.",
+    "A grouped split prevents within-cell cycle leakage, but the available profile count and protocol/cohort confounding limit generalization claims."
+  ]
+}
